@@ -190,17 +190,17 @@ public readonly CfKey KeyRotateUp = new CfKey(KeyCode.UpArrow);
 public readonly CfKey KeyRotateDown = new CfKey(KeyCode.DownArrow);
 
 // 平滑过渡
-[Config("SmoothTransition", "应用平滑过渡",
+[Config("SmoothTransition", "启用平滑过渡",
         "摄像机移动、旋转或缩放时，过渡可以是平滑的或瞬时的。\n" +
-        "启用此选项可以使摄像机看起来有延迟。")]
+        "启用此选项会使摄像机看起来有延迟。")]
 public readonly CfFlag SmoothTransition = new CfFlag(true);
 
 [Config("TransitionRate", "平滑过渡速率")]
 public readonly CfFloat TransRate = new CfFloat(.5f, min: .1f, max: .9f);
 
 [Config("GiveUpTransitionDistance", "平滑过渡的最大距离",
-        "当摄像机目标位置太远时，平滑过渡需要太长时间。\n" +
-        "此数字设置放弃过渡的距离。")]
+        "摄像机目标位置越远，平滑过渡需要的时间越长。\n" +
+        "此数字设置关闭平滑过渡的距离。")]
 public readonly CfFloat GiveUpTransDistance = new CfFloat(500f, min: 100f, max: 2000f);
 
 [Config("DeltaPosMin", "平滑过渡的最小移动")]
