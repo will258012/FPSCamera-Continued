@@ -13,7 +13,7 @@ namespace FPSCamera.UI
         public void OnCamActivate()
         {
             _mainPanel.Visible = false;
-            ShowMessage($"Press [{Config.G.KeyCamToggle}] to exit");
+            ShowMessage($"按下 [{Config.G.KeyCamToggle}] 以退出");
         }
 
         public void ShowMessage(string msg)
@@ -65,7 +65,7 @@ namespace FPSCamera.UI
 
             _msgLabel = _panelBtn.Add<Label>(new Properties { name = "ToggleMsgLabel", });
             _msgLabel.position = _MsgLabelPosition;
-            ShowMessage($"Press [{Config.G.KeyCamToggle}] for Free-Camera");
+         ShowMessage($"按下 [{Config.G.KeyCamToggle}] 切换至自由摄像机模式");
 
             _mainPanel = Element.Root.Add<SpritePanel>(new LayoutProperties
             {
@@ -128,7 +128,8 @@ namespace FPSCamera.UI
 
                 var walkThruBtn = _mainPanel.Add<TextButton>(new Properties
                 {
-                    name = "WalkThruBtn", text = "Start Walk-Through",
+                    name = "WalkThruBtn", text = "进入漫游模式",
+
                     x = (_mainPanel.width - _walkThruBtnSize.width) / 2f,
                     y = _mainPanel.height - Style.basic.padding - _walkThruBtnSize.height,
                     size = _walkThruBtnSize

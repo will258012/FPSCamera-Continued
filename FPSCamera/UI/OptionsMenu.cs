@@ -12,7 +12,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "General", text = "General Options"
+                    name = "General", text = "通用选项"
                 });
                 var props = _DefaultProps(group);
                 props.x = CStyle.Current.padding;
@@ -42,14 +42,14 @@ namespace FPSCamera.UI
 
                 var btnProps = new Properties
                 {
-                    name = "ReloadConfig", text = "Reload Configurations",
+                      name = "ReloadConfig", text = "重新加载配置",
                     x = group.width - _btnSize.width - Style.basic.padding * 2f,
                     y = 10f, size = _btnSize
                 };
                 var btn = group.Add<TextButton>(btnProps);
                 btn.SetTriggerAction(() => Mod.I?.LoadConfig());
 
-                btnProps.name = "ResetConfig"; btnProps.text = "Reset Configurations";
+                btnProps.name = "ResetConfig"; btnProps.text = "重置配置";
                 btnProps.y += _btnSize.height;
                 btn = group.Add<TextButton>(btnProps);
                 btn.SetTriggerAction(() => Mod.I?.ResetConfig());
@@ -57,7 +57,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "CamControl", text = "Camera Controls",
+                     name = "CamControl", text = "摄像机控制",
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
@@ -82,7 +82,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "FreeCam", text = "Free-Camera Mode Options",
+                   name = "FreeCam", text = "自由模式设置",
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
@@ -98,7 +98,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "FollowWalkThru", text = "Follow Mode Options",
+                    name = "FollowWalkThru", text = "跟随模式设置",
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
@@ -115,7 +115,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "WalkThru", text = "Walk-Through Mode Options",
+                    name = "WalkThru", text = "漫游模式设置",
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
@@ -135,16 +135,16 @@ namespace FPSCamera.UI
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectCargo)));
             }
             {
-                var group = settingPanel.Add<Group>(new LayoutProperties
+            var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "KeyMap", text = "Key Mappings",
+                    name = "KeyMap", text = "按键映射",
                     autoLayout = true, layoutGap = 0
                 });
                 group.Add<Label>(new Properties
                 {
                     name = "KeyMappingComment",
-                    text = "*Mouse Primary Click: change the key / cancel\n" +
-                           "*Mouse Secondary Click: remove"
+                    text = "*鼠标单击：更改按键/取消\n" +
+                        "*鼠标双击：移除"
                 });
                 var props = _DefaultProps(group);
 
@@ -172,7 +172,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "SmoothTrans", text = "Smooth Transition Options",
+                    name = "SmoothTrans", text = "平滑过渡设置",
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);

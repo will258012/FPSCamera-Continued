@@ -61,8 +61,8 @@ namespace FPSCamera.UI
         {
             _leftInfos.Clear();
             if (cam is Cam.FollowCam followCam) {
-                _leftInfos["Name"] = Obj.Of(followCam.TargetID).Name;
-                _leftInfos["Status"] = followCam.GetTargetStatus();
+                _leftInfos["名称"] = Obj.Of(followCam.TargetID).Name;
+                _leftInfos["状态"] = followCam.GetTargetStatus();
             }
             _leftInfos.AddRange(cam.GetGeoInfos());
         }

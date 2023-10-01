@@ -16,190 +16,231 @@ namespace FPSCamera.Configuration
 
         public static Config Load(string path = defaultPath) => Load<Config>(path);
 
-        /*----------- general config ----------------------------------------*/
+    /*----------- 通用配置 ----------------------------------------*/
 
-        [Config("HideGameUI", "Hide Game's UI")]
-        public readonly CfFlag HideGameUI = new CfFlag(false);
-        [Config("SetBackCamera", "Set camera back after exiting",
-                "When exiting FPS Cam, set the camera position \n" +
-                "back to where it's left beforehand")]
-        public readonly CfFlag SetBackCamera = new CfFlag(true);
-        [Config("UseMetricUnit", "Use metric units")]
-        public readonly CfFlag UseMetricUnit = new CfFlag(true);
-        [Config("ShowInfoPanel", "Show Info panel")]
-        public readonly CfFlag ShowInfoPanel = new CfFlag(true);
-        [Config("InfoPanelHeightScale", "Scaling factor of Info panel's height")]
-        public readonly CfFloat InfoPanelHeightScale = new CfFloat(1f, min: .5f, max: 2f);
-        [Config("MaxPitchDeg", "Max vertical viewing angle",
-                "The maximum degree to rotate camera up & down.")]
-        public readonly CfFloat MaxPitchDeg = new CfFloat(70f, min: 0f, max: 90f);
+[Config("HideGameUI", "隐藏游戏UI")]
+public readonly CfFlag HideGameUI = new CfFlag(false);
 
-        // camera control
-        [Config("MovementSpeed", "Movement/Offset speed")]
-        public readonly CfFloat MovementSpeed = new CfFloat(30f, min: 0f, max: 60f);
-        [Config("SpeedUpFactor", "Speed-up factor for movement/offset")]
-        public readonly CfFloat SpeedUpFactor = new CfFloat(4f, min: 1.25f, max: 10f);
+[Config("SetBackCamera", "退出后设置摄像机位置",
+        "退出FPS模式后，将摄像机位置设置回之前的位置")]
+public readonly CfFlag SetBackCamera = new CfFlag(true);
 
-        [Config("InvertRotateHorizontal", "Invert horizontal rotation")]
-        public readonly CfFlag InvertRotateHorizontal = new CfFlag(false);
-        [Config("InvertRotateVertical", "Invert vertical rotation")]
-        public readonly CfFlag InvertRotateVertical = new CfFlag(false);
-        [Config("RotateSensitivity", "Camera rotation sensitivity")]
-        public readonly CfFloat RotateSensitivity = new CfFloat(5f, min: .25f, max: 10f);
-        [Config("RotateKeyFactor", "Rotation speed using keys")]
-        public readonly CfFloat RotateKeyFactor = new CfFloat(8f, min: .5f, max: 32f);
+[Config("UseMetricUnit", "使用公制单位")]
+public readonly CfFlag UseMetricUnit = new CfFlag(true);
 
-        [Config("EnableDOF", "Apply depth-of-field effect")]
-        public readonly CfFlag EnableDof = new CfFlag(false);
-        [Config("FieldOfView", "Camera Field of View", "Viewing range of the camera (degrees)")]
-        public readonly CfFloat CamFieldOfView = new CfFloat(45f, min: 10f, max: 75f);
+[Config("ShowInfoPanel", "显示信息面板")]
+public readonly CfFlag ShowInfoPanel = new CfFlag(true);
 
-        // free cam config
-        [Config("ShowCursor4Free", "Show cursor in Free-Camera mode")]
-        public readonly CfFlag ShowCursor4Free = new CfFlag(false);
+[Config("InfoPanelHeightScale", "信息面板高度缩放因子")]
+public readonly CfFloat InfoPanelHeightScale = new CfFloat(1f, min: .5f, max: 2f);
 
-        public enum GroundClipping { None, AboveGround, SnapToGround, AboveRoad, SnapToRoad }
-        [Config("GroundClipping", "Ground clipping option",
-                "For Free-Camera Mode:\n-[None] free movement\n" +
-                "-[AboveGround] camera always above ground\n" +
-                "-[SnapToGround] camera sticks to ground\n" +
-                "-[AboveRoad] camera always above the closest road\n" +
-                "-[SnapToRoad] camera sticks to the closest road or ground")]
-        public readonly ConfigData<GroundClipping> GroundClippingOption
-                            = new ConfigData<GroundClipping>(GroundClipping.AboveGround);
-        [Config("GroundLevelOffset", "Ground level offset",
-                "Vertical offset for ground level for ground clipping option")]
-        public readonly CfFloat GroundLevelOffset = new CfFloat(0f, min: -2f, max: 10f);
-        [Config("RoadLevelOffset", "Road level offset",
-                "Vertical offset for road level for ground clipping option")]
-        public readonly CfFloat RoadLevelOffset = new CfFloat(0f, min: -2f, max: 10f);
+[Config("MaxPitchDeg", "最大垂直视角",
+        "摄像机上下旋转的最大角度。")]
+public readonly CfFloat MaxPitchDeg = new CfFloat(70f, min: 0f, max: 90f);
 
-        // follow config
-        [Config("ShowCursor4Follow", "Show cursor in Follow/Walk-Through mode")]
-        public readonly CfFlag ShowCursor4Follow = new CfFlag(false);
-        [Config("StickToFrontVehicle", "Always follow the front vehicle")]
-        public readonly CfFlag StickToFrontVehicle = new CfFlag(true);
-        [Config("LookAhead", "Look ahead",
-                "Camera looks toward the position the target is going to be.")]
-        public readonly CfFlag LookAhead = new CfFlag(false);
-        [Config("InstantMoveMax", "Min distance for smooth transition",
-                "In Follow Mode, camera needs to move instantly with\n" +
-                "the target even when smooth transition is enabled.\n" +
-                "This sets the minimum distance to start applying smooth transition.")]
-        public readonly CfFloat InstantMoveMax = new CfFloat(15f, min: 5f, max: 50f);
-        [Config("FollowCamOffset", "Follow mode universal camera offset")]
-        public readonly CfOffset FollowCamOffset = new CfOffset(
-            new CfFloat(0f, min: -20f, max: 20f),
-            new CfFloat(0f, min: -20f, max: 20f),
-            new CfFloat(0f, min: -20f, max: 20f)
-        );
+// 摄像机控制
+[Config("MovementSpeed", "移动/偏移速度")]
+public readonly CfFloat MovementSpeed = new CfFloat(30f, min: 0f, max: 60f);
 
+[Config("SpeedUpFactor", "移动/偏移的加速因子")]
+public readonly CfFloat SpeedUpFactor = new CfFloat(4f, min: 1.25f, max: 10f);
 
-        // walkThru config
-        [Config("Period4Walk", "Period (seconds) for each random target")]
-        public readonly CfFloat Period4Walk = new CfFloat(20f, min: 5f, max: 300f);
-        [Config("ManualSwitch4Walk", "Manual target switch (Secondary Click)",
-                "Use secondary mouse click to\nswitch following targets instead.")]
-        public readonly CfFlag ManualSwitch4Walk = new CfFlag(false);
+[Config("InvertRotateHorizontal", "反转水平旋转")]
+public readonly CfFlag InvertRotateHorizontal = new CfFlag(false);
 
-        [Config("SelectPedestrian", "Walking pedestrians")]
-        public readonly CfFlag SelectPedestrian = new CfFlag(true);
-        [Config("SelectPassenger", "Pedestrians on public transits")]
-        public readonly CfFlag SelectPassenger = new CfFlag(true);
-        [Config("SelectWaiting", "Pedestrians waiting for public transits")]
-        public readonly CfFlag SelectWaiting = new CfFlag(true);
-        [Config("SelectDriving", "Driving/Riding citizens")]
-        public readonly CfFlag SelectDriving = new CfFlag(true);
-        [Config("SelectPublicTransit", "Public transit vehicles")]
-        public readonly CfFlag SelectPublicTransit = new CfFlag(true);
-        [Config("SelectService", "Service vehicles")]
-        public readonly CfFlag SelectService = new CfFlag(true);
-        [Config("SelectCargo", "Cargo vehicles")]
-        public readonly CfFlag SelectCargo = new CfFlag(true);
+[Config("InvertRotateVertical", "反转垂直旋转")]
+public readonly CfFlag InvertRotateVertical = new CfFlag(false);
 
-        // keys
-        [Config("KeyCamToggle", "FPS Camera toggle")]
-        public readonly CfKey KeyCamToggle = new CfKey(KeyCode.BackQuote);
-        [Config("KeySpeedUp", "Speed up movement/offset")]
-        public readonly CfKey KeySpeedUp = new CfKey(KeyCode.CapsLock);
-        [Config("KeyCamReset", "Reset Camera offset & rotation")]
-        public readonly CfKey KeyCamReset = new CfKey(KeyCode.Backspace);
-        [Config("KeyCursorToggle", "Cursor visibility toggle")]
-        public readonly CfKey KeyCursorToggle = new CfKey(KeyCode.LeftControl);
-        [Config("KeyAutoMove", "Auto moving toggle in Free-Camera mode",
-                "Camera moves forward automatically when it's toggled on.")]
-        public readonly CfKey KeyAutoMove = new CfKey(KeyCode.E);
-        [Config("KeySaveOffset", "Save the current camera setting as default",
-                "In Follow/Walk-Through mode, save the \n" +
-                "current camera setting for the followed target")]
-        public readonly CfKey KeySaveOffset = new CfKey(KeyCode.Backslash);
+[Config("RotateSensitivity", "摄像机旋转灵敏度")]
+public readonly CfFloat RotateSensitivity = new CfFloat(5f, min: .25f, max: 10f);
 
-        [Config("KeyMoveForward", "Move/Offset forward")]
-        public readonly CfKey KeyMoveForward = new CfKey(KeyCode.W);
-        [Config("KeyMoveBackward", "Move/Offset backward")]
-        public readonly CfKey KeyMoveBackward = new CfKey(KeyCode.S);
-        [Config("KeyMoveLeft", "Move/Offset left")]
-        public readonly CfKey KeyMoveLeft = new CfKey(KeyCode.A);
-        [Config("KeyMoveRight", "Move/Offset right")]
-        public readonly CfKey KeyMoveRight = new CfKey(KeyCode.D);
-        [Config("KeyMoveUp", "Move/Offset up")]
-        public readonly CfKey KeyMoveUp = new CfKey(KeyCode.PageUp);
-        [Config("KeyMoveDown", "Move/Offset down")]
-        public readonly CfKey KeyMoveDown = new CfKey(KeyCode.PageDown);
+[Config("RotateKeyFactor", "使用键盘旋转速度")]
+public readonly CfFloat RotateKeyFactor = new CfFloat(8f, min: .5f, max: 32f);
 
-        [Config("KeyRotateLeft", "Rotate/Look left")]
-        public readonly CfKey KeyRotateLeft = new CfKey(KeyCode.LeftArrow);
-        [Config("KeyRotateRight", "Rotate/Look right")]
-        public readonly CfKey KeyRotateRight = new CfKey(KeyCode.RightArrow);
-        [Config("KeyRotateUp", "Rotate/Look up")]
-        public readonly CfKey KeyRotateUp = new CfKey(KeyCode.UpArrow);
-        [Config("KeyRotateDown", "Rotate/Look down")]
-        public readonly CfKey KeyRotateDown = new CfKey(KeyCode.DownArrow);
+[Config("EnableDOF", "应用景深效果")]
+public readonly CfFlag EnableDof = new CfFlag(false);
 
-        // smooth transition
-        [Config("SmoothTransition", "Apply smooth transition",
-                "When camera moves, rotates or zooms,\nthe transition could be either" +
-                "smooth or instant.\nEnabling the option could make camera look lagging.")]
-        public readonly CfFlag SmoothTransition = new CfFlag(true);
-        [Config("TransitionRate", "Smooth transition rate")]
-        public readonly CfFloat TransRate = new CfFloat(.5f, min: .1f, max: .9f);
-        [Config("GiveUpTransitionDistance", "Max distance to transition smoothly",
-                "When the camera target position is too far, smooth transition takes too long.\n" +
-                "This number sets the distance to give up the transition.")]
-        public readonly CfFloat GiveUpTransDistance = new CfFloat(500f, min: 100f, max: 2000f);
-        [Config("DeltaPosMin", "Min movement for smooth transition")]
-        public readonly CfFloat MinTransMove = new CfFloat(.5f, min: .1f, max: 5f);
-        [Config("DeltaPosMax", "Max movement for smooth transition")]
-        public readonly CfFloat MaxTransMove = new CfFloat(30f, min: 5f, max: 100f);
-        [Config("DeltaRotateMin", "Min rotation for smooth transition", "unit: degree")]
-        public readonly CfFloat MinTransRotate = new CfFloat(.1f, min: .05f, max: 5f);
-        [Config("DeltaRotateMax", "Max rotation for smooth transition", "unit: degree")]
-        public readonly CfFloat MaxTransRotate = new CfFloat(10f, min: 5f, max: 45f);
+[Config("FieldOfView", "摄像机视野", "摄像机的视野范围（度）")]
+public readonly CfFloat CamFieldOfView = new CfFloat(45f, min: 10f, max: 75f);
 
+// 自由摄像机配置
+[Config("ShowCursor4Free", "自由摄像机模式下显示光标")]
+public readonly CfFlag ShowCursor4Free = new CfFlag(false);
 
-        /*--------- configurable constants ----------------------------------*/
+public enum GroundClipping { None, AboveGround, SnapToGround, AboveRoad, SnapToRoad }
 
-        [Config("MainPanelBtnPos", "In-Game main panel button position")]
-        public readonly CfScreenPosition MainPanelBtnPos
-            = new CfScreenPosition(CSkyL.Math.Vec2D.Position(-1f, -1f));
-        // (-1, -1): for unset position
+[Config("GroundClipping", "地面裁剪选项",
+        "自由摄像机模式下：\n-[无]自由移动\n" +
+        "-[高于地面]摄像机始终在地面上方\n" +
+        "-[贴近地面]摄像机贴着地面移动\n" +
+        "-[高于道路]摄像机始终在最近的道路上方\n" +
+        "-[贴近道路]摄像机贴着最近的道路或地面移动")]
+public readonly ConfigData<GroundClipping> GroundClippingOption
+                        = new ConfigData<GroundClipping>(GroundClipping.AboveGround);
 
-        [Config("CamNearClipPlane", "Camera Near clip plane")]
-        public readonly CfFloat CamNearClipPlane = new CfFloat(1f, min: .125f, max: 64f);
-        [Config("FoViewScrollfactor", "Field of View scaling factor by scrolling")]
-        public readonly CfFloat FoViewScrollfactor = new CfFloat(1.05f, 1.01f, 2f);
+[Config("GroundLevelOffset", "地面水平偏移",
+        "地面裁剪选项的地面水平偏移")]
+public readonly CfFloat GroundLevelOffset = new CfFloat(0f, min: -2f, max: 10f);
 
-        [Config("VehicleFixedOffset", "Cam fixed offset for vehicle")]
-        public readonly CfOffset VehicleFixedOffset = new CfOffset(
-            new CfFloat(3f), new CfFloat(2f), new CfFloat(0f));
-        [Config("MidVehFixedOffset", "Cam fixed offset for vehicle in the middle")]
-        public readonly CfOffset MidVehFixedOffset = new CfOffset(
-            new CfFloat(-2f), new CfFloat(3f), new CfFloat(0f));
-        [Config("PedestrianFixedOffset", "Cam fixed offset for pedestrian")]
-        public readonly CfOffset PedestrianFixedOffset = new CfOffset(
-            new CfFloat(0f), new CfFloat(2f), new CfFloat(0f));
+[Config("RoadLevelOffset", "道路水平偏移",
+        "地面裁剪选项的道路水平偏移")]
+public readonly CfFloat RoadLevelOffset = new CfFloat(0f, min: -2f, max: 10f);
 
-        [Config("MaxExitingDuration", "Max duration for exiting fps cam")]
+// 跟随模式配置
+[Config("ShowCursor4Follow", "跟随/漫游模式下显示光标")]
+public readonly CfFlag ShowCursor4Follow = new CfFlag(false);
+
+[Config("StickToFrontVehicle", "始终跟随前方车辆")]
+public readonly CfFlag StickToFrontVehicle = new CfFlag(true);
+
+[Config("LookAhead", "前瞻",
+        "摄像机朝向目标位置。")]
+public readonly CfFlag LookAhead = new CfFlag(false);
+
+[Config("InstantMoveMax", "平滑过渡的最小距离",
+        "在跟随模式下，即使启用了平滑过渡，摄像机也需要立即跟随目标。\n" +
+        "这设置了开始应用平滑过渡的最小距离。")]
+public readonly CfFloat InstantMoveMax = new CfFloat(15f, min: 5f, max: 50f);
+
+[Config("FollowCamOffset", "跟随模式通用摄像机偏移")]
+public readonly CfOffset FollowCamOffset = new CfOffset(
+    new CfFloat(0f, min: -20f, max: 20f),
+    new CfFloat(0f, min: -20f, max: 20f),
+    new CfFloat(0f, min: -20f, max: 20f)
+);
+
+// 漫游模式配置
+[Config("Period4Walk", "每个随机目标的周期（秒）")]
+public readonly CfFloat Period4Walk = new CfFloat(20f, min: 5f, max: 300f);
+
+[Config("ManualSwitch4Walk", "手动切换目标（次要点击）",
+        "使用次要鼠标点击来切换跟随的目标。")]
+public readonly CfFlag ManualSwitch4Walk = new CfFlag(false);
+
+[Config("SelectPedestrian", "选择行走的行人")]
+public readonly CfFlag SelectPedestrian = new CfFlag(true);
+
+[Config("SelectPassenger", "选择公共交通工具上的行人")]
+public readonly CfFlag SelectPassenger = new CfFlag(true);
+
+[Config("SelectWaiting", "选择等待公共交通工具的行人")]
+public readonly CfFlag SelectWaiting = new CfFlag(true);
+
+[Config("SelectDriving", "选择驾驶/乘坐车辆的市民")]
+public readonly CfFlag SelectDriving = new CfFlag(true);
+
+[Config("SelectPublicTransit", "选择公共交通工具")]
+public readonly CfFlag SelectPublicTransit = new CfFlag(true);
+
+[Config("SelectService", "选择服务车辆")]
+public readonly CfFlag SelectService = new CfFlag(true);
+
+[Config("SelectCargo", "选择货运车辆")]
+public readonly CfFlag SelectCargo = new CfFlag(true);
+
+// 键盘映射
+[Config("KeyCamToggle", "FPS摄像机切换")]
+public readonly CfKey KeyCamToggle = new CfKey(KeyCode.BackQuote);
+
+[Config("KeySpeedUp", "加速移动/偏移")]
+public readonly CfKey KeySpeedUp = new CfKey(KeyCode.CapsLock);
+
+[Config("KeyCamReset", "重置摄像机偏移和旋转")]
+public readonly CfKey KeyCamReset = new CfKey(KeyCode.Backspace);
+
+[Config("KeyCursorToggle", "切换光标可见性")]
+public readonly CfKey KeyCursorToggle = new CfKey(KeyCode.LeftControl);
+
+[Config("KeyAutoMove", "自由摄像机模式下自动移动切换",
+        "在切换时，摄像机会自动向前移动。")]
+public readonly CfKey KeyAutoMove = new CfKey(KeyCode.E);
+
+[Config("KeySaveOffset", "保存当前摄像机设置为默认值",
+        "在跟随/漫游模式下，保存跟随目标的当前摄像机设置")]
+public readonly CfKey KeySaveOffset = new CfKey(KeyCode.Backslash);
+
+[Config("KeyMoveForward", "向前移动/偏移")]
+public readonly CfKey KeyMoveForward = new CfKey(KeyCode.W);
+
+[Config("KeyMoveBackward", "向后移动/偏移")]
+public readonly CfKey KeyMoveBackward = new CfKey(KeyCode.S);
+
+[Config("KeyMoveLeft", "向左移动/偏移")]
+public readonly CfKey KeyMoveLeft = new CfKey(KeyCode.A);
+
+[Config("KeyMoveRight", "向右移动/偏移")]
+public readonly CfKey KeyMoveRight = new CfKey(KeyCode.D);
+
+[Config("KeyMoveUp", "向上移动/偏移")]
+public readonly CfKey KeyMoveUp = new CfKey(KeyCode.PageUp);
+
+[Config("KeyMoveDown", "向下移动/偏移")]
+public readonly CfKey KeyMoveDown = new CfKey(KeyCode.PageDown);
+
+[Config("KeyRotateLeft", "向左旋转/查看")]
+public readonly CfKey KeyRotateLeft = new CfKey(KeyCode.LeftArrow);
+
+[Config("KeyRotateRight", "向右旋转/查看")]
+public readonly CfKey KeyRotateRight = new CfKey(KeyCode.RightArrow);
+
+[Config("KeyRotateUp", "向上旋转/查看")]
+public readonly CfKey KeyRotateUp = new CfKey(KeyCode.UpArrow);
+
+[Config("KeyRotateDown", "向下旋转/查看")]
+public readonly CfKey KeyRotateDown = new CfKey(KeyCode.DownArrow);
+
+// 平滑过渡
+[Config("SmoothTransition", "应用平滑过渡",
+        "摄像机移动、旋转或缩放时，过渡可以是平滑的或瞬时的。\n" +
+        "启用此选项可以使摄像机看起来有延迟。")]
+public readonly CfFlag SmoothTransition = new CfFlag(true);
+
+[Config("TransitionRate", "平滑过渡速率")]
+public readonly CfFloat TransRate = new CfFloat(.5f, min: .1f, max: .9f);
+
+[Config("GiveUpTransitionDistance", "平滑过渡的最大距离",
+        "当摄像机目标位置太远时，平滑过渡需要太长时间。\n" +
+        "此数字设置放弃过渡的距离。")]
+public readonly CfFloat GiveUpTransDistance = new CfFloat(500f, min: 100f, max: 2000f);
+
+[Config("DeltaPosMin", "平滑过渡的最小移动")]
+public readonly CfFloat MinTransMove = new CfFloat(.5f, min: .1f, max: 5f);
+
+[Config("DeltaPosMax", "平滑过渡的最大移动")]
+public readonly CfFloat MaxTransMove = new CfFloat(30f, min: 5f, max: 100f);
+
+[Config("DeltaRotateMin", "平滑过渡的最小旋转", "单位：度")]
+public readonly CfFloat MinTransRotate = new CfFloat(.1f, min: .05f, max: 5f);
+
+[Config("DeltaRotateMax", "平滑过渡的最大旋转", "单位：度")]
+public readonly CfFloat MaxTransRotate = new CfFloat(10f, min: 5f, max: 45f);
+
+/*--------- 可配置常量 ----------------------------------*/
+
+[Config("MainPanelBtnPos", "游戏主面板按钮位置")]
+public readonly CfScreenPosition MainPanelBtnPos
+    = new CfScreenPosition(CSkyL.Math.Vec2D.Position(-1f, -1f));
+// (-1, -1): 未设置位置
+
+[Config("CamNearClipPlane", "摄像机近裁剪平面")]
+public readonly CfFloat CamNearClipPlane = new CfFloat(1f, min: .125f, max: 64f);
+
+[Config("FoViewScrollfactor", "滚动缩放的视野缩放因子")]
+public readonly CfFloat FoViewScrollfactor = new CfFloat(1.05f, 1.01f, 2f);
+
+[Config("VehicleFixedOffset", "车辆的摄像机固定偏移")]
+public readonly CfOffset VehicleFixedOffset = new CfOffset(
+    new CfFloat(3f), new CfFloat(2f), new CfFloat(0f));
+
+[Config("MidVehFixedOffset", "中间车辆的摄像机固定偏移")]
+public readonly CfOffset MidVehFixedOffset = new CfOffset(
+    new CfFloat(-2f), new CfFloat(3f), new CfFloat(0f));
+
+[Config("PedestrianFixedOffset", "行人的摄像机固定偏移")]
+public readonly CfOffset PedestrianFixedOffset = new CfOffset(
+    new CfFloat(0f), new CfFloat(2f), new CfFloat(0f));
+
+[Config("MaxExitingDuration", "退出第一人称摄像机的最大持续时间")]
         public readonly CfFloat MaxExitingDuration = new CfFloat(2f, 0f);
         /*-------------------------------------------------------------------*/
 

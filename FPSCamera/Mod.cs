@@ -7,10 +7,10 @@ namespace FPSCamera
 
     public class Mod : CSkyL.Mod<Config, UI.OptionsMenu>
     {
-        public override string FullName => "First Person Camera";
+        public override string FullName => "第一人称相机(First Person Camara) 原作者CSkyL";
         public override string ShortName => "FPSCamera";
         public override string Version => "2.1";
-        public override string Description => "View your city from a different perspective";
+        public override string Description => "以不同的视角查看您的城市";
 
         protected override void _PostEnable()
         {
