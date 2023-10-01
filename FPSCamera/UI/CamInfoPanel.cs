@@ -42,7 +42,7 @@ namespace FPSCamera.UI
                 if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval) {
                     _UpdateStatus(cam); _UpdateTargetInfos(cam); _UpdateSpeed(cam);
 
-                    _footer = "Time: ";
+                    _footer = "时间：";
                     if (cam is Cam.ICamUsingTimer timerCam) {
                         var time = timerCam.GetElapsedTime();
                         _footer += $"{((uint) time) / 60:00}:{((uint) time) % 60:00} / ";

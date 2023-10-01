@@ -56,7 +56,7 @@ namespace FPSCamera.UI
                 }
                 _panelBtn = Element.Root.Add<SpriteButton>(new Properties
                 {
-                    name = "MainPanelBtn", tooltip = "FPS Camera",
+                    name = "MainPanelBtn", tooltip = "第一人称相机",
                     x = x, y = y, size = _mainBtnSize,
                     sprite = "InfoPanelIconFreecamera"
                 });

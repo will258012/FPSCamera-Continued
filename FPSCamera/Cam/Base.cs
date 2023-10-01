@@ -28,12 +28,12 @@ namespace FPSCamera.Cam
             if (Map.RayCastDistrict(positioning.position) is DistrictID disID) {
                 var name = District.GetName(disID);
                 if (!string.IsNullOrEmpty(name))
-                    infos["District"] = name;
+                    infos["区域"] = name;
             }
             if (Map.RayCastRoad(positioning.position) is SegmentID segID) {
                 var name = Segment.GetName(segID);
                 if (!string.IsNullOrEmpty(name))
-                    infos["Road"] = name;
+                    infos["路段"] = name;
             }
             return infos;
         }

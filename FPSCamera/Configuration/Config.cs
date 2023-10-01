@@ -69,7 +69,7 @@ public readonly CfFlag ShowCursor4Free = new CfFlag(false);
 
 public enum GroundClipping { None, AboveGround, SnapToGround, AboveRoad, SnapToRoad }
 
-[Config("GroundClipping", "地面裁剪选项",
+[Config("GroundClipping", "地面贴靠选项",
         "自由摄像机模式下：\n-[无]自由移动\n" +
         "-[高于地面]摄像机始终在地面上方\n" +
         "-[贴近地面]摄像机贴着地面移动\n" +
@@ -139,7 +139,7 @@ public readonly CfFlag SelectService = new CfFlag(true);
 public readonly CfFlag SelectCargo = new CfFlag(true);
 
 // 键盘映射
-[Config("KeyCamToggle", "FPS摄像机切换")]
+[Config("KeyCamToggle", "第一人称摄像机切换")]
 public readonly CfKey KeyCamToggle = new CfKey(KeyCode.BackQuote);
 
 [Config("KeySpeedUp", "加速移动/偏移")]
