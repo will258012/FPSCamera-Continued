@@ -1,17 +1,19 @@
-# Cities: Skylines - First Person Camera Mod v2
+# Cities: Skylines - First Person Camera Mod v2 汉化版
 
 <img src="images/banner.svg" width="750px"/>
 
-> This is an updated version for [First Person Camera: Updated](https://steamcommunity.com/sharedfiles/filedetails/?id=650805785) by tony56a
+> 这是[First Person Camera v2.2.0 by Asu4ni](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667)的汉化版本。
+> 同时也是[First Person Camera: Updated by tony56a](https://steamcommunity.com/sharedfiles/filedetails/?id=650805785)的更新版本。
 
 
-[First Person Camera](https://github.com/Asu4ni/CitiesSkylines-FPSCamera) is a lightweight mod that attaches an extra **Camera Controller** to the original [Cities: Skylines](https://www.citiesskylines.com) game to enable users to view their cities in first person perspective.
+## 请在下载前先取订原模组！
 
-Refer to the [wiki](https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki) page for instructions and guide on how to use the mode as well as how to contribute to the development.
+[First Person Camera（第一人称相机）](https://github.com/Asu4ni/CitiesSkylines-FPSCamera)是一个轻量级的mod，在原来的[Cities: Skylines](https://www.citiesskylines.com)上附加了一个额外的**相机控制器**，使用户能够以第一人称视角查看他们的城市。
+
+有关如何使用该模组以及如何为开发做出贡献的说明和指南，请参阅[Wiki](https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki)。
 
 ---
-> The mod can also be downloaded on [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667).
-
+> 也可前往[Steam 创意工坊](https://steamcommunity.com/sharedfiles/filedetails/?id=)下载。
 
 <p><img src="images/image1.png" width="375px" />
 <img src="images/image4.png" width="375px" /></p>
