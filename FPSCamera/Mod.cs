@@ -9,7 +9,7 @@ namespace FPSCamera
     {
         public override string FullName => "First Person Camara (第一人称相机) 汉化版";
         public override string ShortName => "FPSCameraCHS";
-        public override string Version => "2.1";
+        public override string Version => "2.2";
         public override string Description => "以不同的视角查看您的城市 原作者:Asu4ni";
 
         protected override void _PostEnable()
