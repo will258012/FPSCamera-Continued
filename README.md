@@ -10,7 +10,7 @@
 有关如何使用该模组以及如何为开发做出贡献的说明和指南，请参阅[Wiki](https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki)。
 
 ---
-> 也可前往[Steam 创意工坊](https://steamcommunity.com/sharedfiles/filedetails/?id=)下载。
+> 也可前往[Steam 创意工坊](https://steamcommunity.com/sharedfiles/filedetails/?id=3044638930)下载。
 
 <p><img src="images/image2.png" width="500px" />
 <img src="images/image3.png" width="500px" /></p>
