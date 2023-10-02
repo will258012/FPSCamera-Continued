@@ -1,7 +1,7 @@
 # Cities: Skylines - First Person Camera Mod v2 汉化版
 ## 请在下载前先取订原模组！
 
-<img src="images/banner.svg" width="750px"/>
+<img src="images/banner.png" width="750px"/>
 
 > 这是[First Person Camera v2.2.0 by Asu4ni](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667)的汉化版本。
 > 同时也是[First Person Camera: Updated by tony56a](https://steamcommunity.com/sharedfiles/filedetails/?id=650805785)的更新版本。
@@ -12,5 +12,5 @@
 ---
 > 也可前往[Steam 创意工坊](https://steamcommunity.com/sharedfiles/filedetails/?id=)下载。
 
-<p><img src="images/image1.png" width="375px" />
-<img src="images/image4.png" width="375px" /></p>
+<p><img src="images/image2.png" width="500px" />
+<img src="images/image3.png" width="500px" /></p>
