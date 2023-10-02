@@ -124,7 +124,7 @@ namespace FPSCamera.UI
                 _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.Period4Walk)));
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.ManualSwitch4Walk)));
 
-                props.text = "Targets to follow:";
+                props.text = "要跟随的对象：";
                 group.Add<Label>(props);
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectPedestrian)));
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectPassenger)));
@@ -143,8 +143,8 @@ namespace FPSCamera.UI
                 group.Add<Label>(new Properties
                 {
                     name = "KeyMappingComment",
-                    text = "*鼠标单击：更改按键/取消\n" +
-                        "*鼠标双击：移除"
+                    text = "*鼠标左键单击：更改按键/取消\n" +
+                        "*鼠标右键单击：移除"
                 });
                 var props = _DefaultProps(group);
 

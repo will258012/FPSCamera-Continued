@@ -16,13 +16,13 @@ namespace FPSCamera.Configuration
 
         public static Config Load(string path = defaultPath) => Load<Config>(path);
 
-    /*----------- 通用配置 ----------------------------------------*/
+    /*----------- 通用选项 ----------------------------------------*/
 
 [Config("HideGameUI", "隐藏游戏UI")]
 public readonly CfFlag HideGameUI = new CfFlag(false);
 
-[Config("SetBackCamera", "退出后设置摄像机位置",
-        "退出FPS模式后，将摄像机位置设置回之前的位置")]
+[Config("SetBackCamera", "退出后重置摄像机位置",
+        "退出第一人称摄像机后，将摄像机位置重置回之前的位置")]
 public readonly CfFlag SetBackCamera = new CfFlag(true);
 
 [Config("UseMetricUnit", "使用公制单位")]
@@ -35,7 +35,7 @@ public readonly CfFlag ShowInfoPanel = new CfFlag(true);
 public readonly CfFloat InfoPanelHeightScale = new CfFloat(1f, min: .5f, max: 2f);
 
 [Config("MaxPitchDeg", "最大垂直视角",
-        "摄像机上下旋转的最大角度。")]
+        "摄像机上下旋转的最大角度")]
 public readonly CfFloat MaxPitchDeg = new CfFloat(70f, min: 0f, max: 90f);
 
 // 摄像机控制
@@ -63,18 +63,18 @@ public readonly CfFlag EnableDof = new CfFlag(false);
 [Config("FieldOfView", "摄像机视野", "摄像机的视野范围（度）")]
 public readonly CfFloat CamFieldOfView = new CfFloat(45f, min: 10f, max: 75f);
 
-// 自由摄像机配置
-[Config("ShowCursor4Free", "自由摄像机模式下显示光标")]
+// 自由模式配置
+[Config("ShowCursor4Free", "自由模式下显示光标")]
 public readonly CfFlag ShowCursor4Free = new CfFlag(false);
 
 public enum GroundClipping { None, AboveGround, SnapToGround, AboveRoad, SnapToRoad }
 
 [Config("GroundClipping", "地面贴靠选项",
-        "自由摄像机模式下：\n-[无]自由移动\n" +
-        "-[高于地面]摄像机始终在地面上方\n" +
-        "-[贴近地面]摄像机贴着地面移动\n" +
-        "-[高于道路]摄像机始终在最近的道路上方\n" +
-        "-[贴近道路]摄像机贴着最近的道路或地面移动")]
+        "自由模式下：\n-[None]（无）自由移动\n" +
+        "-[AboveGround]（高于地面）摄像机始终在地面上方\n" +
+        "-[SnapToGround]（贴近地面）摄像机贴着地面移动\n" +
+        "-[AboveRoad]（高于道路）摄像机始终在最近的道路上方\n" +
+        "-[SnapToRoad]（贴近道路）摄像机贴着最近的道路或地面移动")]
 public readonly ConfigData<GroundClipping> GroundClippingOption
                         = new ConfigData<GroundClipping>(GroundClipping.AboveGround);
 
@@ -110,32 +110,32 @@ public readonly CfOffset FollowCamOffset = new CfOffset(
 );
 
 // 漫游模式配置
-[Config("Period4Walk", "每个随机目标的周期（秒）")]
+[Config("Period4Walk", "切换随机目标的周期（秒）")]
 public readonly CfFloat Period4Walk = new CfFloat(20f, min: 5f, max: 300f);
 
-[Config("ManualSwitch4Walk", "手动切换目标（次要点击）",
-        "使用次要鼠标点击来切换跟随的目标。")]
+[Config("ManualSwitch4Walk", "右键手动切换目标",
+        "右键点击来切换跟随的目标。")]
 public readonly CfFlag ManualSwitch4Walk = new CfFlag(false);
 
-[Config("SelectPedestrian", "选择行走的行人")]
+[Config("SelectPedestrian", "行走的市民")]
 public readonly CfFlag SelectPedestrian = new CfFlag(true);
 
-[Config("SelectPassenger", "选择公共交通工具上的行人")]
+[Config("SelectPassenger", "公共交通工具上的市民")]
 public readonly CfFlag SelectPassenger = new CfFlag(true);
 
-[Config("SelectWaiting", "选择等待公共交通工具的行人")]
+[Config("SelectWaiting", "等待公共交通工具的市民")]
 public readonly CfFlag SelectWaiting = new CfFlag(true);
 
-[Config("SelectDriving", "选择驾驶/乘坐车辆的市民")]
+[Config("SelectDriving", "驾驶/乘坐车辆的市民")]
 public readonly CfFlag SelectDriving = new CfFlag(true);
 
-[Config("SelectPublicTransit", "选择公共交通工具")]
+[Config("SelectPublicTransit", "公共交通工具")]
 public readonly CfFlag SelectPublicTransit = new CfFlag(true);
 
-[Config("SelectService", "选择服务车辆")]
+[Config("SelectService", "服务车辆")]
 public readonly CfFlag SelectService = new CfFlag(true);
 
-[Config("SelectCargo", "选择货运车辆")]
+[Config("SelectCargo", "货运车辆")]
 public readonly CfFlag SelectCargo = new CfFlag(true);
 
 // 键盘映射
@@ -220,7 +220,6 @@ public readonly CfFloat MaxTransRotate = new CfFloat(10f, min: 5f, max: 45f);
 [Config("MainPanelBtnPos", "游戏主面板按钮位置")]
 public readonly CfScreenPosition MainPanelBtnPos
     = new CfScreenPosition(CSkyL.Math.Vec2D.Position(-1f, -1f));
-// (-1, -1): 未设置位置
 
 [Config("CamNearClipPlane", "摄像机近裁剪平面")]
 public readonly CfFloat CamNearClipPlane = new CfFloat(1f, min: .125f, max: 64f);
@@ -232,7 +231,7 @@ public readonly CfFloat FoViewScrollfactor = new CfFloat(1.05f, 1.01f, 2f);
 public readonly CfOffset VehicleFixedOffset = new CfOffset(
     new CfFloat(3f), new CfFloat(2f), new CfFloat(0f));
 
-[Config("MidVehFixedOffset", "中间车辆的摄像机固定偏移")]
+[Config("MidVehFixedOffset", "车辆中间的摄像机固定偏移")]
 public readonly CfOffset MidVehFixedOffset = new CfOffset(
     new CfFloat(-2f), new CfFloat(3f), new CfFloat(0f));
 
