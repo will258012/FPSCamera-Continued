@@ -21,7 +21,7 @@ namespace FPSCamera.Cam
         {
             var status = _target.GetStatus();
             if (_state is UsingOtherCam)
-              status = $"正在使用 \"{_camOther.Target.Name}\" 进行 {status}";
+              status = $"使用 \" {_camOther.Target.Name} \" {status}";
             return status;
         }
 
