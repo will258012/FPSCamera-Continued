@@ -65,7 +65,7 @@ namespace FPSCamera.UI
 
             _msgLabel = _panelBtn.Add<Label>(new Properties { name = "ToggleMsgLabel", });
             _msgLabel.position = _MsgLabelPosition;
-         ShowMessage($"按下 [{Config.G.KeyCamToggle}] 切换至自由摄像机模式");
+         ShowMessage($"按下 [{Config.G.KeyCamToggle}] 切换至自由模式");
 
             _mainPanel = Element.Root.Add<SpritePanel>(new LayoutProperties
             {
