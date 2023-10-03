@@ -49,7 +49,7 @@ namespace FPSCamera.Configuration
 
         private Dictionary<string, CfOffset> _offsets = new Dictionary<string, CfOffset>
         {
-              ["Bus"] = _CreateOffset(2.55f, .42f),
+            ["Bus"] = _CreateOffset(2.55f, .42f),
             ["Biofuel Bus 01"] = _CreateOffset(2.1f, .2f),
             ["School Bus 01"] = _CreateOffset(.75f, .3f),
 
