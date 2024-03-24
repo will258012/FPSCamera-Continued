@@ -1,5 +1,7 @@
 # Cities: Skylines - First Person Camera Mod v2 汉化版
-## 请在下载前先取订原模组！
+
+## 请在下载前先取订或卸载[原模组](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667)！
+## 同时，也请安装前置[Harmony](https://github.com/boformer/CitiesHarmony/releases)。
 
 <img src="images/banner.png" width="750px"/>
 
