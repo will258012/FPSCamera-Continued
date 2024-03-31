@@ -40,8 +40,8 @@ namespace FPSCamera
             _camGame.AllSetting = _originalSetting;
             if (!Config.G.SetBackCamera)
                 _camGame.Positioning = CamController.I.LocateAt(_camGame.Positioning);
-
-            _camGame.SetFullScreen(false);
+            if (_uiHidden) 
+                Control.ShowUI();
             _uiHidden = false;
             _uiCamInfoPanel.enabled = false;
 
@@ -81,11 +81,9 @@ namespace FPSCamera
         private void _DisableFPSCam()
         {
             Log.Msg("FPS camera stopped");
-
             _uiMainPanel.OnCamDeactivate();
-            Control.ShowUI();
-
             Control.ShowCursor();
+            _camGame.SetFullScreen(false);
             CamController.I.Restore();
             _state = State.Idle;
         }
