@@ -33,6 +33,14 @@ namespace FPSCamera.Cam
                 if (Config.G.StickToFrontVehicle &&
                     !_SwitchTarget(_target.GetFrontVehicleID())) return false;
             }
+
+            if (!_target.IsSpawned) {
+                if (_target.IsExporting || _target.IsImporting) {
+                    return _target.IsGoingBack;
+                }
+                return false;
+            }
+
             return true;
         }
 
