@@ -3,6 +3,7 @@ namespace FPSCamera.UI
     using Configuration;
     using CSkyL.UI;
     using CStyle = CSkyL.UI.Style;
+    using CSkyL.Translation;
 
     public class OptionsMenu : OptionsBase
     {
@@ -17,6 +18,9 @@ namespace FPSCamera.UI
                 var props = _DefaultProps(group);
                 props.x = CStyle.Current.padding;
                 const float gap = 10f;
+
+                var lang = group.Add<LangSetting>(props.Swap(Config.G.Language));
+                props.y += lang.height + gap; _settings.Add(lang); 
 
                 var tog = group.Add<ToggleSetting>(props.Swap(Config.G.HideGameUI));
                 props.y += tog.height + gap; _settings.Add(tog);
@@ -44,7 +48,7 @@ namespace FPSCamera.UI
                 {
                       name = "ReloadConfig", text = "重新加载配置",
                     x = group.width - _btnSize.width - Style.basic.padding * 2f,
-                    y = 10f, size = _btnSize
+                    y = 50f, size = _btnSize
                 };
                 var btn = group.Add<TextButton>(btnProps);
                 btn.SetTriggerAction(() => Mod.I?.LoadConfig());

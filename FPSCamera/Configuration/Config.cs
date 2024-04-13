@@ -5,6 +5,7 @@ namespace FPSCamera.Configuration
     using UnityEngine;
     using CfFlag = CSkyL.Config.ConfigData<bool>;
     using CfKey = CSkyL.Config.ConfigData<UnityEngine.KeyCode>;
+    using CTransl = CSkyL.Translation.Translations;
 
     public class Config : Base
     {
@@ -17,6 +18,9 @@ namespace FPSCamera.Configuration
         public static Config Load(string path = defaultPath) => Load<Config>(path);
 
         /*----------- 通用选项 ----------------------------------------*/
+
+        [Config("Language", "语言")]
+        public readonly ConfigData<int> Language = new ConfigData<int>(0);
 
         [Config("HideGameUI", "隐藏游戏UI")]
         public readonly CfFlag HideGameUI = new CfFlag(false);
