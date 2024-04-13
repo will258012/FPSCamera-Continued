@@ -1,6 +1,8 @@
-# Cities: Skylines - First Person Camera Mod v2 汉化版
+# 施工中
 
-# [Click Here to the English version(First Person Camera - Financial Districts Fix)](https://github.com/will258012/CitiesSkylines-FPSCamera-CHS/tree/eng_fix)
+# under construction
+
+~~# Cities: Skylines - First Person Camera Mod v2 
 
 ## 请在下载前先取订或卸载[原模组](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667)！
 ## 同时，也请安装前置[Harmony](https://github.com/boformer/CitiesHarmony/releases)。
@@ -17,4 +19,4 @@
 > 也可前往[Steam 创意工坊](https://steamcommunity.com/sharedfiles/filedetails/?id=3044638930)下载。
 
 <p><img src="images/image2.png" width="500px" />
-<img src="images/image3.png" width="500px" /></p>
+<img src="images/image3.png" width="500px" /></p>~~
