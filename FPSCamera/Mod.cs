@@ -2,15 +2,16 @@ namespace FPSCamera
 {
     using Configuration;
     using CSkyL.Game;
+    using CTransl = CSkyL.Translation.Translations;
     using System.Reflection;
     using Log = CSkyL.Log;
 
     public class Mod : CSkyL.Mod<Config, UI.OptionsMenu>
     {
-        public override string FullName => "First Person Camara (第一人称相机) 汉化版";
-        public override string ShortName => "FPSCameraCHS";
-        public override string Version => "2.2";
-        public override string Description => "以不同的视角查看您的城市 原作者:Asu4ni";
+        public override string FullName => "First Person Camera";
+        public override string ShortName => "FPSCamera";
+        public override string Version => "2.3";
+        public override string Description => CTransl.Translate("MODDESCRIPTION");
 
         protected override void _PostEnable()
         {
@@ -61,7 +62,7 @@ namespace FPSCamera
         {
             if (Config.Load() is Config config) Config.G.Assign(config);
             Config.G.Save();
-
+            CTransl.Index = Config.G.Language;
             if (CamOffset.Load() is CamOffset offset) CamOffset.G.Assign(offset);
             CamOffset.G.Save();
 
@@ -74,7 +75,7 @@ namespace FPSCamera
 
             CamOffset.G.Reset();
             CamOffset.G.Save();
-
+            CTransl.Index = 0;
             Log.Msg("Config: reset");
         }
 
