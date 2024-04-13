@@ -7,8 +7,8 @@
     <ProjectGuid>{72C99E7C-C11B-4669-90ED-0944DE5B9085}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FPSCameraCHS</RootNamespace>
-    <AssemblyName>FPSCameraCHS</AssemblyName>
+    <RootNamespace>FPSCamera</RootNamespace>
+    <AssemblyName>FPSCamera</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
