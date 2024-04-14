@@ -5,8 +5,7 @@ namespace FPSCamera.Configuration
     using UnityEngine;
     using CfFlag = CSkyL.Config.ConfigData<bool>;
     using CfKey = CSkyL.Config.ConfigData<UnityEngine.KeyCode>;
-    using CTransl = CSkyL.Translation.Translations;
-
+    
     public class Config : Base
     {
         private const string defaultPath = "FPSCameraConfig.xml";
@@ -17,29 +16,26 @@ namespace FPSCamera.Configuration
 
         public static Config Load(string path = defaultPath) => Load<Config>(path);
 
-        /*----------- 通用选项 ----------------------------------------*/
-
-        [Config("Language", "语言")]
+        [Config("Language", "LANGUAGE_CHOICE")]
         public readonly ConfigData<int> Language = new ConfigData<int>(0);
 
-        [Config("HideGameUI", "隐藏游戏UI")]
+        [Config("HideGameUI", "SETTINGS_HIDEUI")]
         public readonly CfFlag HideGameUI = new CfFlag(false);
 
-        [Config("SetBackCamera", "退出后重置摄像机位置",
-                "退出第一人称摄像机后，将摄像机位置重置回之前的位置")]
+        [Config("SetBackCamera", "SETTINGS_SETBACKCAMERA", "SETTINGS_SETBACKCAMERA_DETAIL")]
         public readonly CfFlag SetBackCamera = new CfFlag(true);
 
-        [Config("UseMetricUnit", "使用公制单位")]
+        [Config("UseMetricUnit", "SETTINGS_USEMETRICUNIT")]
         public readonly CfFlag UseMetricUnit = new CfFlag(true);
 
-        [Config("ShowInfoPanel", "显示信息面板")]
+        [Config("ShowInfoPanel", "SETTINGS_SHOWINFOPANEL")]
         public readonly CfFlag ShowInfoPanel = new CfFlag(true);
 
-        [Config("InfoPanelHeightScale", "信息面板高度缩放因子")]
+        [Config("InfoPanelHeightScale", "SETTINGS_INFOPANELHEIGHTSCALE")]
         public readonly CfFloat InfoPanelHeightScale = new CfFloat(1f, min: .5f, max: 2f);
 
-        [Config("MaxPitchDeg", "最大垂直视角",
-                "摄像机上下旋转的最大角度")]
+        [Config("MaxPitchDeg", "SETTINGS_MAXPITSHDEG",
+                "SETTINGS_MAXPITSHDEG_DETAIL")]
         public readonly CfFloat MaxPitchDeg = new CfFloat(70f, min: 0f, max: 90f);
 
         // 摄像机控制
