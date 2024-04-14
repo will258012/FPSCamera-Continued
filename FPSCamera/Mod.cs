@@ -62,7 +62,7 @@ namespace FPSCamera
         {
             if (Config.Load() is Config config) Config.G.Assign(config);
             Config.G.Save();
-            CTransl.Index = Config.G.Language;
+
             if (CamOffset.Load() is CamOffset offset) CamOffset.G.Assign(offset);
             CamOffset.G.Save();
 
@@ -75,7 +75,7 @@ namespace FPSCamera
 
             CamOffset.G.Reset();
             CamOffset.G.Save();
-            CTransl.Index = 0;
+
             Log.Msg("Config: reset");
         }
 
