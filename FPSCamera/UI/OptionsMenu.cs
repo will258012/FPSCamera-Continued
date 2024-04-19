@@ -3,7 +3,7 @@ namespace FPSCamera.UI
     using Configuration;
     using CSkyL.UI;
     using CStyle = CSkyL.UI.Style;
-    using CSkyL.Translation;
+    using Ctransl = CSkyL.Translation.Translations;
 
     public class OptionsMenu : OptionsBase
     {
@@ -13,7 +13,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "General", text = "通用选项"
+                    name = "General", text = Ctransl.Translate("SETTINGS_GROUPNAME_GENERAL")
                 });
                 var props = _DefaultProps(group);
                 props.x = CStyle.Current.padding;
@@ -46,14 +46,14 @@ namespace FPSCamera.UI
 
                 var btnProps = new Properties
                 {
-                      name = "ReloadConfig", text = "重新加载配置",
+                      name = "ReloadConfig", text = Ctransl.Translate("SETTINGS_RELOADBTN"),
                     x = group.width - _btnSize.width - Style.basic.padding * 2f,
                     y = 50f, size = _btnSize
                 };
                 var btn = group.Add<TextButton>(btnProps);
                 btn.SetTriggerAction(() => Mod.I?.LoadConfig());
 
-                btnProps.name = "ResetConfig"; btnProps.text = "重置配置";
+                btnProps.name = "ResetConfig"; btnProps.text = Ctransl.Translate("SETTINGS_RESETBTN");
                 btnProps.y += _btnSize.height;
                 btn = group.Add<TextButton>(btnProps);
                 btn.SetTriggerAction(() => Mod.I?.ResetConfig());
@@ -61,7 +61,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                     name = "CamControl", text = "摄像机控制",
+                     name = "CamControl", text = Ctransl.Translate("SETTINGS_GROUPNAME_CAMCONTROL"),
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
@@ -89,7 +89,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                   name = "FreeCam", text = "自由模式设置",
+                   name = "FreeCam", text = Ctransl.Translate("SETTINGS_GROUPNAME_FREECAM"),
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
@@ -105,7 +105,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "FollowWalkThru", text = "跟随模式设置",
+                    name = "FollowWalkThru", text = Ctransl.Translate("SETTINGS_GROUPNAME_FOLLOWWALKTHRU"),
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
@@ -125,7 +125,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "WalkThru", text = "漫游模式设置",
+                    name = "WalkThru", text = Ctransl.Translate("SETTINGS_GROUPNAME_WALKTHRU"),
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
@@ -134,7 +134,7 @@ namespace FPSCamera.UI
                 _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.Period4Walk)));
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.ManualSwitch4Walk)));
 
-                props.text = "要跟随的对象：";
+                props.text = Ctransl.Translate("SETTINGS_TARGETSTOFOLLOW");
                 group.Add<Label>(props);
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectPedestrian)));
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.SelectPassenger)));
@@ -147,14 +147,13 @@ namespace FPSCamera.UI
             {
             var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "KeyMap", text = "按键设置",
+                    name = "KeyMap", text = Ctransl.Translate("SETTINGS_GROUPNAME_KEYMAP"),
                     autoLayout = true, layoutGap = 0
                 });
                 group.Add<Label>(new Properties
                 {
                     name = "KeyMappingComment",
-                    text = "*鼠标左键单击：更改按键/取消\n" +
-                        "*鼠标右键单击：移除"
+                    text = Ctransl.Translate("SETTINGS_KEYMAPPINGCOMMENT")
                 });
                 var props = _DefaultProps(group);
 
@@ -182,7 +181,7 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "SmoothTrans", text = "平滑过渡设置",
+                    name = "SmoothTrans", text = Ctransl.Translate("SETTINGS_GROUPNAME_SMOOTHTRANS"),
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
