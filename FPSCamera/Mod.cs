@@ -8,7 +8,7 @@ namespace FPSCamera
 
     public class Mod : CSkyL.Mod<Config, UI.OptionsMenu>
     {
-        public override string FullName => "First Person Camera";
+        public override string FullName => "First Person Camera - Continued";
         public override string ShortName => "FPSCamera";
         public override string Version => "2.3";
         public override string Description => CTransl.Translate("MODDESCRIPTION");
