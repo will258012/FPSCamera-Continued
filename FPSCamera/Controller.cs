@@ -41,7 +41,7 @@ namespace FPSCamera
             if (!Config.G.SetBackCamera)
                 _camGame.Positioning = CamController.I.LocateAt(_camGame.Positioning);
             if (_uiHidden) 
-                Control.ShowUI();
+                Control.UIManager.ShowUI();
             _uiHidden = false;
             _uiCamInfoPanel.enabled = false;
 
@@ -235,7 +235,7 @@ namespace FPSCamera
                     _uiCamInfoPanel.enabled = Config.G.ShowInfoPanel;
                     if (Config.G.HideGameUI ^ _uiHidden) {
                         _uiHidden = Config.G.HideGameUI;
-                        Control.ShowUI(!_uiHidden);
+                        Control.UIManager.ShowUI(!_uiHidden);
                         _camGame.SetFullScreen(_uiHidden);
                     }
                 }
