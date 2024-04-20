@@ -10,7 +10,12 @@ namespace FPSCamera
     {
         public override string FullName => "First Person Camera - Continued";
         public override string ShortName => "FPSCamera";
-        public override string Version => "2.3";
+        public override string Version {
+            get {
+                var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                return $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
+            }
+        }
         public override string Description => CTransl.Translate("MODDESCRIPTION");
 
         protected override void _PostEnable()
