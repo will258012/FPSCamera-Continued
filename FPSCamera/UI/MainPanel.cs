@@ -13,7 +13,7 @@ namespace FPSCamera.UI
         public void OnCamActivate()
         {
             _mainPanel.Visible = false;
-            ShowMessage($"按下 [{Config.G.KeyCamToggle}] 以退出");
+            ShowMessage($"{CSkyL.Translation.Translations.Translate("MAINPANELBTN_PRESS")} [{Config.G.KeyCamToggle}] {CSkyL.Translation.Translations.Translate("MAINPANElBTN_2EXIT")}");
         }
 
         public void ShowMessage(string msg)
@@ -56,7 +56,7 @@ namespace FPSCamera.UI
                 }
                 _panelBtn = Element.Root.Add<SpriteButton>(new Properties
                 {
-                    name = "MainPanelBtn", tooltip = "第一人称相机",
+                    name = "MainPanelBtn", tooltip = CSkyL.Translation.Translations.Translate("MAINPANELBTN_TOOLTIP"),
                     x = x, y = y, size = _mainBtnSize,
                     sprite = "InfoPanelIconFreecamera"
                 });
@@ -65,7 +65,7 @@ namespace FPSCamera.UI
 
             _msgLabel = _panelBtn.Add<Label>(new Properties { name = "ToggleMsgLabel", });
             _msgLabel.position = _MsgLabelPosition;
-         ShowMessage($"按下 [{Config.G.KeyCamToggle}] 切换至自由模式");
+         ShowMessage($"{CSkyL.Translation.Translations.Translate("MAINPANELBTN_PRESS")} [{Config.G.KeyCamToggle}] {CSkyL.Translation.Translations.Translate("MAINPANELBTN_4FREECAMERA")}");
 
             _mainPanel = Element.Root.Add<SpritePanel>(new LayoutProperties
             {
@@ -128,7 +128,7 @@ namespace FPSCamera.UI
 
                 var walkThruBtn = _mainPanel.Add<TextButton>(new Properties
                 {
-                    name = "WalkThruBtn", text = "进入漫游模式",
+                    name = "WalkThruBtn", text = CSkyL.Translation.Translations.Translate("WALKTHRUBTN_TEXT"),
 
                     x = (_mainPanel.width - _walkThruBtnSize.width) / 2f,
                     y = _mainPanel.height - Style.basic.padding - _walkThruBtnSize.height,

@@ -42,7 +42,7 @@ namespace FPSCamera.UI
                 if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval) {
                     _UpdateStatus(cam); _UpdateTargetInfos(cam); _UpdateSpeed(cam);
 
-                    _footer = "时间：";
+                    _footer = CSkyL.Translation.Translations.Translate("INFO_TIME");
                     if (cam is Cam.ICamUsingTimer timerCam) {
                         var time = timerCam.GetElapsedTime();
                         _footer += $"{((uint) time) / 60:00}:{((uint) time) % 60:00} / ";
@@ -61,8 +61,8 @@ namespace FPSCamera.UI
         {
             _leftInfos.Clear();
             if (cam is Cam.FollowCam followCam) {
-                _leftInfos["名称"] = Obj.Of(followCam.TargetID).Name;
-                _leftInfos["状态"] = followCam.GetTargetStatus();
+                _leftInfos[CSkyL.Translation.Translations.Translate("INFO_NAME")] = Obj.Of(followCam.TargetID).Name;
+                _leftInfos[CSkyL.Translation.Translations.Translate("INFO_STATUS")] = followCam.GetTargetStatus();
             }
             _leftInfos.AddRange(cam.GetGeoInfos());
         }

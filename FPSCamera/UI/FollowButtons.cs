@@ -36,7 +36,7 @@ namespace FPSCamera.UI
             var btn = infoPanel.Add<SpriteButton>(new Properties
             {
                 name = infoPanel.GetType().Name + "_StartFollow",
-                tooltip = "进入跟随模式",
+                tooltip = CSkyL.Translation.Translations.Translate("FOLLOWBTN_TOOLTIP"),
                 width = _btnSize, height = _btnSize,
                 x = _btnOffsetX, y = _btnOffsetY, align = Properties.Align.BottomRight,
                 sprite = "InfoPanelIconFreecamera"

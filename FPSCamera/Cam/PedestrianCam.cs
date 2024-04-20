@@ -21,7 +21,7 @@ namespace FPSCamera.Cam
         {
             var status = _target.GetStatus();
             if (_state is UsingOtherCam)
-              status = $"使用 \"{_camOther.Target.Name}\" {status}";
+             status = CSkyL.Translation.Translations.Translate("INFO_TARGETSTATUS") + _camOther.Target.Name + status;
             return status;
         }
 
@@ -32,7 +32,7 @@ namespace FPSCamera.Cam
         {
             var details = _target.GetInfos();
             if (_state is UsingOtherCam) {
-                details["v/状态"] = _camOther.GetTargetStatus();
+                details[CSkyL.Translation.Translations.Translate("INFO_STATUS")] = _camOther.GetTargetStatus();
                 foreach (var pair in _camOther.GetTargetInfos())
                     details["v/" + pair.field] = pair.text;
             }
