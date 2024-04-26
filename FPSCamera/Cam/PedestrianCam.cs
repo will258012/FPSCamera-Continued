@@ -21,7 +21,7 @@ namespace FPSCamera.Cam
         {
             var status = _target.GetStatus();
             if (_state is UsingOtherCam)
-             status = CSkyL.Translation.Translations.Translate("INFO_TARGETSTATUS") + _camOther.Target.Name + status;
+            status = string.Format(CSkyL.Translation.Translations.Translate("INFO_TARGETSTATUS"), _camOther.Target.Name, status);
             return status;
         }
 

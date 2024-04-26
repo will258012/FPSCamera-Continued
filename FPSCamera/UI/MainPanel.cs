@@ -5,6 +5,7 @@ namespace FPSCamera.UI
     using System.Collections.Generic;
     using CStyle = CSkyL.UI.Style;
     using Vec2D = CSkyL.Math.Vec2D;
+    using Ctransl = CSkyL.Translation.Translations;
 
     internal class MainPanel : CSkyL.Game.Behavior
     {
@@ -13,7 +14,7 @@ namespace FPSCamera.UI
         public void OnCamActivate()
         {
             _mainPanel.Visible = false;
-            ShowMessage($"{CSkyL.Translation.Translations.Translate("MAINPANELBTN_PRESS")} [{Config.G.KeyCamToggle}] {CSkyL.Translation.Translations.Translate("MAINPANElBTN_2EXIT")}");
+            ShowMessage(string.Format(Ctransl.Translate("MAINPANELBTN_EXIGMSG"),Config.G.KeyCamToggle));
         }
 
         public void ShowMessage(string msg)
@@ -56,7 +57,7 @@ namespace FPSCamera.UI
                 }
                 _panelBtn = Element.Root.Add<SpriteButton>(new Properties
                 {
-                    name = "MainPanelBtn", tooltip = CSkyL.Translation.Translations.Translate("MAINPANELBTN_TOOLTIP"),
+                    name = "MainPanelBtn", tooltip = Ctransl.Translate("MAINPANELBTN_TOOLTIP"),
                     x = x, y = y, size = _mainBtnSize,
                     sprite = "InfoPanelIconFreecamera"
                 });
@@ -65,7 +66,7 @@ namespace FPSCamera.UI
 
             _msgLabel = _panelBtn.Add<Label>(new Properties { name = "ToggleMsgLabel", });
             _msgLabel.position = _MsgLabelPosition;
-         ShowMessage($"{CSkyL.Translation.Translations.Translate("MAINPANELBTN_PRESS")} [{Config.G.KeyCamToggle}] {CSkyL.Translation.Translations.Translate("MAINPANELBTN_4FREECAMERA")}");
+            ShowMessage(string.Format(Ctransl.Translate("MAINPANELBTN_TOGGLEMSG"), Config.G.KeyCamToggle));
 
             _mainPanel = Element.Root.Add<SpritePanel>(new LayoutProperties
             {
@@ -128,7 +129,7 @@ namespace FPSCamera.UI
 
                 var walkThruBtn = _mainPanel.Add<TextButton>(new Properties
                 {
-                    name = "WalkThruBtn", text = CSkyL.Translation.Translations.Translate("WALKTHRUBTN_TEXT"),
+                    name = "WalkThruBtn", text = Ctransl.Translate("WALKTHRUBTN_TEXT"),
 
                     x = (_mainPanel.width - _walkThruBtnSize.width) / 2f,
                     y = _mainPanel.height - Style.basic.padding - _walkThruBtnSize.height,
