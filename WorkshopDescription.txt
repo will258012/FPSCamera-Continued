@@ -1,9 +1,14 @@
-[h1]Please UNSUBSCRIBE the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667]original mod[/url] first![/h1]
+[h1]Please UNSUBSCRIBE the [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667]original mod[/url] before subscribing to this version![/h1]
 
 [quote] This is an updated version for [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667]First Person Camera v2.2.0[/url] by Asu4ni [/quote] 
 
-* Please refer to [url=https://steamcommunity.com/sharedfiles/filedetails/changelog/3198388677]here[/url] for Change Notes.
+[quote] [h2] What's New [/h2] 
+[list]
+[*] Added localization support! The mod is now able to support more languages.([url=https://www.crowdin.com/project/CSL_FPSCamera_Continued]Crowdin[/url])
+[*] a number of bug fixes. Please refer to the [url=https://steamcommunity.com/sharedfiles/filedetails/changelog/3198388677]Change Notes[/url] for more information.
+[/list]
 * Consider submitting your issues or suggestions on the [url=https://github.com/will258012/CitiesSkylines-FPSCamera-Continued/issues]Issues[/url] page.
+[/quote]
 
 Thanks for the source code provided by Asu4ni!
 [url=https://github.com/will258012/CitiesSkylines-FPSCamera-Continued]Source code[/url]
