@@ -1,6 +1,7 @@
 namespace FPSCamera
 {
     using Configuration;
+    using CSkyL;
     using CSkyL.Transform;
     using CamController = CSkyL.Game.CamController;
     using Control = CSkyL.Game.Control;
@@ -40,9 +41,13 @@ namespace FPSCamera
             _camGame.AllSetting = _originalSetting;
             if (!Config.G.SetBackCamera)
                 _camGame.Positioning = CamController.I.LocateAt(_camGame.Positioning);
-            if (_uiHidden) 
+            if (_uiHidden) {
                 Control.UIManager.ShowUI();
-            _uiHidden = false;
+                _uiHidden = false;
+            }
+            if (ModSupport.IsTrainDisplayFoundandEnbled && ModSupport.FollowVehicleID != default) 
+                ModSupport.FollowVehicleID = default;
+            
             _uiCamInfoPanel.enabled = false;
 
             _state = State.Exiting;

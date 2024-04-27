@@ -1,6 +1,7 @@
 namespace FPSCamera.Cam
 {
     using Configuration;
+    using CSkyL;
     using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
@@ -45,6 +46,9 @@ namespace FPSCamera.Cam
         protected override bool _ReadyToSwitchBack {
             get {
                 if (_ReadyToSwitchToOtherCam) return false;
+                if (ModSupport.IsTrainDisplayFoundandEnbled && ModSupport.FollowVehicleID != default) {
+                    ModSupport.FollowVehicleID = default;
+                }
                 Log.Msg($" -- pedestrian(ID:{_id}) left the vehicle");
                 return true;
             }

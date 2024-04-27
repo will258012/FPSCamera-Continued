@@ -1,6 +1,7 @@
 namespace FPSCamera.Cam
 {
     using Configuration;
+    using CSkyL;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
     using CSkyL.Transform;
@@ -20,6 +21,13 @@ namespace FPSCamera.Cam
                 return;
             }
             Log.Msg($" -- following vehicle(ID:{_id})");
+
+            if (ModSupport.IsTrainDisplayFoundandEnbled) {
+                var _IDparts = _id.ToString().Split('/');
+                var firstPart = _IDparts[0];
+                ModSupport.FollowVehicleID = ushort.Parse(firstPart);
+            }
+
             _wasReversed = _target.IsReversed;
         }
 
