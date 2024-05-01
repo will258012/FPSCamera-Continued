@@ -23,7 +23,7 @@ namespace FPSCamera
         {
             Log.Msg("Starting Follow mode");
             var newCam = Cam.FollowCam.Follow(idToFollow);
-            if (newCam is Cam.FollowCam cam) _SetCam(newCam);
+            if (newCam is Cam.FollowCam) _SetCam(newCam);
             else Log.Msg($"Fail to start Follow mode (ID: {idToFollow})");
         }
         public void StartWalkThruMode()
@@ -42,7 +42,7 @@ namespace FPSCamera
             if (!Config.G.SetBackCamera)
                 _camGame.Positioning = CamController.I.LocateAt(_camGame.Positioning);
             if (_uiHidden) {
-                Control.UIManager.ShowUI();
+                Control.UIManager.ToggleUI(true);
                 _uiHidden = false;
             }
             if (ModSupport.IsTrainDisplayFoundandEnbled && ModSupport.FollowVehicleID != default) 
@@ -87,7 +87,7 @@ namespace FPSCamera
         {
             Log.Msg("FPS camera stopped");
             _uiMainPanel.OnCamDeactivate();
-            Control.ShowCursor();
+            Control.ToggleCursor(true);
             _camGame.SetFullScreen(false);
             CamController.I.Restore();
             _state = State.Idle;
@@ -140,7 +140,7 @@ namespace FPSCamera
             var cursorVisible = Control.KeyPressed(Config.G.KeyCursorToggle) ^ (
                                 _camMod is Cam.FreeCam ? Config.G.ShowCursor4Free
                                                     : Config.G.ShowCursor4Follow);
-            Control.ShowCursor(cursorVisible);
+            Control.ToggleCursor(cursorVisible);
 
             float yawDegree = 0f, pitchDegree = 0f;
             { // key rotation
@@ -240,7 +240,7 @@ namespace FPSCamera
                     _uiCamInfoPanel.enabled = Config.G.ShowInfoPanel;
                     if (Config.G.HideGameUI ^ _uiHidden) {
                         _uiHidden = Config.G.HideGameUI;
-                        Control.UIManager.ShowUI(!_uiHidden);
+                        Control.UIManager.ToggleUI(!_uiHidden);
                         _camGame.SetFullScreen(_uiHidden);
                     }
                 }
