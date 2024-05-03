@@ -21,17 +21,22 @@
             _positioning = _positioning.Apply(inputOffset);
             _positioning.angle = _positioning.angle.Clamp(pitchRange:
                     new CSkyL.Math.Range(-Config.G.MaxPitchDeg, Config.G.MaxPitchDeg));
-
-            if (Config.G.GroundClippingOption != Config.GroundClipping.None) {
+            /*
+             NONE = 0 
+            ABOVEGROUND = 1
+            SNAPTOGROUND = 2
+            ABOVEROAD = 3
+            SNAPTOROAD = 4 */
+            if (Config.G.GroundClippingOption != 0) {
                 var minH = Map.GetMinHeightAt(_positioning.position) + Config.G.GroundLevelOffset;
-                if ((Config.G.GroundClippingOption == Config.GroundClipping.AboveRoad ||
-                             Config.G.GroundClippingOption == Config.GroundClipping.SnapToRoad ?
+                if ((Config.G.GroundClippingOption == 3 ||
+                             Config.G.GroundClippingOption == 4 ?
                              Map.GetClosestSegmentLevel(_positioning.position) : null)
                         is float roadH
                     ) minH = roadH + Config.G.RoadLevelOffset;
 
-                if (Config.G.GroundClippingOption == Config.GroundClipping.SnapToGround ||
-                    Config.G.GroundClippingOption == Config.GroundClipping.SnapToRoad ||
+                if (Config.G.GroundClippingOption == 2 ||
+                    Config.G.GroundClippingOption == 4 ||
                         _positioning.position.up < minH)
                     _positioning.position.up = minH;
             }

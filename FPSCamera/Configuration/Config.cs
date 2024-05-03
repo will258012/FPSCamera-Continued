@@ -1,10 +1,12 @@
 namespace FPSCamera.Configuration
 {
     using CSkyL.Config;
+    using CSkyL.UI;
     using System;
     using UnityEngine;
     using CfFlag = CSkyL.Config.ConfigData<bool>;
     using CfKey = CSkyL.Config.ConfigData<UnityEngine.KeyCode>;
+    using Ctransl = CSkyL.Translation.Translations;
 
     public class Config : Base
     {
@@ -18,7 +20,7 @@ namespace FPSCamera.Configuration
 
         #region General Options
         [Config("Language", "LANGUAGE_CHOICE")]
-        public readonly ConfigData<int> Language = new ConfigData<int>(0);
+        public readonly ConfigData<string> Language = new ConfigData<string>("default");
 
         [Config("HideGameUI", "SETTINGS_HIDEUI")]
         public readonly CfFlag HideGameUI = new CfFlag(false);
@@ -70,11 +72,18 @@ namespace FPSCamera.Configuration
         [Config("ShowCursor4Free", "SETTINGS_SHOWCORSOR4FREE")]
         public readonly CfFlag ShowCursor4Free = new CfFlag(false);
 
-        public enum GroundClipping { None, AboveGround, SnapToGround, AboveRoad, SnapToRoad }
+        public static string[] GroundClipping = {
+            Ctransl.Translate("SETTINGS_GROUNDCLIPING_NONE"),
+            Ctransl.Translate("SETTINGS_GROUNDCLIPING_ABOVE_GROUND"),
+            Ctransl.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_GROUND"),
+            Ctransl.Translate("SETTINGS_GROUNDCLIPING_ABOVE_ROAD"),
+            Ctransl.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_ROAD")
+        };
+
 
         [Config("GroundClipping", "SETTINGS_GROUNDCLIPING", "SETTINGS_GROUNDCLIPING_DETAIL")]
-        public readonly ConfigData<GroundClipping> GroundClippingOption
-                                = new ConfigData<GroundClipping>(GroundClipping.AboveGround);
+        public readonly ConfigData<int> GroundClippingOption
+                                = new ConfigData<int>(0);
 
         [Config("GroundLevelOffset", "SETTINGS_GROUNDLEVELOFFSET",
                 "SETTINGS_GROUNDLEVELOFFFSET_DETAIL")]

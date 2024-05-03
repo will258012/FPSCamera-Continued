@@ -19,8 +19,8 @@ namespace FPSCamera.UI
                 props.x = CStyle.Current.padding;
                 const float gap = 10f;
 
-                var lang = group.Add<LangSetting>(props.Swap(Config.G.Language));
-                props.y += lang.height + gap; _settings.Add(lang); 
+                var lang = group.Add<LangChoiceSetting>(props.Swap(Config.G.Language));
+                lang._dropdown.items = Ctransl.LanguageList; props.y += lang.height + gap; _settings.Add(lang); 
 
                 var tog = group.Add<ToggleSetting>(props.Swap(Config.G.HideGameUI));
                 props.y += tog.height + gap; _settings.Add(tog);
@@ -95,10 +95,8 @@ namespace FPSCamera.UI
                 var props = _DefaultProps(group);
 
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.G.ShowCursor4Free)));
-
-                _settings.Add(group.Add<ChoiceSetting<Config.GroundClipping>>(
-                                    props.Swap(Config.G.GroundClippingOption)));
-                props.stepSize = .1f; props.valueFormat = "F1";
+                var choice = group.Add<ChoiceSettingv2>(props.Swap(Config.G.GroundClippingOption));
+                choice._dropdown.items = Config.GroundClipping; _settings.Add(choice);
                 _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.GroundLevelOffset)));
                 _settings.Add(group.Add<SliderSetting>(props.Swap(Config.G.RoadLevelOffset)));
             }

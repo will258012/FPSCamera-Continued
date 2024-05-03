@@ -109,9 +109,8 @@ namespace FPSCamera.UI
 
             _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.SmoothTransition)));
 
-            var tmpLast = _mainPanel.Add<ChoiceSetting<Config.GroundClipping>>(
-                                props.Swap(Config.G.GroundClippingOption));
-            _settings.Add(tmpLast);
+            var tmpLast = _mainPanel.Add<ChoiceSettingv2>(props.Swap(Config.G.GroundClippingOption));
+            tmpLast._dropdown.items = Config.GroundClipping; _settings.Add(tmpLast);
 
             if (CSkyL.Game.Utils.InGameMode) {
 

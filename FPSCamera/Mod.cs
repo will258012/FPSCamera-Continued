@@ -2,7 +2,7 @@ namespace FPSCamera
 {
     using Configuration;
     using CSkyL.Game;
-    using CTransl = CSkyL.Translation.Translations;
+    using Ctransl = CSkyL.Translation.Translations;
     using System.Reflection;
     using Log = CSkyL.Log;
 
@@ -16,7 +16,7 @@ namespace FPSCamera
                 return $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
             }
         }
-        public override string Description => CTransl.Translate("MODDESCRIPTION");
+        public override string Description => Ctransl.Translate("MODDESCRIPTION");
 
         protected override void _PostEnable()
         {
