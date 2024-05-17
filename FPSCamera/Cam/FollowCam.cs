@@ -134,10 +134,10 @@ namespace FPSCamera.Cam
         {
             _frames[_target.GetLastFrame()] = _target.GetTargetPos(targetPosIndex);
         }
-
+#if DEBUG
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
         {
-#if DEBUG
+
             uint targetFrame = _target.GetTargetFrame();
             float hw = 4f;
 
@@ -146,17 +146,17 @@ namespace FPSCamera.Cam
                 uint targetF = (uint) (targetFrame - (16 * i));
                 var color = new UnityEngine.Color32(255, (byte) (100 + 50 * i), (byte) (64 * i), 255);
                 float r = hw * (1 - .25f * i);
-                OverlayUtil.RenderCircle(cameraInfo, _GetFrame(targetF), color, r);
+                Debug.RenderCircle(cameraInfo, _GetFrame(targetF), color, r);
             }
 
             var pos0 = _target.GetPositioning().position;
             var lookPos = GetSmoothLookPos();
             if (pos0.DistanceTo(lookPos) > minLookDistance) {
-                OverlayUtil.RenderArrow(cameraInfo, pos0, lookPos, UnityEngine.Color.red);
+                Debug.RenderArrow(cameraInfo, pos0, lookPos, UnityEngine.Color.red);
             }
-#endif
-        }
 
+        }
+#endif
         protected virtual string _SavedOffsetKey => _target.GetPrefabName();
 
         protected const float movementFactor = .1f;
@@ -168,7 +168,7 @@ namespace FPSCamera.Cam
         protected IDType _id;
         protected TargetType _target;
         protected Offset _inputOffset;
-        private Position[] _frames;
+        private readonly Position[] _frames;
     }
 
     public abstract class FollowCamWithCam<IDType, TargetType, AnotherCam>
@@ -202,13 +202,13 @@ namespace FPSCamera.Cam
             if (_state is UsingOtherCam) _camOther.SimulationFrame();
             else base.SimulationFrame();
         }
-
+#if DEBUG
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
         {
             if (_state is UsingOtherCam) _camOther.RenderOverlay(cameraInfo);
             else base.RenderOverlay(cameraInfo);
         }
-
+#endif
         public override Positioning GetPositioning()
             => _state is UsingOtherCam ? _camOther.GetPositioning() : base.GetPositioning();
 
