@@ -46,7 +46,7 @@ namespace FPSCamera.Cam
         protected override bool _ReadyToSwitchBack {
             get {
                 if (_ReadyToSwitchToOtherCam) return false;
-                if (ModSupport.IsTrainDisplayFoundandEnbled && ModSupport.FollowVehicleID != default) {
+                if (ModSupport.IsTrainDisplayFoundandEnabled && ModSupport.FollowVehicleID != default) {
                     ModSupport.FollowVehicleID = default;
                 }
                 Log.Msg($" -- pedestrian(ID:{_id}) left the vehicle");
