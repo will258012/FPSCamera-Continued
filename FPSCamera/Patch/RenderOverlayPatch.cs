@@ -2,12 +2,12 @@
 namespace FPSCamera.Patch
 {
     using HarmonyLib;
-
-    [HarmonyPatch(typeof(DefaultTool), "RenderOverlay")]
-    public static class RenderOverlayPatch
+    [HarmonyPatch]
+    internal class RenderOverlay
     {
+        [HarmonyPatch(typeof(DefaultTool), "RenderOverlay")]
         [HarmonyPostfix]
-        public static void Postfix(RenderManager.CameraInfo cameraInfo)
+        public static void RenderOverlayPatch(RenderManager.CameraInfo cameraInfo)
         {
             ThreadingExtension.Controller?.RenderOverlay(cameraInfo);
         }
