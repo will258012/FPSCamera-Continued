@@ -49,7 +49,7 @@ namespace FPSCamera
 
         protected override void _PostLoad()
         {
-            if (CamController.I is CamController c)
+            if (CamController.I is CamController)
                 _TryInstallController();
 
             else Log.Err("Mod: fail to get <CameraController>.");

@@ -77,7 +77,7 @@ namespace FPSCamera.UI
                 Config.G.UseMetricUnit ? cam.GetSpeed().ToKilometer() : cam.GetSpeed().ToMile(),
                 Config.G.UseMetricUnit ? "k" : "m");
 
-        private void OnGUI()
+        public void OnGUI()
         {
             var width = (float) Screen.width;
             var height = (Screen.height * _heightRatio).Clamp(100f, 800f)
@@ -85,8 +85,10 @@ namespace FPSCamera.UI
 
             GUI.Box(new Rect(0f, -10f, width, height + 10f), _panelTexture);
 
-            var style = new GUIStyle();
-            style.fontSize = (int) (height * _fontHeightRatio);
+            var style = new GUIStyle
+            {
+                fontSize = (int) (height * _fontHeightRatio)
+            };
             style.normal.textColor = new Color(1f, 1f, 1f, .8f);
 
             var margin = (width * _marginWidthRatio).Clamp(0f, height * _marginHeightRatio);
