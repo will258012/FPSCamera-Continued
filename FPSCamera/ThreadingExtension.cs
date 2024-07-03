@@ -1,7 +1,6 @@
 ﻿namespace FPSCamera
 {
     using ICities;
-    using UnityEngine;
 
     public sealed class ThreadingExtension : ThreadingExtensionBase
     {

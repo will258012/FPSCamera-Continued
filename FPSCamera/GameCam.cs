@@ -1,6 +1,6 @@
 ﻿namespace FPSCamera
 {
-    using Configuration;
+    using Config;
     using CSkyL;
     using CSkyL.Transform;
     using Range = CSkyL.Math.Range;
@@ -43,11 +43,11 @@
             base.Positioning = new Positioning(
                 smoothMove ? current.positioning.position.AdvanceToTarget(
                                  _targetSetting.positioning.position, advanceRatio,
-                                 new Range(Config.G.MinTransMove, Config.G.MaxTransMove)) :
+                                 new Range(Config.Config.instance.MinTransMove, Config.Config.instance.MaxTransMove)) :
                              _targetSetting.positioning.position,
                 smoothAngle ? current.positioning.angle.AdvanceToTarget(
                                   _targetSetting.positioning.angle, advanceRatio,
-                                  new Range(Config.G.MinTransRotate, Config.G.MaxTransRotate)) :
+                                  new Range(Config.Config.instance.MinTransRotate, Config.Config.instance.MaxTransRotate)) :
                               _targetSetting.positioning.angle
             );
 
@@ -69,7 +69,7 @@
         public void SetFullScreen(bool isFullScreen)
             => Area = isFullScreen ? RenderArea.Full : originalArea;
 
-        public GameCam() : base(CSkyL.Game.CamController.I.Camera)
+        public GameCam() : base(CSkyL.Game.CamController.instance.Camera)
         {
             originalArea = Area;
             _targetSetting = AllSetting;

@@ -1,9 +1,10 @@
 namespace FPSCamera
 {
-    using Configuration;
+    using Config;
     using CSkyL;
     using CSkyL.Transform;
     using CamController = CSkyL.Game.CamController;
+    using CLOD = CSkyL.Game.Control.LodManager;
     using Control = CSkyL.Game.Control;
     using CUtils = CSkyL.Game.Utils;
     using Log = CSkyL.Log;
@@ -37,17 +38,17 @@ namespace FPSCamera
             if (!IsActivated) return;
             _camMod = null;
 
-            _exitingTimer = Config.G.MaxExitingDuration;
+            _exitingTimer = Config.Config.instance.MaxExitingDuration;
             _camGame.AllSetting = _originalSetting;
-            if (!Config.G.SetBackCamera)
-                _camGame.Positioning = CamController.I.LocateAt(_camGame.Positioning);
+            if (!Config.Config.instance.SetBackCamera)
+                _camGame.Positioning = CamController.instance.LocateAt(_camGame.Positioning);
             if (_uiHidden) {
-                Control.UIManager.ToggleUI(true);
+                StartCoroutine(Control.UIManager.ToggleUI(true));
                 _uiHidden = false;
             }
-            if (ModSupport.IsTrainDisplayFoundandEnbled && ModSupport.FollowVehicleID != default) 
+            if (ModSupport.IsTrainDisplayFoundandEnabled && ModSupport.FollowVehicleID != default)
                 ModSupport.FollowVehicleID = default;
-            
+
             _uiCamInfoPanel.enabled = false;
 
             _state = State.Exiting;
@@ -76,10 +77,13 @@ namespace FPSCamera
             _originalSetting = _camGame.AllSetting;
             _ResetCamGame();
 
-            CamController.I.SetDepthOfField(Config.G.EnableDof);
-            CamController.I.Disable();
+            CamController.instance.SetDepthOfField(Config.Config.instance.EnableDof);
+            CamController.instance.Disable();
 
             _uiMainPanel.OnCamActivate();
+
+            if (Config.Config.instance.LODOptimization)
+                StartCoroutine(CLOD.ToggleLODOptimization(true));
 
             _state = State.Activated;
         }
@@ -87,37 +91,39 @@ namespace FPSCamera
         {
             Log.Msg("FPS camera stopped");
             _uiMainPanel.OnCamDeactivate();
+            if (Config.Config.instance.LODOptimization)
+                StartCoroutine(CLOD.ToggleLODOptimization(false));
             Control.ToggleCursor(true);
             _camGame.SetFullScreen(false);
-            CamController.I.Restore();
+            CamController.instance.Restore();
             _state = State.Idle;
         }
         private void _ResetCamGame()
         {
             _camGame.ResetTarget();
-            _camGame.FieldOfView = Config.G.CamFieldOfView;
-            _camGame.NearClipPlane = Config.G.CamNearClipPlane;
+            _camGame.FieldOfView = Config.Config.instance.CamFieldOfView;
+            _camGame.NearClipPlane = Config.Config.instance.CamNearClipPlane;
         }
 
         private Offset _GetInputOffsetAfterHandleInput()
         {
-            if (Control.KeyTriggered(Config.G.KeyCamToggle)) {
+            if (Control.KeyTriggered(Config.Config.instance.KeyCamToggle)) {
                 if (IsActivated) StopFPSCam();
                 else StartFreeCam();
             }
             if (!IsActivated || !_camMod.Validate()) return null;
 
             if (Control.MouseTriggered(Control.MouseButton.Middle) ||
-                Control.KeyTriggered(Config.G.KeyCamReset)) {
+                Control.KeyTriggered(Config.Config.instance.KeyCamReset)) {
                 _camMod.InputReset();
                 _ResetCamGame();
             }
 
             if (Control.MouseTriggered(Control.MouseButton.Secondary))
                 (_camMod as Cam.WalkThruCam)?.SwitchTarget();
-            if (Control.KeyTriggered(Config.G.KeyAutoMove))
+            if (Control.KeyTriggered(Config.Config.instance.KeyAutoMove))
                 (_camMod as Cam.FreeCam)?.ToggleAutoMove();
-            if (Control.KeyTriggered(Config.G.KeySaveOffset) &&
+            if (Control.KeyTriggered(Config.Config.instance.KeySaveOffset) &&
                     _camMod is Cam.FollowCam followCam) {
                 if (followCam.SaveOffset() is string name)
                     _uiMainPanel.ShowMessage($"Offset saved for <{name}>");
@@ -126,49 +132,49 @@ namespace FPSCamera
 
             var movement = LocalMovement.None;
             { // key movement
-                if (Control.KeyPressed(Config.G.KeyMoveForward)) movement.forward += 1f;
-                if (Control.KeyPressed(Config.G.KeyMoveBackward)) movement.forward -= 1f;
-                if (Control.KeyPressed(Config.G.KeyMoveRight)) movement.right += 1f;
-                if (Control.KeyPressed(Config.G.KeyMoveLeft)) movement.right -= 1f;
-                if (Control.KeyPressed(Config.G.KeyMoveUp)) movement.up += 1f;
-                if (Control.KeyPressed(Config.G.KeyMoveDown)) movement.up -= 1f;
-                movement *= (Control.KeyPressed(Config.G.KeySpeedUp) ? Config.G.SpeedUpFactor : 1f)
-                            * Config.G.MovementSpeed * CUtils.TimeSinceLastFrame
+                if (Control.KeyPressed(Config.Config.instance.KeyMoveForward)) movement.forward += 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyMoveBackward)) movement.forward -= 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyMoveRight)) movement.right += 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyMoveLeft)) movement.right -= 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyMoveUp)) movement.up += 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyMoveDown)) movement.up -= 1f;
+                movement *= (Control.KeyPressed(Config.Config.instance.KeySpeedUp) ? Config.Config.instance.SpeedUpFactor : 1f)
+                            * Config.Config.instance.MovementSpeed * CUtils.TimeSinceLastFrame
                             / CSkyL.Game.Map.ToKilometer(1f);
             }
 
-            var cursorVisible = Control.KeyPressed(Config.G.KeyCursorToggle) ^ (
-                                _camMod is Cam.FreeCam ? Config.G.ShowCursor4Free
-                                                    : Config.G.ShowCursor4Follow);
+            var cursorVisible = Control.KeyPressed(Config.Config.instance.KeyCursorToggle) ^ (
+                                _camMod is Cam.FreeCam ? Config.Config.instance.ShowCursor4Free
+                                                    : Config.Config.instance.ShowCursor4Follow);
             Control.ToggleCursor(cursorVisible);
 
             float yawDegree = 0f, pitchDegree = 0f;
             { // key rotation
-                if (Control.KeyPressed(Config.G.KeyRotateRight)) yawDegree += 1f;
-                if (Control.KeyPressed(Config.G.KeyRotateLeft)) yawDegree -= 1f;
-                if (Control.KeyPressed(Config.G.KeyRotateUp)) pitchDegree += 1f;
-                if (Control.KeyPressed(Config.G.KeyRotateDown)) pitchDegree -= 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyRotateRight)) yawDegree += 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyRotateLeft)) yawDegree -= 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyRotateUp)) pitchDegree += 1f;
+                if (Control.KeyPressed(Config.Config.instance.KeyRotateDown)) pitchDegree -= 1f;
 
                 if (yawDegree != 0f || pitchDegree != 0f) {
-                    var factor = Config.G.RotateKeyFactor * CUtils.TimeSinceLastFrame;
+                    var factor = Config.Config.instance.RotateKeyFactor * CUtils.TimeSinceLastFrame;
                     yawDegree *= factor; pitchDegree *= factor;
                 }
                 else if (!cursorVisible) {
                     // mouse rotation
                     const float factor = .2f;
-                    yawDegree = Control.MouseMoveHori * Config.G.RotateSensitivity *
-                                (Config.G.InvertRotateHorizontal ? -1f : 1f) * factor;
-                    pitchDegree = Control.MouseMoveVert * Config.G.RotateSensitivity *
-                                  (Config.G.InvertRotateVertical ? -1f : 1f) * factor;
+                    yawDegree = Control.MouseMoveHori * Config.Config.instance.RotateSensitivity *
+                                (Config.Config.instance.InvertRotateHorizontal ? -1f : 1f) * factor;
+                    pitchDegree = Control.MouseMoveVert * Config.Config.instance.RotateSensitivity *
+                                  (Config.Config.instance.InvertRotateVertical ? -1f : 1f) * factor;
                 }
             }
             { // scroll zooming
                 var scroll = Control.MouseScroll;
                 var targetFoV = _camGame.TargetFoV;
-                if (scroll > 0f && targetFoV > Config.G.CamFieldOfView.Min)
-                    _camGame.FieldOfView = targetFoV / Config.G.FoViewScrollfactor;
-                else if (scroll < 0f && targetFoV < Config.G.CamFieldOfView.Max)
-                    _camGame.FieldOfView = targetFoV * Config.G.FoViewScrollfactor;
+                if (scroll > 0f && targetFoV > Config.Config.instance.CamFieldOfView.Min)
+                    _camGame.FieldOfView = targetFoV / Config.Config.instance.FoViewScrollfactor;
+                else if (scroll < 0f && targetFoV < Config.Config.instance.CamFieldOfView.Max)
+                    _camGame.FieldOfView = targetFoV * Config.Config.instance.FoViewScrollfactor;
             }
             return new Offset(movement, new DeltaAttitude(yawDegree, pitchDegree));
         }
@@ -197,8 +203,9 @@ namespace FPSCamera
         }
 
         public void SimulationFrame() => _camMod?.SimulationFrame();
+#if DEBUG
         public void RenderOverlay(RenderManager.CameraInfo cameraInfo) => _camMod?.RenderOverlay(cameraInfo);
-
+#endif
         protected override void _UpdateLate()
         {
             try {
@@ -223,12 +230,12 @@ namespace FPSCamera
 
                 var distance = _camGame.Positioning.position
                                    .DistanceTo(_camGame.TargetPositioning.position);
-                var factor = Config.G.GetAdvanceRatio(CUtils.TimeSinceLastFrame);
-                if (Config.G.SmoothTransition) {
-                    if (distance > Config.G.GiveUpTransDistance)
+                var factor = Config.Config.instance.GetAdvanceRatio(CUtils.TimeSinceLastFrame);
+                if (Config.Config.instance.SmoothTransition) {
+                    if (distance > Config.Config.instance.GiveUpTransDistance)
                         _camGame.AdvanceToTargetSmooth(factor,
                                                         instantMove: true, instantAngle: true);
-                    else if (_camMod is Cam.FollowCam && distance <= Config.G.InstantMoveMax)
+                    else if (_camMod is Cam.FollowCam && distance <= Config.Config.instance.InstantMoveMax)
                         _camGame.AdvanceToTargetSmooth(factor, instantMove: true);
                     else _camGame.AdvanceToTargetSmooth(factor);
                 }
@@ -237,16 +244,16 @@ namespace FPSCamera
                 }
 
                 if (IsActivated) {
-                    _uiCamInfoPanel.enabled = Config.G.ShowInfoPanel;
-                    if (Config.G.HideGameUI ^ _uiHidden) {
-                        _uiHidden = Config.G.HideGameUI;
-                        Control.UIManager.ToggleUI(!_uiHidden);
+                    _uiCamInfoPanel.enabled = Config.Config.instance.ShowInfoPanel;
+                    if (Config.Config.instance.HideGameUI ^ _uiHidden) {
+                        _uiHidden = Config.Config.instance.HideGameUI;
+                        StartCoroutine(Control.UIManager.ToggleUI(!_uiHidden));
                         _camGame.SetFullScreen(_uiHidden);
                     }
                 }
             }
             catch (System.Exception e) {
-                Log.Err("Unrecognized Error: " + e.ToString());
+                Log.Err("Unrecognized Error: " + e);
             }
         }
 

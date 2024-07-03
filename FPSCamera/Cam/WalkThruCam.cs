@@ -1,6 +1,6 @@
 ﻿namespace FPSCamera.Cam
 {
-    using Configuration;
+    using Config;
     using CSkyL;
     using CSkyL.Game;
     using CSkyL.Game.ID;
@@ -22,8 +22,8 @@
             if (!IsOperating) return false;
 
             var ok = _currentCam?.Validate() ?? false;
-            if (!Config.G.ManualSwitch4Walk &&
-                _elapsedTime > Config.G.Period4Walk) ok = false;
+            if (!Config.instance.ManualSwitch4Walk &&
+                _elapsedTime > Config.instance.Period4Walk) ok = false;
             if (!ok) {
                 _SetRandomCam();
                 ok = _currentCam?.Validate() ?? false;
@@ -53,11 +53,11 @@
 
             var list = Vehicle.GetIf((v) => {
                 switch (v) {
-                case PersonalVehicle _: return Config.G.SelectDriving;
-                case TransitVehicle _: return Config.G.SelectPublicTransit;
-                case ServiceVehicle _: return Config.G.SelectService;
-                case MissionVehicle _: return Config.G.SelectService;
-                case CargoVehicle _: return Config.G.SelectCargo;
+                case PersonalVehicle _: return Config.instance.SelectDriving;
+                case TransitVehicle _: return Config.instance.SelectPublicTransit;
+                case ServiceVehicle _: return Config.instance.SelectService;
+                case MissionVehicle _: return Config.instance.SelectService;
+                case CargoVehicle _: return Config.instance.SelectCargo;
                 default:
                     Log.Warn("WalkThru selection: unknow vehicle type:"
                              + v.GetPrefabName());
@@ -66,16 +66,16 @@
             }).OfType<Object>().Concat(
                        Pedestrian.GetIf((p) => {
                            if (p.IsHangingAround) return false;
-                           switch (Vehicle.Of(p.RiddenVehicleID)) {
-                           case TransitVehicle _: return Config.G.SelectPassenger;
+                           switch (Object.Of(p.RiddenVehicleID)) {
+                           case TransitVehicle _: return Config.instance.SelectPassenger;
                            case PersonalVehicle _: return false;    // already selected by Vehicle
                            case Vehicle v:
                                Log.Warn("WalkThru selection: unknow pedestrian type: on a "
                                         + v.GetPrefabName());
                                return false;
                            default:
-                               return p.IsWaitingTransit ? Config.G.SelectWaiting
-                                                         : Config.G.SelectPedestrian;
+                               return p.IsWaitingTransit ? Config.instance.SelectWaiting
+                                                         : Config.instance.SelectPedestrian;
                            }
                        }).OfType<Object>()).ToList();
             if (!list.Any()) return;

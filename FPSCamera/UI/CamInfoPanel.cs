@@ -1,6 +1,6 @@
 namespace FPSCamera.UI
 {
-    using Configuration;
+    using Config;
     using CSkyL;
     using CSkyL.Game;
     using System.Collections.Generic;
@@ -74,14 +74,14 @@ namespace FPSCamera.UI
         }
         private void _UpdateSpeed(Cam.Base cam)
             => _mid = string.Format("{0,5:F1} {1}ph",
-                Config.G.UseMetricUnit ? cam.GetSpeed().ToKilometer() : cam.GetSpeed().ToMile(),
-                Config.G.UseMetricUnit ? "k" : "m");
+                Config.instance.UseMetricUnit ? cam.GetSpeed().ToKilometer() : cam.GetSpeed().ToMile(),
+                Config.instance.UseMetricUnit ? "k" : "m");
 
         public void OnGUI()
         {
             var width = (float) Screen.width;
             var height = (Screen.height * _heightRatio).Clamp(100f, 800f)
-                                                       * Config.G.InfoPanelHeightScale;
+                                                       * Config.instance.InfoPanelHeightScale;
 
             GUI.Box(new Rect(0f, -10f, width, height + 10f), _panelTexture);
 

@@ -1,6 +1,6 @@
 namespace FPSCamera.Cam
 {
-    using Configuration;
+    using Config;
     using CSkyL;
     using CSkyL.Game;
     using CSkyL.Game.ID;
@@ -22,12 +22,12 @@ namespace FPSCamera.Cam
         {
             var status = _target.GetStatus();
             if (_state is UsingOtherCam)
-            status = string.Format(CSkyL.Translation.Translations.Translate("INFO_TARGETSTATUS"), _camOther.Target.Name, status);
+                status = string.Format(CSkyL.Translation.Translations.Translate("INFO_TARGETSTATUS"), _camOther.Target.Name, status);
             return status;
         }
 
         protected override Offset _LocalOffset
-            => Config.G.PedestrianFixedOffset.AsOffSet;
+            => Config.instance.PedestrianFixedOffset.AsOffSet;
 
         public override Utils.Infos GetTargetInfos()
         {

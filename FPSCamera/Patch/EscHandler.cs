@@ -9,7 +9,7 @@
         public static bool EscapePatch()
         {
             // cancel calling <Escape> if FPSCamera consumes it
-            var controller = CSkyL.Game.CamController.I?.GetComponent<Controller>();
+            var controller = CSkyL.Game.CamController.instance?.GetComponent<Controller>();
 
             if (controller != null && controller.OnEsc()) return false;
 

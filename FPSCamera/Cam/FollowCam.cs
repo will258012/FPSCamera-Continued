@@ -1,11 +1,10 @@
 namespace FPSCamera.Cam
 {
-    using Configuration;
+    using Config;
     using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
     using CSkyL.Transform;
-    using CSkyL.UI;
 
     public abstract class FollowCam : Base
     {
@@ -38,7 +37,7 @@ namespace FPSCamera.Cam
             _id = id;
             _target = Object.Of(_id) as TargetType;
             if (_target is null) _state = new Finish();
-            else _inputOffset = CamOffset.G[_target.GetPrefabName()];
+            else _inputOffset = CamOffset.instance[_target.GetPrefabName()];
             _frames = new Position[4];
             for (int i = 0; i < 4; ++i) {
                 _frames[i] = _target.GetTargetPos(targetPosIndex);
@@ -70,7 +69,7 @@ namespace FPSCamera.Cam
         public override Positioning GetPositioning()
         {
             var pos = _target.GetPositioning();
-            if (Config.G.LookAhead) {
+            if (Config.instance.LookAhead) {
                 var look = GetSmoothLookPos();
                 var dir = pos.position.DisplacementTo(look);
                 if (dir.SqrDistance >= minLookDistance * minLookDistance) {
@@ -80,14 +79,14 @@ namespace FPSCamera.Cam
 
             return pos
                 .Apply(_LocalOffset)
-                .Apply(Config.G.FollowCamOffset.AsOffSet)
+                .Apply(Config.instance.FollowCamOffset.AsOffSet)
                 .Apply(_inputOffset);
         }
 
         public override string SaveOffset()
         {
-            CamOffset.G[_SavedOffsetKey] = _inputOffset;
-            CamOffset.G.Save();
+            CamOffset.instance[_SavedOffsetKey] = _inputOffset;
+            CamOffset.instance.Save();
             return _SavedOffsetKey;
         }
 
@@ -99,10 +98,10 @@ namespace FPSCamera.Cam
             inputOffset.movement.up *= heightMovementFactor;
             _inputOffset = _inputOffset.FollowedBy(inputOffset);
             _inputOffset.deltaAttitude = _inputOffset.deltaAttitude.Clamp(pitchRange:
-                    new CSkyL.Math.Range(-Config.G.MaxPitchDeg, Config.G.MaxPitchDeg));
+                    new CSkyL.Math.Range(-Config.instance.MaxPitchDeg, Config.instance.MaxPitchDeg));
         }
         public override void InputReset()
-            => _inputOffset = CamOffset.G[_SavedOffsetKey];
+            => _inputOffset = CamOffset.instance[_SavedOffsetKey];
 
         protected virtual bool _SwitchTarget(IDType newID)
         {

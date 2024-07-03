@@ -1,12 +1,12 @@
 namespace FPSCamera
 {
-    using Configuration;
+    using Config;
     using CSkyL.Game;
-    using Ctransl = CSkyL.Translation.Translations;
     using System.Reflection;
+    using Ctransl = CSkyL.Translation.Translations;
     using Log = CSkyL.Log;
 
-    public class Mod : CSkyL.Mod<Config, UI.OptionsMenu>
+    public class Mod : CSkyL.Mod<Config.Config, UI.OptionsMenu>
     {
         public override string FullName => "First Person Camera - Continued";
         public override string ShortName => "FPSCamera";
@@ -18,10 +18,11 @@ namespace FPSCamera
         }
         public override string Description => Ctransl.Translate("MODDESCRIPTION");
 
+
         protected override void _PostEnable()
         {
             I = this;
-            if (CamController.I is null) return;
+            if (CamController.instance is null) return;
             // Otherwise, this implies it's in game/editor.
             // This usually means dll was just updated.
 
@@ -44,12 +45,12 @@ namespace FPSCamera
         }
         protected override void _PreDisable()
         {
-            if (_controller != null) _controller.Destroy();
+            _controller?.Destroy();
         }
 
         protected override void _PostLoad()
         {
-            if (CamController.I is CamController)
+            if (CamController.instance is CamController)
                 _TryInstallController();
 
             else Log.Err("Mod: fail to get <CameraController>.");
@@ -65,40 +66,39 @@ namespace FPSCamera
 
         public override void LoadConfig()
         {
-            if (Config.Load() is Config config) Config.G.Assign(config);
-            Config.G.Save();
+            if (Config.Config.Load() is Config.Config config) Config.Config.instance.Assign(config);
+            Config.Config.instance.Save();
 
-            if (CamOffset.Load() is CamOffset offset) CamOffset.G.Assign(offset);
-            CamOffset.G.Save();
+            if (CamOffset.Load() is CamOffset offset) CamOffset.instance.Assign(offset);
+            CamOffset.instance.Save();
 
             Log.Msg("Config: loaded");
         }
         public override void ResetConfig()
         {
-            Config.G.Reset();
-            Config.G.Save();
+            Config.Config.instance.Reset();
+            Config.Config.instance.Save();
 
-            CamOffset.G.Reset();
-            CamOffset.G.Save();
+            CamOffset.instance.Reset();
+            CamOffset.instance.Save();
 
             Log.Msg("Config: reset");
         }
 
-        protected override Assembly _Assembly => Assembly.GetExecutingAssembly();
+        protected override Assembly FPSCamAssembly => Assembly.GetExecutingAssembly();
 
         private bool _TryInstallController()
         {
-            if (CamController.I.GetComponent<Controller>() is Controller c) {
+            if (CamController.instance.GetComponent<Controller>() is Controller c) {
                 Log.Warn("Controller: old one not yet removed");
                 UnityEngine.Object.Destroy(c);
                 return false;
             }
 
-            _controller = CamController.I.AddComponent<Controller>();
+            _controller = CamController.instance.AddComponent<Controller>();
             Log.Msg("Controller: installed");
             return true;
         }
-
         public static Mod I { get; private set; }
 
         private Controller _controller;

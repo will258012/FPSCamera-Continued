@@ -67,8 +67,8 @@
     <Compile Include="UI\CamInfoPanel.cs" />
     <Compile Include="UI\FollowButtons.cs" />
     <Compile Include="UI\OptionsMenu.cs" />
-    <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Configuration\CamOffset.cs" />
+    <Compile Include="Config\Config.cs" />
+    <Compile Include="Config\CamOffset.cs" />
     <Compile Include="Patch\EscHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

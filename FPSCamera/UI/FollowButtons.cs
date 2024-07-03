@@ -15,7 +15,7 @@ namespace FPSCamera.UI
         {
             _panelSets = new List<PanelSet>();
 
-            Func<ObjectID, bool> always = (_) => true;
+            bool always(ObjectID _) => true;
             CSkyL.UI.Style.Current = Style.basic;
             CreateFollowBtn(InfoPanel.Citizen.I, always);
             CreateFollowBtn(InfoPanel.Tourist.I, always);
@@ -55,7 +55,7 @@ namespace FPSCamera.UI
         public void Enable() { foreach (var p in _panelSets) p.followButton.Enable(); }
         public void Disable() { foreach (var p in _panelSets) p.followButton.Disable(); }
 
-        struct PanelSet : CSkyL.Game.IDestruction
+        readonly struct PanelSet : CSkyL.Game.IDestruction
         {
             public readonly InfoPanel.Base panel;
             [CSkyL.Game.RequireDestruction] public readonly SpriteButton followButton;
