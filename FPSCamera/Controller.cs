@@ -119,7 +119,7 @@ namespace FPSCamera
                 _ResetCamGame();
             }
 
-            if (Control.MouseTriggered(Control.MouseButton.Secondary))
+            if (Control.MouseTriggered(Control.MouseButton.Secondary) && Config.Config.instance.ManualSwitch4Walk)
                 (_camMod as Cam.WalkThruCam)?.SwitchTarget();
             if (Control.KeyTriggered(Config.Config.instance.KeyAutoMove))
                 (_camMod as Cam.FreeCam)?.ToggleAutoMove();

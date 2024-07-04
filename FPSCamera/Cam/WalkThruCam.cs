@@ -16,22 +16,25 @@
         public void SwitchTarget() => _SetRandomCam();
         public void ElapseTime(float seconds) => _elapsedTime += seconds;
         public float GetElapsedTime() => _elapsedTime;
-
+        
         public override bool Validate()
         {
             if (!IsOperating) return false;
 
-            var ok = _currentCam?.Validate() ?? false;
+            var status = _currentCam?.Validate() ?? false;
             if (!Config.instance.ManualSwitch4Walk &&
-                _elapsedTime > Config.instance.Period4Walk) ok = false;
-            if (!ok) {
+                _elapsedTime > Config.instance.Period4Walk) status = false;
+            if (!status) {
                 _SetRandomCam();
-                ok = _currentCam?.Validate() ?? false;
-                if (!ok) Log.Warn("no target for Walk-Thru mode");
+                status = _currentCam?.Validate() ?? false;
+                if (!status) {
+                    Log.Warn("no target for Walk-Thru mode");
+                    ColossalFramework.Singleton<AudioManager>.instance.PlaySound(disabledClickSound);
+                }
             }
-            return ok;
+            return status;
         }
-
+        private readonly UnityEngine.AudioClip disabledClickSound = UnityEngine.Object.FindObjectOfType<ColossalFramework.UI.UIView>().defaultDisabledClickSound;
         public override void SimulationFrame() => _currentCam?.SimulationFrame();
 #if DEBUG
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
