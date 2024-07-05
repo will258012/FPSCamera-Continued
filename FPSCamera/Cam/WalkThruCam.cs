@@ -16,7 +16,7 @@
         public void SwitchTarget() => _SetRandomCam();
         public void ElapseTime(float seconds) => _elapsedTime += seconds;
         public float GetElapsedTime() => _elapsedTime;
-        
+
         public override bool Validate()
         {
             if (!IsOperating) return false;
@@ -58,8 +58,9 @@
                 switch (v) {
                 case PersonalVehicle _: return Config.instance.SelectDriving;
                 case TransitVehicle _: return Config.instance.SelectPublicTransit;
-                case ServiceVehicle _: return Config.instance.SelectService;
-                case MissionVehicle _: return Config.instance.SelectService;
+                case ServiceVehicle _:
+                case MissionVehicle _:
+                    return Config.instance.SelectService;
                 case CargoVehicle _: return Config.instance.SelectCargo;
                 default:
                     Log.Warn("WalkThru selection: unknow vehicle type:"

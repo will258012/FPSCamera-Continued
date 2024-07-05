@@ -1,6 +1,5 @@
 ﻿namespace FPSCamera
 {
-    using Config;
     using CSkyL;
     using CSkyL.Transform;
     using Range = CSkyL.Math.Range;
