@@ -2,9 +2,9 @@
 {
     using Config;
     using CSkyL;
-    using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
     using System.Linq;
 
@@ -46,7 +46,7 @@
             => _currentCam.InputOffset(inputOffset);
         public override void InputReset() => _currentCam.InputReset();
         public override string GetTargetStatus() => _currentCam.GetTargetStatus();
-        public override Utils.Infos GetTargetInfos() => _currentCam.GetTargetInfos();
+        public override GameUtil.Infos GetTargetInfos() => _currentCam.GetTargetInfos();
         public override string SaveOffset() => _currentCam.SaveOffset();
 
         private void _SetRandomCam()

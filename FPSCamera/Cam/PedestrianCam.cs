@@ -2,9 +2,9 @@ namespace FPSCamera.Cam
 {
     using Config;
     using CSkyL;
-    using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
     using Log = CSkyL.Log;
 
@@ -29,7 +29,7 @@ namespace FPSCamera.Cam
         protected override Offset _LocalOffset
             => Config.instance.PedestrianFixedOffset.AsOffSet;
 
-        public override Utils.Infos GetTargetInfos()
+        public override GameUtil.Infos GetTargetInfos()
         {
             var details = _target.GetInfos();
             if (_state is UsingOtherCam) {

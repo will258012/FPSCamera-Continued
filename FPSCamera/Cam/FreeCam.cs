@@ -2,6 +2,7 @@
 {
     using Config;
     using CSkyL.Game;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
 
     public class FreeCam : Base
@@ -10,12 +11,12 @@
         public override Positioning GetPositioning() => _positioning;
 
         public override float GetSpeed()
-            => _lastPosition.DistanceTo(_positioning.position) / Utils.TimeSinceLastFrame;
+            => _lastPosition.DistanceTo(_positioning.position) / GameUtil.TimeSinceLastFrame;
 
         public override void InputOffset(Offset inputOffset)
         {
             if (_autoMove && !Control.MousePressed(Control.MouseButton.Secondary))
-                inputOffset.movement.forward += Utils.TimeSinceLastFrame
+                inputOffset.movement.forward += GameUtil.TimeSinceLastFrame
                                                 * Config.instance.MovementSpeed / Map.ToKilometer(1f);
             _lastPosition = _positioning.position;
             _positioning = _positioning.Apply(inputOffset);

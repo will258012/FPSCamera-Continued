@@ -3,6 +3,7 @@ namespace FPSCamera.Cam
     using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
     using Ctransl = CSkyL.Translation.Translations;
 
@@ -23,9 +24,9 @@ namespace FPSCamera.Cam
 #endif
         public abstract Positioning GetPositioning();
         public abstract float GetSpeed();
-        public virtual Utils.Infos GetGeoInfos()
+        public virtual GameUtil.Infos GetGeoInfos()
         {
-            Utils.Infos infos = new Utils.Infos();
+            GameUtil.Infos infos = new GameUtil.Infos();
             if (!(GetPositioning() is Positioning positioning)) return infos;
 
             if (Map.RayCastDistrict(positioning.position) is DistrictID disID) {

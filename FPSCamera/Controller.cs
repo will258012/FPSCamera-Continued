@@ -5,7 +5,7 @@ namespace FPSCamera
     using CamController = CSkyL.Game.CamController;
     using CLOD = CSkyL.Game.Control.LodManager;
     using Control = CSkyL.Game.Control;
-    using CUtils = CSkyL.Game.Utils;
+    using CUtils = CSkyL.Game.Utils.GameUtil;
     using Log = CSkyL.Log;
 
     public class Controller : CSkyL.Game.Behavior

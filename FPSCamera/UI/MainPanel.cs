@@ -1,6 +1,7 @@
 namespace FPSCamera.UI
 {
     using Config;
+    using CSkyL.Game.Utils;
     using CSkyL.UI;
     using System.Collections.Generic;
     using CStyle = CSkyL.UI.Style;
@@ -112,7 +113,7 @@ namespace FPSCamera.UI
             var tmpLast = _mainPanel.Add<ChoiceSettingv2>(props.Swap(Config.instance.GroundClippingOption));
             tmpLast._dropdown.items = Config.GroundClipping; _settings.Add(tmpLast);
 
-            if (CSkyL.Game.Utils.InGameMode) {
+            if (GameUtil.InGameMode) {
 
                 _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.StickToFrontVehicle)));
 
@@ -147,7 +148,7 @@ namespace FPSCamera.UI
         {
             foreach (var setting in _settings) setting.UpdateUI();
 
-            _msgTimer -= CSkyL.Game.Utils.TimeSinceLastFrame;
+            _msgTimer -= GameUtil.TimeSinceLastFrame;
             _msgLabel.opacity = _msgTimer / _msgDuration;
         }
 

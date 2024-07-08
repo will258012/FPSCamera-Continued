@@ -1,9 +1,9 @@
 namespace FPSCamera.Cam
 {
     using Config;
-    using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
 
     public abstract class FollowCam : Base
@@ -23,7 +23,7 @@ namespace FPSCamera.Cam
         public abstract IObjectToFollow Target { get; }
 
         public abstract string GetTargetStatus();
-        public abstract Utils.Infos GetTargetInfos();
+        public abstract GameUtil.Infos GetTargetInfos();
 
         // return saved entry key, usually PrefabInfo.name
         public abstract string SaveOffset();
@@ -64,7 +64,7 @@ namespace FPSCamera.Cam
 
         public override float GetSpeed() => _target.GetSpeed();
         public override string GetTargetStatus() => _target.GetStatus();
-        public override Utils.Infos GetTargetInfos() => _target.GetInfos();
+        public override GameUtil.Infos GetTargetInfos() => _target.GetInfos();
 
         public override Positioning GetPositioning()
         {
