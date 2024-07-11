@@ -1,8 +1,9 @@
 namespace FPSCamera.UI
 {
-    using Configuration;
+    using Config;
     using CSkyL;
     using CSkyL.Game;
+    using CSkyL.Game.Utils;
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
@@ -23,7 +24,7 @@ namespace FPSCamera.UI
         {
             _elapsedTime = 0f; _lastBufferStrUpdateTime = -1f;
             _mid = _footer = "";
-            _leftInfos = new Utils.Infos(); _rightInfos = new Utils.Infos();
+            _leftInfos = new GameUtil.Infos(); _rightInfos = new GameUtil.Infos();
 
             _panelTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             _panelTexture.SetPixel(0, 0, new Color32(45, 40, 105, 200));
@@ -38,7 +39,7 @@ namespace FPSCamera.UI
         protected override void _UpdateLate()
         {
             if (_camWRef?.Target is Cam.Base cam && cam.Validate()) {
-                _elapsedTime += Utils.TimeSinceLastFrame;
+                _elapsedTime += GameUtil.TimeSinceLastFrame;
                 if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval) {
                     _UpdateStatus(cam); _UpdateTargetInfos(cam); _UpdateSpeed(cam);
 
@@ -74,19 +75,21 @@ namespace FPSCamera.UI
         }
         private void _UpdateSpeed(Cam.Base cam)
             => _mid = string.Format("{0,5:F1} {1}ph",
-                Config.G.UseMetricUnit ? cam.GetSpeed().ToKilometer() : cam.GetSpeed().ToMile(),
-                Config.G.UseMetricUnit ? "k" : "m");
+                Config.instance.UseMetricUnit ? cam.GetSpeed().ToKilometer() : cam.GetSpeed().ToMile(),
+                Config.instance.UseMetricUnit ? "k" : "m");
 
-        private void OnGUI()
+        public void OnGUI()
         {
             var width = (float) Screen.width;
             var height = (Screen.height * _heightRatio).Clamp(100f, 800f)
-                                                       * Config.G.InfoPanelHeightScale;
+                                                       * Config.instance.InfoPanelHeightScale;
 
             GUI.Box(new Rect(0f, -10f, width, height + 10f), _panelTexture);
 
-            var style = new GUIStyle();
-            style.fontSize = (int) (height * _fontHeightRatio);
+            var style = new GUIStyle
+            {
+                fontSize = (int) (height * _fontHeightRatio)
+            };
             style.normal.textColor = new Color(1f, 1f, 1f, .8f);
 
             var margin = (width * _marginWidthRatio).Clamp(0f, height * _marginHeightRatio);
@@ -123,7 +126,7 @@ namespace FPSCamera.UI
             GUI.Label(rect, _footer, style);
         }
 
-        private void _DrawInfoFields(Utils.Infos infos, GUIStyle style, Rect rect, float margin)
+        private void _DrawInfoFields(GameUtil.Infos infos, GUIStyle style, Rect rect, float margin)
         {
             style.normal.background = _infoFieldTexture;
             var oAlign = style.alignment;
@@ -163,7 +166,7 @@ namespace FPSCamera.UI
         private float _elapsedTime, _lastBufferStrUpdateTime;
 
         private string _mid, _footer;
-        private Utils.Infos _leftInfos, _rightInfos;
+        private GameUtil.Infos _leftInfos, _rightInfos;
         [RequireDestruction] private Texture2D _panelTexture, _infoFieldTexture;
     }
 }

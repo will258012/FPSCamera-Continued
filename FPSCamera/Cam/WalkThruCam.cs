@@ -1,10 +1,10 @@
 ﻿namespace FPSCamera.Cam
 {
-    using Configuration;
+    using Config;
     using CSkyL;
-    using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
     using System.Linq;
 
@@ -21,27 +21,32 @@
         {
             if (!IsOperating) return false;
 
-            var ok = _currentCam?.Validate() ?? false;
-            if (!Config.G.ManualSwitch4Walk &&
-                _elapsedTime > Config.G.Period4Walk) ok = false;
-            if (!ok) {
+            var status = _currentCam?.Validate() ?? false;
+            if (!Config.instance.ManualSwitch4Walk &&
+                _elapsedTime > Config.instance.Period4Walk) status = false;
+            if (!status) {
                 _SetRandomCam();
-                ok = _currentCam?.Validate() ?? false;
-                if (!ok) Log.Warn("no target for Walk-Thru mode");
+                status = _currentCam?.Validate() ?? false;
+                if (!status) {
+                    Log.Warn("no target for Walk-Thru mode");
+                    ColossalFramework.Singleton<AudioManager>.instance.PlaySound(disabledClickSound);
+                }
             }
-            return ok;
+            return status;
         }
-
+        private readonly UnityEngine.AudioClip disabledClickSound = UnityEngine.Object.FindObjectOfType<ColossalFramework.UI.UIView>().defaultDisabledClickSound;
         public override void SimulationFrame() => _currentCam?.SimulationFrame();
+#if DEBUG
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
             => _currentCam?.RenderOverlay(cameraInfo);
+#endif
         public override Positioning GetPositioning() => _currentCam.GetPositioning();
         public override float GetSpeed() => _currentCam.GetSpeed();
         public override void InputOffset(Offset inputOffset)
             => _currentCam.InputOffset(inputOffset);
         public override void InputReset() => _currentCam.InputReset();
         public override string GetTargetStatus() => _currentCam.GetTargetStatus();
-        public override Utils.Infos GetTargetInfos() => _currentCam.GetTargetInfos();
+        public override GameUtil.Infos GetTargetInfos() => _currentCam.GetTargetInfos();
         public override string SaveOffset() => _currentCam.SaveOffset();
 
         private void _SetRandomCam()
@@ -51,11 +56,12 @@
 
             var list = Vehicle.GetIf((v) => {
                 switch (v) {
-                case PersonalVehicle _: return Config.G.SelectDriving;
-                case TransitVehicle _: return Config.G.SelectPublicTransit;
-                case ServiceVehicle _: return Config.G.SelectService;
-                case MissionVehicle _: return Config.G.SelectService;
-                case CargoVehicle _: return Config.G.SelectCargo;
+                case PersonalVehicle _: return Config.instance.SelectDriving;
+                case TransitVehicle _: return Config.instance.SelectPublicTransit;
+                case ServiceVehicle _:
+                case MissionVehicle _:
+                    return Config.instance.SelectService;
+                case CargoVehicle _: return Config.instance.SelectCargo;
                 default:
                     Log.Warn("WalkThru selection: unknow vehicle type:"
                              + v.GetPrefabName());
@@ -64,16 +70,16 @@
             }).OfType<Object>().Concat(
                        Pedestrian.GetIf((p) => {
                            if (p.IsHangingAround) return false;
-                           switch (Vehicle.Of(p.RiddenVehicleID)) {
-                           case TransitVehicle _: return Config.G.SelectPassenger;
+                           switch (Object.Of(p.RiddenVehicleID)) {
+                           case TransitVehicle _: return Config.instance.SelectPassenger;
                            case PersonalVehicle _: return false;    // already selected by Vehicle
                            case Vehicle v:
                                Log.Warn("WalkThru selection: unknow pedestrian type: on a "
                                         + v.GetPrefabName());
                                return false;
                            default:
-                               return p.IsWaitingTransit ? Config.G.SelectWaiting
-                                                         : Config.G.SelectPedestrian;
+                               return p.IsWaitingTransit ? Config.instance.SelectWaiting
+                                                         : Config.instance.SelectPedestrian;
                            }
                        }).OfType<Object>()).ToList();
             if (!list.Any()) return;

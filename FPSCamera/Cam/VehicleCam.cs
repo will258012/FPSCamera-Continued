@@ -1,6 +1,6 @@
 namespace FPSCamera.Cam
 {
-    using Configuration;
+    using Config;
     using CSkyL;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
@@ -15,17 +15,15 @@ namespace FPSCamera.Cam
                 Log.Warn($"vehicle(ID:{_id}) to follow does not exist");
                 return;
             }
-            if (Config.G.StickToFrontVehicle &&
+            if (Config.instance.StickToFrontVehicle &&
                 !_SwitchTarget(_target.GetFrontVehicleID())) {
                 Log.Warn($"vehicle(ID:{_id}) to follow does not exist");
                 return;
             }
             Log.Msg($" -- following vehicle(ID:{_id})");
 
-            if (ModSupport.IsTrainDisplayFoundandEnbled) {
-                var _IDparts = _id.ToString().Split('/');
-                var firstPart = _IDparts[0];
-                ModSupport.FollowVehicleID = ushort.Parse(firstPart);
+            if (ModSupport.IsTrainDisplayFoundandEnabled) {
+                ModSupport.FollowVehicleID = _id.Value;
             }
 
             _wasReversed = _target.IsReversed;
@@ -38,7 +36,7 @@ namespace FPSCamera.Cam
             if (_target.IsReversed != _wasReversed) {
                 Log.Msg($" -- vehicle(ID:{_id}) changes direction");
                 _wasReversed = !_wasReversed;
-                if (Config.G.StickToFrontVehicle &&
+                if (Config.instance.StickToFrontVehicle &&
                     !_SwitchTarget(_target.GetFrontVehicleID())) return false;
             }
 
@@ -53,10 +51,10 @@ namespace FPSCamera.Cam
         }
 
         protected override Offset _LocalOffset
-            => Config.G.VehicleFixedOffset.AsOffSet.FollowedBy(
+            => Config.instance.VehicleFixedOffset.AsOffSet.FollowedBy(
                    !_target.IsHead && _target.GetPrefabName() !=
                        (Object.Of(_target.GetFrontVehicleID()) as Vehicle).GetPrefabName() ?
-                   Config.G.MidVehFixedOffset.AsOffSet : Offset.None);
+                   Config.instance.MidVehFixedOffset.AsOffSet : Offset.None);
 
         private bool _wasReversed;
     }

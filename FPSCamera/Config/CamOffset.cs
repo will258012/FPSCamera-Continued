@@ -1,4 +1,4 @@
-namespace FPSCamera.Configuration
+namespace FPSCamera.Config
 {
     using CSkyL.Config;
     using System.Collections.Generic;
@@ -7,7 +7,7 @@ namespace FPSCamera.Configuration
     public class CamOffset : Base
     {
         private const string defaultPath = "FPSCameraOffset.xml";
-        public static readonly CamOffset G = new CamOffset();  // G: Global config
+        public static readonly CamOffset instance = new CamOffset();
 
         public CamOffset() : this(defaultPath) { }
         public CamOffset(string filePath) : base(filePath) { }
@@ -59,7 +59,7 @@ namespace FPSCamera.Configuration
 
             ["Metro"] = _CreateOffset(4.35f, .76f),
             ["Metro Passenger"] = _CreateOffset(.11f, -1.05f, 2.43f, -6.3f, -8f),
-            ["Monorail Passenger"] = _CreateOffset(-.32f,-1.7f,1.2f),
+            ["Monorail Passenger"] = _CreateOffset(-.32f, -1.7f, 1.2f),
             ["Train Engine"] = _CreateOffset(3.84f, .9f),
             ["Train Passenger"] = _CreateOffset(-2.44f, -.45f, 1.78f, -4.5f, -7.35f),
             ["Train Cargo Engine"] = _CreateOffset(3.19f, .9f),

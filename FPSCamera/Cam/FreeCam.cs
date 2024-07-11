@@ -1,7 +1,8 @@
 ﻿namespace FPSCamera.Cam
 {
-    using Configuration;
+    using Config;
     using CSkyL.Game;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
 
     public class FreeCam : Base
@@ -10,33 +11,33 @@
         public override Positioning GetPositioning() => _positioning;
 
         public override float GetSpeed()
-            => _lastPosition.DistanceTo(_positioning.position) / Utils.TimeSinceLastFrame;
+            => _lastPosition.DistanceTo(_positioning.position) / GameUtil.TimeSinceLastFrame;
 
         public override void InputOffset(Offset inputOffset)
         {
             if (_autoMove && !Control.MousePressed(Control.MouseButton.Secondary))
-                inputOffset.movement.forward += Utils.TimeSinceLastFrame
-                                                * Config.G.MovementSpeed / Map.ToKilometer(1f);
+                inputOffset.movement.forward += GameUtil.TimeSinceLastFrame
+                                                * Config.instance.MovementSpeed / Map.ToKilometer(1f);
             _lastPosition = _positioning.position;
             _positioning = _positioning.Apply(inputOffset);
             _positioning.angle = _positioning.angle.Clamp(pitchRange:
-                    new CSkyL.Math.Range(-Config.G.MaxPitchDeg, Config.G.MaxPitchDeg));
+                    new CSkyL.Math.Range(-Config.instance.MaxPitchDeg, Config.instance.MaxPitchDeg));
             /*
              NONE = 0 
             ABOVEGROUND = 1
             SNAPTOGROUND = 2
             ABOVEROAD = 3
             SNAPTOROAD = 4 */
-            if (Config.G.GroundClippingOption != 0) {
-                var minH = Map.GetMinHeightAt(_positioning.position) + Config.G.GroundLevelOffset;
-                if ((Config.G.GroundClippingOption == 3 ||
-                             Config.G.GroundClippingOption == 4 ?
+            if (Config.instance.GroundClippingOption != 0) {
+                var minH = Map.GetMinHeightAt(_positioning.position) + Config.instance.GroundLevelOffset;
+                if ((Config.instance.GroundClippingOption == 3 ||
+                             Config.instance.GroundClippingOption == 4 ?
                              Map.GetClosestSegmentLevel(_positioning.position) : null)
                         is float roadH
-                    ) minH = roadH + Config.G.RoadLevelOffset;
+                    ) minH = roadH + Config.instance.RoadLevelOffset;
 
-                if (Config.G.GroundClippingOption == 2 ||
-                    Config.G.GroundClippingOption == 4 ||
+                if (Config.instance.GroundClippingOption == 2 ||
+                    Config.instance.GroundClippingOption == 4 ||
                         _positioning.position.up < minH)
                     _positioning.position.up = minH;
             }

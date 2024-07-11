@@ -1,11 +1,10 @@
 namespace FPSCamera.Cam
 {
-    using Configuration;
-    using CSkyL.Game;
+    using Config;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
-    using CSkyL.UI;
 
     public abstract class FollowCam : Base
     {
@@ -24,7 +23,7 @@ namespace FPSCamera.Cam
         public abstract IObjectToFollow Target { get; }
 
         public abstract string GetTargetStatus();
-        public abstract Utils.Infos GetTargetInfos();
+        public abstract GameUtil.Infos GetTargetInfos();
 
         // return saved entry key, usually PrefabInfo.name
         public abstract string SaveOffset();
@@ -38,7 +37,7 @@ namespace FPSCamera.Cam
             _id = id;
             _target = Object.Of(_id) as TargetType;
             if (_target is null) _state = new Finish();
-            else _inputOffset = CamOffset.G[_target.GetPrefabName()];
+            else _inputOffset = CamOffset.instance[_target.GetPrefabName()];
             _frames = new Position[4];
             for (int i = 0; i < 4; ++i) {
                 _frames[i] = _target.GetTargetPos(targetPosIndex);
@@ -65,12 +64,12 @@ namespace FPSCamera.Cam
 
         public override float GetSpeed() => _target.GetSpeed();
         public override string GetTargetStatus() => _target.GetStatus();
-        public override Utils.Infos GetTargetInfos() => _target.GetInfos();
+        public override GameUtil.Infos GetTargetInfos() => _target.GetInfos();
 
         public override Positioning GetPositioning()
         {
             var pos = _target.GetPositioning();
-            if (Config.G.LookAhead) {
+            if (Config.instance.LookAhead) {
                 var look = GetSmoothLookPos();
                 var dir = pos.position.DisplacementTo(look);
                 if (dir.SqrDistance >= minLookDistance * minLookDistance) {
@@ -80,14 +79,14 @@ namespace FPSCamera.Cam
 
             return pos
                 .Apply(_LocalOffset)
-                .Apply(Config.G.FollowCamOffset.AsOffSet)
+                .Apply(Config.instance.FollowCamOffset.AsOffSet)
                 .Apply(_inputOffset);
         }
 
         public override string SaveOffset()
         {
-            CamOffset.G[_SavedOffsetKey] = _inputOffset;
-            CamOffset.G.Save();
+            CamOffset.instance[_SavedOffsetKey] = _inputOffset;
+            CamOffset.instance.Save();
             return _SavedOffsetKey;
         }
 
@@ -99,10 +98,10 @@ namespace FPSCamera.Cam
             inputOffset.movement.up *= heightMovementFactor;
             _inputOffset = _inputOffset.FollowedBy(inputOffset);
             _inputOffset.deltaAttitude = _inputOffset.deltaAttitude.Clamp(pitchRange:
-                    new CSkyL.Math.Range(-Config.G.MaxPitchDeg, Config.G.MaxPitchDeg));
+                    new CSkyL.Math.Range(-Config.instance.MaxPitchDeg, Config.instance.MaxPitchDeg));
         }
         public override void InputReset()
-            => _inputOffset = CamOffset.G[_SavedOffsetKey];
+            => _inputOffset = CamOffset.instance[_SavedOffsetKey];
 
         protected virtual bool _SwitchTarget(IDType newID)
         {
@@ -134,10 +133,10 @@ namespace FPSCamera.Cam
         {
             _frames[_target.GetLastFrame()] = _target.GetTargetPos(targetPosIndex);
         }
-
+#if DEBUG
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
         {
-#if DEBUG
+
             uint targetFrame = _target.GetTargetFrame();
             float hw = 4f;
 
@@ -146,17 +145,17 @@ namespace FPSCamera.Cam
                 uint targetF = (uint) (targetFrame - (16 * i));
                 var color = new UnityEngine.Color32(255, (byte) (100 + 50 * i), (byte) (64 * i), 255);
                 float r = hw * (1 - .25f * i);
-                OverlayUtil.RenderCircle(cameraInfo, _GetFrame(targetF), color, r);
+                Debug.RenderCircle(cameraInfo, _GetFrame(targetF), color, r);
             }
 
             var pos0 = _target.GetPositioning().position;
             var lookPos = GetSmoothLookPos();
             if (pos0.DistanceTo(lookPos) > minLookDistance) {
-                OverlayUtil.RenderArrow(cameraInfo, pos0, lookPos, UnityEngine.Color.red);
+                Debug.RenderArrow(cameraInfo, pos0, lookPos, UnityEngine.Color.red);
             }
-#endif
-        }
 
+        }
+#endif
         protected virtual string _SavedOffsetKey => _target.GetPrefabName();
 
         protected const float movementFactor = .1f;
@@ -168,7 +167,7 @@ namespace FPSCamera.Cam
         protected IDType _id;
         protected TargetType _target;
         protected Offset _inputOffset;
-        private Position[] _frames;
+        private readonly Position[] _frames;
     }
 
     public abstract class FollowCamWithCam<IDType, TargetType, AnotherCam>
@@ -202,13 +201,13 @@ namespace FPSCamera.Cam
             if (_state is UsingOtherCam) _camOther.SimulationFrame();
             else base.SimulationFrame();
         }
-
+#if DEBUG
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
         {
             if (_state is UsingOtherCam) _camOther.RenderOverlay(cameraInfo);
             else base.RenderOverlay(cameraInfo);
         }
-
+#endif
         public override Positioning GetPositioning()
             => _state is UsingOtherCam ? _camOther.GetPositioning() : base.GetPositioning();
 

@@ -1,7 +1,6 @@
-namespace FPSCamera.Configuration
+namespace FPSCamera.Config
 {
     using CSkyL.Config;
-    using CSkyL.UI;
     using System;
     using UnityEngine;
     using CfFlag = CSkyL.Config.ConfigData<bool>;
@@ -11,7 +10,7 @@ namespace FPSCamera.Configuration
     public class Config : Base
     {
         private const string defaultPath = "FPSCameraConfig.xml";
-        public static readonly Config G = new Config();  // G: Global config
+        public static readonly Config instance = new Config();
 
         public Config() : this(defaultPath) { }
         public Config(string filePath) : base(filePath) { }
@@ -224,6 +223,12 @@ namespace FPSCamera.Configuration
         public readonly CfFloat MaxTransRotate = new CfFloat(10f, min: 5f, max: 45f);
         #endregion
 
+        #region LOD Optimization Options
+        [Config("LODOptimization", "SETTINGS_LODOPT",
+        "SETTINGS_LODOPT_DETAIL")]
+        public readonly CfFlag LODOptimization = new CfFlag(false);
+        #endregion
+
         #region Configurable constants
         //this setting will not displayed in the settings screen
         [Config("MainPanelBtnPos", "SETTINGS_MAINPANELBTNPOS")]
@@ -265,5 +270,6 @@ namespace FPSCamera.Configuration
         public float GetAdvanceRatio(float elapsedTime)
             => 1f - (float) Math.Pow(1f - TransRate, elapsedTime / .1f);
         #endregion
+
     }
 }

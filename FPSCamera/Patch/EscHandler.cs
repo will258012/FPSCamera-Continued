@@ -1,20 +1,20 @@
 ﻿namespace FPSCamera.Patch
 {
     using HarmonyLib;
+    [HarmonyPatch]
     internal class EscHandler
     {
         [HarmonyPatch(typeof(GameKeyShortcuts), "Escape")]
-        public static class EscapePatch
+        [HarmonyPrefix]
+        public static bool EscapePatch()
         {
             // cancel calling <Escape> if FPSCamera consumes it
-            public static bool Prefix()
-            {
-                var controller = CSkyL.Game.CamController.I?.GetComponent<Controller>();
+            var controller = CSkyL.Game.CamController.instance?.GetComponent<Controller>();
 
-                if (controller != null && controller.OnEsc()) return false;
+            if (controller != null && controller.OnEsc()) return false;
 
-                return true;
-            }
+            return true;
+
         }
     }
 }

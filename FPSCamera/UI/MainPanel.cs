@@ -1,11 +1,12 @@
 namespace FPSCamera.UI
 {
-    using Configuration;
+    using Config;
+    using CSkyL.Game.Utils;
     using CSkyL.UI;
     using System.Collections.Generic;
     using CStyle = CSkyL.UI.Style;
-    using Vec2D = CSkyL.Math.Vec2D;
     using Ctransl = CSkyL.Translation.Translations;
+    using Vec2D = CSkyL.Math.Vec2D;
 
     internal class MainPanel : CSkyL.Game.Behavior
     {
@@ -14,7 +15,7 @@ namespace FPSCamera.UI
         public void OnCamActivate()
         {
             _mainPanel.Visible = false;
-            ShowMessage(string.Format(Ctransl.Translate("MAINPANELBTN_EXIGMSG"),Config.G.KeyCamToggle));
+            ShowMessage(string.Format(Ctransl.Translate("MAINPANELBTN_EXIGMSG"), Config.instance.KeyCamToggle));
         }
 
         public void ShowMessage(string msg)
@@ -47,13 +48,13 @@ namespace FPSCamera.UI
             CStyle.Current = Style.basic;
             {
                 CStyle.Current.scale = .75f;
-                float x = Config.G.MainPanelBtnPos.x, y = Config.G.MainPanelBtnPos.y;
+                float x = Config.instance.MainPanelBtnPos.x, y = Config.instance.MainPanelBtnPos.y;
                 if (x < 0f || y < 0f) {
                     var escbutton = Helper.GetElement("Esc");
                     x = escbutton.x;
                     y = escbutton.y + escbutton.height * 1.5f;
-                    Config.G.MainPanelBtnPos.Assign(Vec2D.Position(x, y));
-                    Config.G.Save();
+                    Config.instance.MainPanelBtnPos.Assign(Vec2D.Position(x, y));
+                    Config.instance.Save();
                 }
                 _panelBtn = Element.Root.Add<SpriteButton>(new Properties
                 {
@@ -66,7 +67,7 @@ namespace FPSCamera.UI
 
             _msgLabel = _panelBtn.Add<Label>(new Properties { name = "ToggleMsgLabel", });
             _msgLabel.position = _MsgLabelPosition;
-            ShowMessage(string.Format(Ctransl.Translate("MAINPANELBTN_TOGGLEMSG"), Config.G.KeyCamToggle));
+            ShowMessage(string.Format(Ctransl.Translate("MAINPANELBTN_TOGGLEMSG"), Config.instance.KeyCamToggle));
 
             _mainPanel = Element.Root.Add<SpritePanel>(new LayoutProperties
             {
@@ -86,40 +87,40 @@ namespace FPSCamera.UI
             _panelBtn.MakeDraggable(
                 actionDragStart: () => _mainPanel.Visible = false,
                 actionDragEnd: () => {
-                    Config.G.MainPanelBtnPos.Assign(Vec2D.Position(_panelBtn.x, _panelBtn.y));
-                    Config.G.Save();
+                    Config.instance.MainPanelBtnPos.Assign(Vec2D.Position(_panelBtn.x, _panelBtn.y));
+                    Config.instance.Save();
                 });
 
             var props = new SettingProperties
             {
                 width = _mainPanel.width - Style.basic.padding * 2f,
-                configObj = Config.G
+                configObj = Config.instance
             };
 
-            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.HideGameUI)));
-            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.ShowInfoPanel)));
-            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.SetBackCamera)));
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.HideGameUI)));
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.ShowInfoPanel)));
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.SetBackCamera)));
 
             props.stepSize = 1f; props.valueFormat = "F0";
-            _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.G.MovementSpeed)));
+            _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.instance.MovementSpeed)));
 
-            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.EnableDof)));
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.EnableDof)));
             props.stepSize = 1f; props.valueFormat = "F0";
-            _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.G.CamFieldOfView)));
+            _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.instance.CamFieldOfView)));
 
-            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.SmoothTransition)));
+            _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.SmoothTransition)));
 
-            var tmpLast = _mainPanel.Add<ChoiceSettingv2>(props.Swap(Config.G.GroundClippingOption));
+            var tmpLast = _mainPanel.Add<ChoiceSettingv2>(props.Swap(Config.instance.GroundClippingOption));
             tmpLast._dropdown.items = Config.GroundClipping; _settings.Add(tmpLast);
 
-            if (CSkyL.Game.Utils.InGameMode) {
+            if (GameUtil.InGameMode) {
 
-                _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.G.StickToFrontVehicle)));
+                _settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.StickToFrontVehicle)));
 
                 props.stepSize = 1f; props.valueFormat = "F0";
-                _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.G.Period4Walk)));
+                _settings.Add(_mainPanel.Add<SliderSetting>(props.Swap(Config.instance.Period4Walk)));
 
-                var last = _mainPanel.Add<ToggleSetting>(props.Swap(Config.G.ManualSwitch4Walk));
+                var last = _mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.ManualSwitch4Walk));
                 _settings.Add(last);
 
                 _mainPanel.AutoLayout = false;
@@ -147,7 +148,7 @@ namespace FPSCamera.UI
         {
             foreach (var setting in _settings) setting.UpdateUI();
 
-            _msgTimer -= CSkyL.Game.Utils.TimeSinceLastFrame;
+            _msgTimer -= GameUtil.TimeSinceLastFrame;
             _msgLabel.opacity = _msgTimer / _msgDuration;
         }
 

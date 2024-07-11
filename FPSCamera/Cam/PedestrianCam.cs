@@ -1,10 +1,10 @@
 namespace FPSCamera.Cam
 {
-    using Configuration;
+    using Config;
     using CSkyL;
-    using CSkyL.Game;
     using CSkyL.Game.ID;
     using CSkyL.Game.Object;
+    using CSkyL.Game.Utils;
     using CSkyL.Transform;
     using Log = CSkyL.Log;
 
@@ -22,14 +22,14 @@ namespace FPSCamera.Cam
         {
             var status = _target.GetStatus();
             if (_state is UsingOtherCam)
-            status = string.Format(CSkyL.Translation.Translations.Translate("INFO_TARGETSTATUS"), _camOther.Target.Name, status);
+                status = string.Format(CSkyL.Translation.Translations.Translate("INFO_TARGETSTATUS"), _camOther.Target.Name, status);
             return status;
         }
 
         protected override Offset _LocalOffset
-            => Config.G.PedestrianFixedOffset.AsOffSet;
+            => Config.instance.PedestrianFixedOffset.AsOffSet;
 
-        public override Utils.Infos GetTargetInfos()
+        public override GameUtil.Infos GetTargetInfos()
         {
             var details = _target.GetInfos();
             if (_state is UsingOtherCam) {
@@ -46,7 +46,7 @@ namespace FPSCamera.Cam
         protected override bool _ReadyToSwitchBack {
             get {
                 if (_ReadyToSwitchToOtherCam) return false;
-                if (ModSupport.IsTrainDisplayFoundandEnbled && ModSupport.FollowVehicleID != default) {
+                if (ModSupport.IsTrainDisplayFoundandEnabled && ModSupport.FollowVehicleID != default) {
                     ModSupport.FollowVehicleID = default;
                 }
                 Log.Msg($" -- pedestrian(ID:{_id}) left the vehicle");
