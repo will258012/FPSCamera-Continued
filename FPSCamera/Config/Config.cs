@@ -226,7 +226,7 @@ namespace FPSCamera.Config
         #region LOD Optimization Options
         [Config("LODOptimization", "SETTINGS_LODOPT",
         "SETTINGS_LODOPT_DETAIL")]
-        public readonly CfFlag LODOptimization = new CfFlag(true);
+        public readonly CfFlag LODOptimization = new CfFlag(false);
         #endregion
 
         #region Configurable constants
