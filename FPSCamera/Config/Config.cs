@@ -39,6 +39,7 @@ namespace FPSCamera.Config
         [Config("MaxPitchDeg", "SETTINGS_MAXPITSHDEG",
                 "SETTINGS_MAXPITSHDEG_DETAIL")]
         public readonly CfFloat MaxPitchDeg = new CfFloat(70f, min: 0f, max: 90f);
+
         #endregion
 
         #region Camera Controls
@@ -196,6 +197,7 @@ namespace FPSCamera.Config
 
         [Config("KeyRotateDown", "SETTINGS_KEYROTATEDOWN")]
         public readonly CfKey KeyRotateDown = new CfKey(KeyCode.DownArrow);
+
         #endregion
 
         #region Smooth Transition Options
@@ -223,10 +225,12 @@ namespace FPSCamera.Config
         public readonly CfFloat MaxTransRotate = new CfFloat(10f, min: 5f, max: 45f);
         #endregion
 
-        #region LOD Optimization Options
+        #region Optimization Options
         [Config("LODOptimization", "SETTINGS_LODOPT",
         "SETTINGS_LODOPT_DETAIL")]
         public readonly CfFlag LODOptimization = new CfFlag(false);
+        [Config("ShadowsOptimization", "SETTINGS_SHADOWSOPT", "SETTINGS_SHADOWSOPT_DETAIL")]
+        public readonly CfFlag ShadowsOptimization = new CfFlag(false);
         #endregion
 
         #region Configurable constants
@@ -261,6 +265,8 @@ namespace FPSCamera.Config
 
         [Config("MaxExitingDuration", "SETTINGS_MAXEXITINGDURATION")]
         public readonly CfFloat MaxExitingDuration = new CfFloat(2f, min: .1f, max: 10f);
+
+
         /*-------------------------------------------------------------------*/
 
         // Return a ratio[0f, 1f] representing the proportion to advance to the target

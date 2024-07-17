@@ -4,7 +4,8 @@ namespace FPSCamera
     using CSkyL.Transform;
     using CamController = CSkyL.Game.CamController;
     using CLOD = CSkyL.Game.Control.LodManager;
-    using Control = CSkyL.Game.Control;
+    using CInput = CSkyL.Game.Control.InputManager;
+    using CShadows = CSkyL.Game.Control.ShadowsManager;
     using CUtils = CSkyL.Game.Utils.GameUtil;
     using Log = CSkyL.Log;
 
@@ -42,7 +43,7 @@ namespace FPSCamera
             if (!Config.Config.instance.SetBackCamera)
                 _camGame.Positioning = CamController.instance.LocateAt(_camGame.Positioning);
             if (_uiHidden) {
-                StartCoroutine(Control.UIManager.ToggleUI(true));
+                StartCoroutine(CSkyL.Game.Control.UIManager.ToggleUI(true));
                 _uiHidden = false;
             }
             if (ModSupport.IsTrainDisplayFoundandEnabled && ModSupport.FollowVehicleID != default)
@@ -83,7 +84,8 @@ namespace FPSCamera
 
             if (Config.Config.instance.LODOptimization)
                 StartCoroutine(CLOD.ToggleLODOptimization(true));
-
+            if (Config.Config.instance.ShadowsOptimization)
+                StartCoroutine(CShadows.ToggleShadowsOptimization(true));
             _state = State.Activated;
         }
         private void _DisableFPSCam()
@@ -92,7 +94,9 @@ namespace FPSCamera
             _uiMainPanel.OnCamDeactivate();
             if (Config.Config.instance.LODOptimization)
                 StartCoroutine(CLOD.ToggleLODOptimization(false));
-            Control.ToggleCursor(true);
+            if (Config.Config.instance.ShadowsOptimization)
+                StartCoroutine(CShadows.ToggleShadowsOptimization(false));
+            CInput.ToggleCursor(true);
             _camGame.SetFullScreen(false);
             CamController.instance.Restore();
             _state = State.Idle;
@@ -106,23 +110,23 @@ namespace FPSCamera
 
         private Offset _GetInputOffsetAfterHandleInput()
         {
-            if (Control.KeyTriggered(Config.Config.instance.KeyCamToggle)) {
+            if (CInput.KeyTriggered(Config.Config.instance.KeyCamToggle)) {
                 if (IsActivated) StopFPSCam();
                 else StartFreeCam();
             }
             if (!IsActivated || !_camMod.Validate()) return null;
 
-            if (Control.MouseTriggered(Control.MouseButton.Middle) ||
-                Control.KeyTriggered(Config.Config.instance.KeyCamReset)) {
+            if (CInput.MouseTriggered(CInput.MouseButton.Middle) ||
+                CInput.KeyTriggered(Config.Config.instance.KeyCamReset)) {
                 _camMod.InputReset();
                 _ResetCamGame();
             }
 
-            if (Control.MouseTriggered(Control.MouseButton.Secondary) && Config.Config.instance.ManualSwitch4Walk)
+            if (CInput.MouseTriggered(CInput.MouseButton.Secondary) && Config.Config.instance.ManualSwitch4Walk)
                 (_camMod as Cam.WalkThruCam)?.SwitchTarget();
-            if (Control.KeyTriggered(Config.Config.instance.KeyAutoMove))
+            if (CInput.KeyTriggered(Config.Config.instance.KeyAutoMove))
                 (_camMod as Cam.FreeCam)?.ToggleAutoMove();
-            if (Control.KeyTriggered(Config.Config.instance.KeySaveOffset) &&
+            if (CInput.KeyTriggered(Config.Config.instance.KeySaveOffset) &&
                     _camMod is Cam.FollowCam followCam) {
                 if (followCam.SaveOffset() is string name)
                     _uiMainPanel.ShowMessage($"Offset saved for <{name}>");
@@ -131,28 +135,28 @@ namespace FPSCamera
 
             var movement = LocalMovement.None;
             { // key movement
-                if (Control.KeyPressed(Config.Config.instance.KeyMoveForward)) movement.forward += 1f;
-                if (Control.KeyPressed(Config.Config.instance.KeyMoveBackward)) movement.forward -= 1f;
-                if (Control.KeyPressed(Config.Config.instance.KeyMoveRight)) movement.right += 1f;
-                if (Control.KeyPressed(Config.Config.instance.KeyMoveLeft)) movement.right -= 1f;
-                if (Control.KeyPressed(Config.Config.instance.KeyMoveUp)) movement.up += 1f;
-                if (Control.KeyPressed(Config.Config.instance.KeyMoveDown)) movement.up -= 1f;
-                movement *= (Control.KeyPressed(Config.Config.instance.KeySpeedUp) ? Config.Config.instance.SpeedUpFactor : 1f)
+                if (CInput.KeyPressed(Config.Config.instance.KeyMoveForward)) movement.forward += 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyMoveBackward)) movement.forward -= 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyMoveRight)) movement.right += 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyMoveLeft)) movement.right -= 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyMoveUp)) movement.up += 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyMoveDown)) movement.up -= 1f;
+                movement *= (CInput.KeyPressed(Config.Config.instance.KeySpeedUp) ? Config.Config.instance.SpeedUpFactor : 1f)
                             * Config.Config.instance.MovementSpeed * CUtils.TimeSinceLastFrame
                             / CSkyL.Game.Map.ToKilometer(1f);
             }
 
-            var cursorVisible = Control.KeyPressed(Config.Config.instance.KeyCursorToggle) ^ (
+            var cursorVisible = CInput.KeyPressed(Config.Config.instance.KeyCursorToggle) ^ (
                                 _camMod is Cam.FreeCam ? Config.Config.instance.ShowCursor4Free
                                                     : Config.Config.instance.ShowCursor4Follow);
-            Control.ToggleCursor(cursorVisible);
+            CInput.ToggleCursor(cursorVisible);
 
             float yawDegree = 0f, pitchDegree = 0f;
             { // key rotation
-                if (Control.KeyPressed(Config.Config.instance.KeyRotateRight)) yawDegree += 1f;
-                if (Control.KeyPressed(Config.Config.instance.KeyRotateLeft)) yawDegree -= 1f;
-                if (Control.KeyPressed(Config.Config.instance.KeyRotateUp)) pitchDegree += 1f;
-                if (Control.KeyPressed(Config.Config.instance.KeyRotateDown)) pitchDegree -= 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyRotateRight)) yawDegree += 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyRotateLeft)) yawDegree -= 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyRotateUp)) pitchDegree += 1f;
+                if (CInput.KeyPressed(Config.Config.instance.KeyRotateDown)) pitchDegree -= 1f;
 
                 if (yawDegree != 0f || pitchDegree != 0f) {
                     var factor = Config.Config.instance.RotateKeyFactor * CUtils.TimeSinceLastFrame;
@@ -161,14 +165,14 @@ namespace FPSCamera
                 else if (!cursorVisible) {
                     // mouse rotation
                     const float factor = .2f;
-                    yawDegree = Control.MouseMoveHori * Config.Config.instance.RotateSensitivity *
+                    yawDegree = CInput.MouseMoveHori * Config.Config.instance.RotateSensitivity *
                                 (Config.Config.instance.InvertRotateHorizontal ? -1f : 1f) * factor;
-                    pitchDegree = Control.MouseMoveVert * Config.Config.instance.RotateSensitivity *
+                    pitchDegree = CInput.MouseMoveVert * Config.Config.instance.RotateSensitivity *
                                   (Config.Config.instance.InvertRotateVertical ? -1f : 1f) * factor;
                 }
             }
             { // scroll zooming
-                var scroll = Control.MouseScroll;
+                var scroll = CInput.MouseScroll;
                 var targetFoV = _camGame.TargetFoV;
                 if (scroll > 0f && targetFoV > Config.Config.instance.CamFieldOfView.Min)
                     _camGame.FieldOfView = targetFoV / Config.Config.instance.FoViewScrollfactor;
@@ -246,7 +250,7 @@ namespace FPSCamera
                     _uiCamInfoPanel.enabled = Config.Config.instance.ShowInfoPanel;
                     if (Config.Config.instance.HideGameUI ^ _uiHidden) {
                         _uiHidden = Config.Config.instance.HideGameUI;
-                        StartCoroutine(Control.UIManager.ToggleUI(!_uiHidden));
+                        StartCoroutine(CSkyL.Game.Control.UIManager.ToggleUI(!_uiHidden));
                         _camGame.SetFullScreen(_uiHidden);
                     }
                 }
