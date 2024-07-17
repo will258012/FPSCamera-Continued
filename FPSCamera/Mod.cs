@@ -21,7 +21,7 @@ namespace FPSCamera
 
         protected override void _PostEnable()
         {
-            I = this;
+            Instance = this;
             if (CamController.instance is null) return;
             // Otherwise, this implies it's in game/editor.
             // This usually means dll was just updated.
@@ -99,7 +99,7 @@ namespace FPSCamera
             Log.Msg("Controller: installed");
             return true;
         }
-        public static Mod I { get; private set; }
+        public static Mod Instance { get; private set; }
 
         private Controller _controller;
     }

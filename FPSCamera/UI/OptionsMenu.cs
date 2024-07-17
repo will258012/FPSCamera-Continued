@@ -1,6 +1,7 @@
 namespace FPSCamera.UI
 {
     using Config;
+    using CSkyL.Config;
     using CSkyL.UI;
     using CStyle = CSkyL.UI.Style;
     using Ctransl = CSkyL.Translation.Translations;
@@ -51,12 +52,12 @@ namespace FPSCamera.UI
                     y = 50f, size = _btnSize
                 };
                 var btn = group.Add<TextButton>(btnProps);
-                btn.SetTriggerAction(() => Mod.I?.LoadConfig());
+                btn.SetTriggerAction(() => Mod.Instance?.LoadConfig());
 
                 btnProps.name = "ResetConfig"; btnProps.text = Ctransl.Translate("SETTINGS_RESETBTN");
                 btnProps.y += _btnSize.height;
                 btn = group.Add<TextButton>(btnProps);
-                btn.SetTriggerAction(() => Mod.I?.ResetConfig());
+                btn.SetTriggerAction(() => Mod.Instance?.ResetConfig());
             }
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
@@ -209,11 +210,12 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "LODOpt", text = Ctransl.Translate("SETTINGS_GROUPNAME_LODSOPT"),
+                    name = "Opt", text = Ctransl.Translate("SETTINGS_GROUPNAME_OPT"),
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.instance.LODOptimization)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.instance.ShadowsOptimization)));
             }
         }
 
