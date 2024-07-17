@@ -21,6 +21,9 @@
     <Reference Include="ICities">
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnifiedUILib">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\workshop\content\255710\2966990700\UnifiedUILib.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <Private>False</Private>
     </Reference>
@@ -38,8 +41,13 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="del /q &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;&#xD;&#xA;mkdir &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;&#xD;&#xA;&#xD;&#xA;xcopy /y &quot;$(TargetDir)&quot; &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;&#xD;&#xA;&#xD;&#xA;mkdir &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations&quot;&#xD;&#xA;xcopy /y &quot;$(ProjectDir)..\CSkyL\Translations&quot; &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)\Translations&quot;&#xD;&#xA;&#xD;&#xA;del /q &quot;$(TargetDir)Translations&quot;&#xD;&#xA;mkdir &quot;$(TargetDir)Translations&quot;&#xD;&#xA;xcopy /y &quot;$(ProjectDir)..\CSkyL\Translations&quot; &quot;$(TargetDir)Translations&quot;&#xD;&#xA;" />
+    <Exec Command="rd /s &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;&#xD;&#xA;mkdir &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;&#xD;&#xA;xcopy /e /y &quot;$(TargetDir)&quot; &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;" />
   </Target>
+  <ItemGroup>
+    <None Update="Resources\icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <Reference Update="System">
       <Private>False</Private>
