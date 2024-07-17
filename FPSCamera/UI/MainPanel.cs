@@ -4,6 +4,7 @@ namespace FPSCamera.UI
     using CSkyL.Game.Utils;
     using CSkyL.UI;
     using System.Collections.Generic;
+    using UnifiedUI.Helpers;
     using CStyle = CSkyL.UI.Style;
     using Ctransl = CSkyL.Translation.Translations;
     using Vec2D = CSkyL.Math.Vec2D;
@@ -33,7 +34,6 @@ namespace FPSCamera.UI
             }
             return false;
         }
-
         public void SetWalkThruCallBack(System.Action callBackAction)
             => _walkThruCallBack = callBackAction;
 
@@ -43,8 +43,11 @@ namespace FPSCamera.UI
                 (_panelBtn.height - _msgLabel.height) / 2f
         );
 
+        public static MainPanel Instance { get; private set; }
+
         protected override void _Init()
         {
+            Instance = this;
             CStyle.Current = Style.basic;
             {
                 CStyle.Current.scale = .75f;
@@ -142,8 +145,12 @@ namespace FPSCamera.UI
                 _mainPanel.height = tmpLast.bottom + Style.basic.padding;
             }
             _mainPanel.Visible = false;
-        }
+            if (CSkyL.ModSupport.IsUUIFoundandEnabled) {
+                UUISupport.UUIRegister();
+                _panelBtn.Visible = false;
+            }
 
+        }
         protected override void _UpdateLate()
         {
             foreach (var setting in _settings) setting.UpdateUI();
@@ -153,8 +160,8 @@ namespace FPSCamera.UI
         }
 
         private Label _msgLabel;
-        [CSkyL.Game.RequireDestruction] private SpriteButton _panelBtn;
-        [CSkyL.Game.RequireDestruction] private Panel _mainPanel;
+        [CSkyL.Game.RequireDestruction] public SpriteButton _panelBtn;
+        [CSkyL.Game.RequireDestruction] public Panel _mainPanel;
 
         private readonly List<ISetting> _settings = new List<ISetting>();
 
