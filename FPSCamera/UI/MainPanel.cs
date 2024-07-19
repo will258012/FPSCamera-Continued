@@ -4,7 +4,6 @@ namespace FPSCamera.UI
     using CSkyL.Game.Utils;
     using CSkyL.UI;
     using System.Collections.Generic;
-    using UnifiedUI.Helpers;
     using CStyle = CSkyL.UI.Style;
     using Ctransl = CSkyL.Translation.Translations;
     using Vec2D = CSkyL.Math.Vec2D;
@@ -149,7 +148,6 @@ namespace FPSCamera.UI
                 UUISupport.UUIRegister();
                 _panelBtn.Visible = false;
             }
-
         }
         protected override void _UpdateLate()
         {

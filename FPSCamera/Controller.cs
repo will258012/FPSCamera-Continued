@@ -3,8 +3,8 @@ namespace FPSCamera
     using CSkyL;
     using CSkyL.Transform;
     using CamController = CSkyL.Game.CamController;
-    using CLOD = CSkyL.Game.Control.LodManager;
     using CInput = CSkyL.Game.Control.InputManager;
+    using CLOD = CSkyL.Game.Control.LodManager;
     using CShadows = CSkyL.Game.Control.ShadowsManager;
     using CUtils = CSkyL.Game.Utils.GameUtil;
     using Log = CSkyL.Log;

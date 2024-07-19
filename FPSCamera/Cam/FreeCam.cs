@@ -2,9 +2,9 @@
 {
     using Config;
     using CSkyL.Game;
+    using CSkyL.Game.Control;
     using CSkyL.Game.Utils;
     using CSkyL.Transform;
-    using CSkyL.Game.Control;
 
     public class FreeCam : Base
     {
