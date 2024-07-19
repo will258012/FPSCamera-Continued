@@ -1,7 +1,6 @@
 namespace FPSCamera.UI
 {
     using Config;
-    using CSkyL.Config;
     using CSkyL.UI;
     using CStyle = CSkyL.UI.Style;
     using Ctransl = CSkyL.Translation.Translations;
@@ -157,24 +156,25 @@ namespace FPSCamera.UI
                 var props = _DefaultProps(group);
 
                 CStyle.Current.scale = .8f;
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyCamToggle)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeySpeedUp)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyCamReset)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyCursorToggle)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyAutoMove)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeySaveOffset)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyCamToggle)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeySpeedUp)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyCamReset)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyCursorToggle)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyAutoMove)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeySaveOffset)));
 
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveForward)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveBackward)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveLeft)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveRight)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveUp)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveDown)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveForward)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveBackward)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveLeft)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveRight)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveUp)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveDown)));
 
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyRotateLeft)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyRotateRight)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyRotateUp)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyRotateDown)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyRotateLeft)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyRotateRight)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyRotateUp)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyRotateDown)));
+                _settings.Add(group.Add<UUIKeySetting>(props.Swap(Config.instance.KeyUUIToggle)));
                 CStyle.Current = Style.basic;
             }
             {

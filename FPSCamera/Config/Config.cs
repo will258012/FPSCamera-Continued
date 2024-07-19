@@ -198,6 +198,8 @@ namespace FPSCamera.Config
         [Config("KeyRotateDown", "SETTINGS_KEYROTATEDOWN")]
         public readonly CfKey KeyRotateDown = new CfKey(KeyCode.DownArrow);
 
+        [Config("KeyUUIToggle", "SETTINGS_KEYUUITOGGLE", "SETTINGS_KEYUUITOGGLE_DETAIL")]
+        public readonly CfKeyWithWithModifiers KeyUUIToggle = new CfKeyWithWithModifiers(new CSkyL.UI.KeyInput.KeyCodeWithModifiers(KeyCode.F, EventModifiers.Shift));
         #endregion
 
         #region Smooth Transition Options
