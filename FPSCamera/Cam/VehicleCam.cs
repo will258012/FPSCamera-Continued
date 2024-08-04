@@ -51,10 +51,10 @@ namespace FPSCamera.Cam
         }
 
         protected override Offset _LocalOffset
-            => Config.instance.VehicleFixedOffset.AsOffSet.FollowedBy(
+            => Config.instance.VehicleFixedOffset.ToOffset().FollowedBy(
                    !_target.IsHead && _target.GetPrefabName() !=
                        (Object.Of(_target.GetFrontVehicleID()) as Vehicle).GetPrefabName() ?
-                   Config.instance.MidVehFixedOffset.AsOffSet : Offset.None);
+                   Config.instance.MidVehFixedOffset.ToOffset() : Offset.None);
 
         private bool _wasReversed;
     }

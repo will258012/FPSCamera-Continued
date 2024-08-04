@@ -79,7 +79,7 @@ namespace FPSCamera.Cam
 
             return pos
                 .Apply(_LocalOffset)
-                .Apply(Config.instance.FollowCamOffset.AsOffSet)
+                .Apply(Config.instance.FollowCamOffset.ToOffset())
                 .Apply(_inputOffset);
         }
 

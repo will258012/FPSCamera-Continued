@@ -27,7 +27,7 @@ namespace FPSCamera.Cam
         }
 
         protected override Offset _LocalOffset
-            => Config.instance.PedestrianFixedOffset.AsOffSet;
+            => Config.instance.PedestrianFixedOffset.ToOffset();
 
         public override GameUtil.Infos GetTargetInfos()
         {
