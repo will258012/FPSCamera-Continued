@@ -22,8 +22,8 @@ namespace FPSCamera.Config
 
         public Offset this[string key] {
             get {
-                if (_offsets.TryGetValue(key, out var offset)) return offset.AsOffSet;
-                return (_offsets[key] = _DefaultFor<CfOffset>()).AsOffSet;
+                if (_offsets.TryGetValue(key, out var offset)) return offset.ToOffset();
+                return (_offsets[key] = _DefaultFor<CfOffset>()).ToOffset();
             }
             set => _offsets[key].Assign(value);
         }

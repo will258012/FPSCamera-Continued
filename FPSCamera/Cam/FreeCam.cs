@@ -2,6 +2,7 @@
 {
     using Config;
     using CSkyL.Game;
+    using CSkyL.Game.Control;
     using CSkyL.Game.Utils;
     using CSkyL.Transform;
 
@@ -15,7 +16,7 @@
 
         public override void InputOffset(Offset inputOffset)
         {
-            if (_autoMove && !Control.MousePressed(Control.MouseButton.Secondary))
+            if (_autoMove && !InputManager.MousePressed(InputManager.MouseButton.Secondary))
                 inputOffset.movement.forward += GameUtil.TimeSinceLastFrame
                                                 * Config.instance.MovementSpeed / Map.ToKilometer(1f);
             _lastPosition = _positioning.position;

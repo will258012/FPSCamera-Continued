@@ -51,12 +51,12 @@ namespace FPSCamera.UI
                     y = 50f, size = _btnSize
                 };
                 var btn = group.Add<TextButton>(btnProps);
-                btn.SetTriggerAction(() => Mod.I?.LoadConfig());
+                btn.SetTriggerAction(() => Mod.Instance?.LoadConfig());
 
                 btnProps.name = "ResetConfig"; btnProps.text = Ctransl.Translate("SETTINGS_RESETBTN");
                 btnProps.y += _btnSize.height;
                 btn = group.Add<TextButton>(btnProps);
-                btn.SetTriggerAction(() => Mod.I?.ResetConfig());
+                btn.SetTriggerAction(() => Mod.Instance?.ResetConfig());
             }
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
@@ -156,24 +156,25 @@ namespace FPSCamera.UI
                 var props = _DefaultProps(group);
 
                 CStyle.Current.scale = .8f;
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyCamToggle)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeySpeedUp)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyCamReset)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyCursorToggle)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyAutoMove)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeySaveOffset)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyCamToggle)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeySpeedUp)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyCamReset)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyCursorToggle)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyAutoMove)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeySaveOffset)));
 
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveForward)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveBackward)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveLeft)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveRight)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveUp)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyMoveDown)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveForward)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveBackward)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveLeft)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveRight)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveUp)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyMoveDown)));
 
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyRotateLeft)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyRotateRight)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyRotateUp)));
-                _settings.Add(group.Add<KeyMapSetting>(props.Swap(Config.instance.KeyRotateDown)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyRotateLeft)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyRotateRight)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyRotateUp)));
+                _settings.Add(group.Add<KeyOnlyMapSetting>(props.Swap(Config.instance.KeyRotateDown)));
+                _settings.Add(group.Add<UUIKeySetting>(props.Swap(Config.instance.KeyUUIToggle)));
                 CStyle.Current = Style.basic;
             }
             {
@@ -209,11 +210,12 @@ namespace FPSCamera.UI
             {
                 var group = settingPanel.Add<Group>(new LayoutProperties
                 {
-                    name = "LODOpt", text = Ctransl.Translate("SETTINGS_GROUPNAME_LODSOPT"),
+                    name = "Opt", text = Ctransl.Translate("SETTINGS_GROUPNAME_OPT"),
                     autoLayout = true, layoutGap = 10
                 });
                 var props = _DefaultProps(group);
                 _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.instance.LODOptimization)));
+                _settings.Add(group.Add<ToggleSetting>(props.Swap(Config.instance.ShadowsOptimization)));
             }
         }
 
