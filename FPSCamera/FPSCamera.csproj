@@ -8,11 +8,15 @@
       C:\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\;
       ..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\;
     </AssemblySearchPaths>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Deterministic>False</Deterministic>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <Deterministic>True</Deterministic>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ColossalManaged">
@@ -21,15 +25,16 @@
     <Reference Include="ICities">
       <Private>False</Private>
     </Reference>
+    <Reference Include="ToggleIt">
+      <HintPath>..\..\..\..\..\SteamLibrary\steamapps\workshop\content\255710\1764637396\ToggleIt.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnifiedUILib">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\workshop\content\255710\2966990700\UnifiedUILib.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <Private>False</Private>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CSkyL\CSkyL.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
@@ -45,11 +50,6 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="rd /s /q &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;&#xD;&#xA;mkdir &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;&#xD;&#xA;xcopy /e /y &quot;$(TargetDir)&quot; &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)&quot;" />
   </Target>
-  <ItemGroup>
-    <None Update="Resources\icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <ItemGroup>
     <Reference Update="System">
       <Private>False</Private>
@@ -85,4 +85,19 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CitiesHarmony.API" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Resources\icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Translations\en-EN.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Translations\zh-CN.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="..\AlgernonCommons\AlgernonCommonsPatchingShared.projitems" Label="Shared" />
 </Project>
