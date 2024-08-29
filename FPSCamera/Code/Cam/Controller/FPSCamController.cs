@@ -36,7 +36,7 @@ namespace FPSCamera.Cam.Controller
                 CamInfoPanel.Instance.EnableCamInfoPanel();
             if (ModSettings.HideGameUI)
             {
-                UIManager.ToggleUI(false);
+                StartCoroutine(UIManager.ToggleUI(false));
             }
             GameCamController.Instance.Initialize();
             //StartCoroutine(ShadowsManager.ToggleShadowsOptimization(true));
@@ -72,8 +72,8 @@ namespace FPSCamera.Cam.Controller
         {
             if (ModSettings.HideGameUI)
             {
-                UIManager.ToggleUI(true);
                 GameCamController.Instance.MainCamera.rect = GameCamController.Instance._cachedRect;
+                StartCoroutine(UIManager.ToggleUI(true));
             }
             GameCamController.Instance.Restore();
         }

@@ -6,7 +6,6 @@
     using FPSCamera.Settings;
     using FPSCamera.Utils;
     using System.Collections.Generic;
-    using System.Linq;
     using UnityEngine;
 
     public class CamInfoPanel : MonoBehaviour
@@ -42,7 +41,7 @@
             enabled = false;
         }
 
-        protected void LateUpdate()
+        private void Update()
         {
             var cam = FPSCamController.Instance.FPSCam;
             if (cam.IsVaild())
@@ -126,12 +125,12 @@
             var columnRect = rect; columnRect.width = fieldWidth;
             DrawInfoFields(_leftInfos, style, columnRect, infoMargin);
             columnRect.x += fieldWidth + margin; columnRect.width = textWidth;
-            DrawListInRows(_leftInfos.Select(info => info.Value), style, columnRect, infoMargin);
+            DrawListInRows(_leftInfos.Values, style, columnRect, infoMargin);
 
             rect.x += blockWidth * 3f;
             style.alignment = TextAnchor.MiddleRight;
             columnRect = rect; columnRect.width = textWidth;
-            DrawListInRows(_rightInfos.Select(info => info.Value), style, columnRect, infoMargin);
+            DrawListInRows(_rightInfos.Values, style, columnRect, infoMargin);
             columnRect.x += textWidth + margin; columnRect.width = fieldWidth;
             DrawInfoFields(_rightInfos, style, columnRect, infoMargin);
 
@@ -155,7 +154,7 @@
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = (int)(oFontSize * _fieldFontSizeRatio);
 
-            DrawListInRows(infos.Select(info => info.Key), style, rect, margin);
+            DrawListInRows(infos.Keys, style, rect, margin);
 
             style.normal.background = null;
             style.alignment = oAlign; style.fontSize = oFontSize;

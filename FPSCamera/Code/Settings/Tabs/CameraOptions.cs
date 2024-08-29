@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace FPSCamera.Settings.Tabs
 {
-    public sealed partial class CameraOptions
+    public sealed class CameraOptions
     {
         // Layout constants.
         private const float Margin = 5f;
@@ -122,7 +122,7 @@ namespace FPSCamera.Settings.Tabs
             rotateKeyFactor_Slider.eventValueChanged += (_, value) => ModSettings.RotateKeyFactor = value;
             currentY += rotateKeyFactor_Slider.height + SliderMargin;
 
-            maxPitchDeg_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MAXPITSHDEG"), 10f, 90f, 1f, ModSettings.MaxPitchDeg, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "°"));
+            maxPitchDeg_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MAXPITSHDEG"), 10f, 89f, 1f, ModSettings.MaxPitchDeg, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "°"));
             maxPitchDeg_Slider.tooltip = Translations.Translate("SETTINGS_MAXPITSHDEG_DETAIL");
             maxPitchDeg_Slider.eventValueChanged += (_, value) => ModSettings.MaxPitchDeg = value;
             currentY += maxPitchDeg_Slider.height + SliderMargin;

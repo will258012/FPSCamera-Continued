@@ -6,8 +6,7 @@ using UnityEngine;
 
 namespace FPSCamera.Settings.Tabs
 {
-
-    internal class GeneralOptions
+    public sealed class GeneralOptions
     {
         // Layout constants.
         private const float LeftMargin = 24f;

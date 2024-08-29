@@ -53,7 +53,7 @@ namespace FPSCamera.Cam.Controller
             if (_camDoF != null) _camDoF.enabled = _IsDoFEnabled;
             if (_camTiltEffect != null) _camTiltEffect.enabled = _IsTiltEffectEnabled;
 
-            _mainCamera.fieldOfView= _cachedfieldOfView;
+            _mainCamera.fieldOfView = _cachedfieldOfView;
             _mainCamera.farClipPlane = _cachednearClipPlane;
 
             _controller.enabled = true;

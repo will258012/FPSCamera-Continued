@@ -25,7 +25,7 @@
             Panel.backgroundSprite = "ScrollbarTrack";
             Panel.width = 400f;
             Panel.height = 1000f;
-            Panel.isVisible = false;
+            AddSettings();
             Panel.eventVisibilityChanged += (_, isVisible) =>
             {
                 if (!isVisible)
@@ -37,12 +37,14 @@
                     AddSettings();
                 }
             };
+            Panel.isVisible = false;
 
             if (ModSupport.FoundUUI)
             {
                 UUISupport.UUIRegister();
                 return;
             }
+
             #endregion
 
             #region Main Button
@@ -125,8 +127,6 @@
             fov_Slider.eventValueChanged += (_, value) => ModSettings.CamFieldOfView = value;
             currentY += fov_Slider.height + SliderMargin;
 
-            //_settings.Add(_mainPanel.Add<ToggleSetting>(props.Swap(Config.instance.SmoothTransition)));
-
             string[] groundClipingItems = new[]
             {
                 Translations.Translate("SETTINGS_GROUNDCLIPING_NONE"),
@@ -163,7 +163,11 @@
 
                 var walkThruBtn = UIButtons.AddButton(Panel, Margin, currentY, Translations.Translate("WALKTHRUBTN_TEXT"), 200f, 40f);
 
-                walkThruBtn.eventClick += (_, m) => FPSCamController.Instance.StartWalkThruCam();
+                walkThruBtn.eventClick += (_, m) =>
+                {
+                    FPSCamController.Instance.StartWalkThruCam();
+                    Panel.isVisible = false;
+                };
                 Panel.height = currentY + walkThruBtn.height + Margin;
             }
             else
@@ -175,7 +179,7 @@
         {
             foreach (var component in Panel.components)
             {
-                Destroy(component.gameObject);
+                Destroy(component);
             }
         }
         public bool OnEsc()

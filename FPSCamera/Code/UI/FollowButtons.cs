@@ -2,107 +2,49 @@
 using ColossalFramework.UI;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Utils;
+using System;
 using UnityEngine;
 
 namespace FPSCamera.UI
 {
     public class FollowButtons : MonoBehaviour
     {
-        private void OnDestroy()
-        {
-            Destroy(citizenVehicleCameraButton);
-            Destroy(cityServiceVehicleCameraButton);
-            Destroy(publicTransportCameraButton);
-            Destroy(citizenCameraButton);
-            Destroy(touristCameraButton);
-        }
-
         private void Awake()
         {
-            var citizenVehicleInfoPanel = UIView.library.Get<CitizenVehicleWorldInfoPanel>(typeof(CitizenVehicleWorldInfoPanel).Name);
-            citizenVehicleCameraButton = CreateCameraButton
-            (
-                citizenVehicleInfoPanel.component,
-                (_, param) =>
-                {
-                    var instance = PrivateField.GetValue<InstanceID>(citizenVehicleInfoPanel, "m_InstanceID");
-                    FPSCamController.Instance.StartFollowing(instance);
-                }
-            );
-            citizenVehicleCameraButton.parent.eventVisibilityChanged += (_, isShow) =>
-            {
-                if (isShow == true)
-                {
-                    var instance = PrivateField.GetValue<InstanceID>(citizenVehicleInfoPanel, "m_InstanceID");
-                    if (instance.Type == InstanceType.ParkedVehicle) citizenVehicleCameraButton.isVisible = false;
-                }
-            };
-            var cityServiceVehicleInfoPanel = UIView.library.Get<CityServiceVehicleWorldInfoPanel>(typeof(CityServiceVehicleWorldInfoPanel).Name);
-            cityServiceVehicleCameraButton = CreateCameraButton
-            (
-                cityServiceVehicleInfoPanel.component,
-                (_, param) =>
-                {
-                    if (!(PrivateField.GetValue<InstanceID>(cityServiceVehicleInfoPanel, "m_InstanceID") is var instance))
-                    {
-                        cityServiceVehicleCameraButton.isVisible = false;
-                        return;
-                    }
-                    FPSCamController.Instance.StartFollowing(instance);
-                }
-            );
-
-            var publicTransportVehicleInfoPanel = UIView.library.Get<PublicTransportVehicleWorldInfoPanel>(typeof(PublicTransportVehicleWorldInfoPanel).Name);
-            publicTransportCameraButton = CreateCameraButton
-            (
-                publicTransportVehicleInfoPanel.component,
-                (_, param) =>
-                {
-                    if (!(PrivateField.GetValue<InstanceID>(publicTransportVehicleInfoPanel, "m_InstanceID") is var instance))
-                    {
-                        publicTransportCameraButton.isVisible = false;
-                        return;
-                    }
-                    FPSCamController.Instance.StartFollowing(instance);
-                }
-            );
-
-            var citizenInfoPanel = UIView.library.Get<CitizenWorldInfoPanel>(typeof(CitizenWorldInfoPanel).Name);
-            citizenCameraButton = CreateCameraButton
-            (
-                citizenInfoPanel.component,
-                (_, param) =>
-                {
-                    if (!(PrivateField.GetValue<InstanceID>(citizenInfoPanel, "m_InstanceID") is var instance))
-                    {
-                        citizenCameraButton.isVisible = false;
-                        return;
-                    }
-                    FPSCamController.Instance.StartFollowing(instance);
-                }
-            );
-
-            var touristInfoPanel = UIView.library.Get<TouristWorldInfoPanel>(typeof(TouristWorldInfoPanel).Name);
-            touristCameraButton = CreateCameraButton
-            (
-                touristInfoPanel.component,
-                (_, param) =>
-                {
-                    if (!(PrivateField.GetValue<InstanceID>(touristInfoPanel, "m_InstanceID") is var instance))
-                    {
-                        touristCameraButton.isVisible = false;
-                        return;
-                    }
-                    FPSCamController.Instance.StartFollowing(instance);
-                }
-            );
+            citizenVehicleInfo_Button = Initialize(ref citizenVehicleInfo_Panel);
+            cityServiceVehicleInfo_Button = Initialize(ref cityServiceVehicleInfo_Panel);
+            publicTransportVehicleInfo_Button = Initialize(ref publicTransportVehicleInfo_Panel);
+            citizenInfo_Button = Initialize(ref citizenInfo_Panel);
+            touristInfo_Button = Initialize(ref touristInfo_Panel);
+        }
+        private void Update()
+        {
+            UpdateButtonVisibility(citizenVehicleInfo_Panel, citizenVehicleInfo_Button,
+                id => id.Type != InstanceType.ParkedVehicle);
+            UpdateButtonVisibility(cityServiceVehicleInfo_Panel, cityServiceVehicleInfo_Button);
+            UpdateButtonVisibility(publicTransportVehicleInfo_Panel, publicTransportVehicleInfo_Button);
+            UpdateButtonVisibility(citizenInfo_Panel, citizenInfo_Button);
+            UpdateButtonVisibility(touristInfo_Panel, touristInfo_Button);
+        }
+        private void OnDestroy()
+        {
+            Destroy(citizenVehicleInfo_Button);
+            Destroy(cityServiceVehicleInfo_Button);
+            Destroy(publicTransportVehicleInfo_Button);
+            Destroy(citizenInfo_Button);
+            Destroy(touristInfo_Button);
         }
 
-        UIButton CreateCameraButton(UIComponent parentComponent, MouseEventHandler handler)
+        private UIButton Initialize<T>(ref T panel) where T : WorldInfoPanel
         {
-            //var button = UIView.GetAView().AddUIComponent(typeof(UIButton)) as UIButton;
-            var button = parentComponent.AddUIComponent<UIButton>();
-            button.name = parentComponent.name + "_StartFollow";
+            panel = UIView.library.Get<T>(typeof(T).Name);
+            return CreateCameraButton(panel);
+        }
+
+        private UIButton CreateCameraButton<T>(T panel) where T : WorldInfoPanel
+        {
+            var button = panel.component.AddUIComponent<UIButton>();
+            button.name = panel.component.name + "_StartFollow";
             button.tooltip = Translations.Translate("FOLLOWBTN_TOOLTIP");
             button.size = new Vector2(40f, 40f);
             button.scaleFactor = .8f;
@@ -116,17 +58,41 @@ namespace FPSCamera.UI
             button.hoveredTextColor = new Color32(255, 255, 255, 255);
             button.focusedTextColor = new Color32(255, 255, 255, 255);
             button.pressedTextColor = new Color32(30, 30, 44, 255);
-            button.eventClick += handler;
-            button.AlignTo(parentComponent, UIAlignAnchor.BottomRight);
-            button.relativePosition = new Vector3(parentComponent.width - 10f, parentComponent.height - 30f);
+            button.eventClick += (_, p) =>
+            {
+                FPSCamController.Instance.StartFollowing(GetPanelInstanceID(panel));
+                panel.component.isVisible = false;
+            };
+            button.AlignTo(panel.component, UIAlignAnchor.BottomRight);
+            button.relativePosition = new Vector3(button.relativePosition.x - 4f, button.relativePosition.y - 20f);
+
             return button;
         }
+        private void UpdateButtonVisibility<T>(T panel, UIButton button, Func<InstanceID, bool> filter = null) where T : WorldInfoPanel
+        {
+            if (panel.component.isVisible)
+            {
+                var instanceID = GetPanelInstanceID(panel);
+                button.isVisible = instanceID != default && (filter?.Invoke(instanceID) ?? true);
+            }
+        }
 
-        private UIButton citizenVehicleCameraButton;
-        private UIButton cityServiceVehicleCameraButton;
-        private UIButton publicTransportCameraButton;
-        private UIButton citizenCameraButton;
-        private UIButton touristCameraButton;
+        private InstanceID GetPanelInstanceID<T>(T panel) where T : WorldInfoPanel => PrivateField.GetValue<InstanceID>(panel, "m_InstanceID");
+
+        private CitizenVehicleWorldInfoPanel citizenVehicleInfo_Panel;
+        private UIButton citizenVehicleInfo_Button;
+
+        private CityServiceVehicleWorldInfoPanel cityServiceVehicleInfo_Panel;
+        private UIButton cityServiceVehicleInfo_Button;
+
+        private PublicTransportVehicleWorldInfoPanel publicTransportVehicleInfo_Panel;
+        private UIButton publicTransportVehicleInfo_Button;
+
+        private CitizenWorldInfoPanel citizenInfo_Panel;
+        private UIButton citizenInfo_Button;
+
+        private TouristWorldInfoPanel touristInfo_Panel;
+        private UIButton touristInfo_Button;
     }
 
 }

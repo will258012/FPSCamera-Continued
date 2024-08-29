@@ -1,5 +1,6 @@
 ﻿using ColossalFramework.UI;
 using FPSCamera.Utils;
+using System.Collections;
 using UnityEngine;
 using Log = AlgernonCommons.Logging;
 using ToggleItManager = ToggleIt.Managers.ToggleManager;
@@ -18,7 +19,7 @@ namespace FPSCamera.Game
 
         private static UIState savedState;
 
-        public static void ToggleUI(bool visibility)
+        public static IEnumerator ToggleUI(bool visibility)
         {
             if (ModSupport.FoundToggleIt)
             {
@@ -37,6 +38,7 @@ namespace FPSCamera.Game
             {
                 SetUIVisibilityDirectly(visibility);
             }
+            yield break;
         }
 
         private static void SaveState()
