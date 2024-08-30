@@ -179,7 +179,7 @@
         {
             foreach (var component in Panel.components)
             {
-                Destroy(component);
+                Destroy(component.gameObject);
             }
         }
         public bool OnEsc()
