@@ -1,8 +1,8 @@
-﻿using ColossalFramework.UI;
+﻿using AlgernonCommons;
+using ColossalFramework.UI;
 using FPSCamera.Utils;
 using System.Collections;
 using UnityEngine;
-using Log = AlgernonCommons.Logging;
 using ToggleItManager = ToggleIt.Managers.ToggleManager;
 namespace FPSCamera.Game
 {
@@ -29,8 +29,8 @@ namespace FPSCamera.Game
                 }
                 catch (System.Exception e)
                 {
-                    Log.Error($"ModSupport: Failed to toggle UI using \"Toggle It!\". Falling back to the vanilla way.");
-                    Log.LogException(e);
+                    Logging.Error($"ModSupport: Failed to toggle UI using \"Toggle It!\". Falling back to the vanilla way.");
+                    Logging.LogException(e);
                     SetUIVisibilityDirectly(visibility);
                 }
             }
@@ -51,13 +51,12 @@ namespace FPSCamera.Game
                 ContoursVisible = ToggleItManager.Instance.GetById(5).On,
                 DirectNamesVisible = ToggleItManager.Instance.GetById(10).On,
             };
-            if (Log.DetailLogging)
-                Log.Message($"ModSupport: Saved UI state from \"Toggle It!\":\n" +
-                         $"  NotificationIcons = {savedState.NotificationsVisible}\n" +
-                         $"  BorderLines = {savedState.BordersVisible}\n" +
-                         $"  ContourLines = {savedState.ContoursVisible}\n" +
-                         $"  RoadNames = {savedState.RoadNamesVisible}\n" +
-                         $"  DistrictNames = {savedState.DirectNamesVisible}");
+            Logging.Message($"ModSupport: Saved UI state from \"Toggle It!\":\n" +
+                     $"  NotificationIcons = {savedState.NotificationsVisible}\n" +
+                     $"  BorderLines = {savedState.BordersVisible}\n" +
+                     $"  ContourLines = {savedState.ContoursVisible}\n" +
+                     $"  RoadNames = {savedState.RoadNamesVisible}\n" +
+                     $"  DistrictNames = {savedState.DirectNamesVisible}");
         }
 
         private static void RestoreState()
@@ -69,8 +68,7 @@ namespace FPSCamera.Game
                 ToggleItManager.Instance.Apply(4, savedState.BordersVisible);
                 ToggleItManager.Instance.Apply(5, savedState.ContoursVisible);
                 ToggleItManager.Instance.Apply(10, savedState.DirectNamesVisible);
-                if (Log.DetailLogging)
-                    Log.Message("ModSupport: Restored saved UI state using \"Toggle It!\"");
+                Logging.Message("ModSupport: Restored saved UI state using \"Toggle It!\"");
             }
         }
 
@@ -85,8 +83,7 @@ namespace FPSCamera.Game
                 ToggleItManager.Instance.Apply(4, false);
                 ToggleItManager.Instance.Apply(5, false);
                 ToggleItManager.Instance.Apply(10, false);
-                if (Log.DetailLogging)
-                    Log.Message("ModSupport: Hid UI using \"Toggle It!\"");
+                Logging.Message("ModSupport: Hid UI using \"Toggle It!\"");
             }
             else
             {
@@ -95,7 +92,8 @@ namespace FPSCamera.Game
             PropManager.instance.MarkersVisible = visibility;
             GuideManager.instance.TutorialDisabled = !visibility;
             DisasterManager.instance.MarkersVisible = visibility;
-            UIView.GetAView().enabled = visibility;
+            UIView.GetAView().uiCamera.enabled = visibility;
+
         }
 
         private static void SetUIVisibilityDirectly(bool visibility)
@@ -107,7 +105,7 @@ namespace FPSCamera.Game
             GuideManager.instance.TutorialDisabled = !visibility;
             DisasterManager.instance.MarkersVisible = visibility;
             NetManager.instance.RoadNamesVisible = visibility;
-            UIView.GetAView().enabled = visibility;
+            UIView.GetAView().uiCamera.enabled = visibility;
             if (!visibility)
                 Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
         }
