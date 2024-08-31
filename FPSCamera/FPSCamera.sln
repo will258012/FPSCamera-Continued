@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPSCamera", "FPSCamera.csproj", "{72C99E7C-C11B-4669-90ED-0944DE5B9085}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPSCamera", "FPSCamera.csproj", "{72C99E7C-C11B-4669-90ED-0944DE5B9085}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSkyL", "..\CSkyL\CSkyL.csproj", "{6BB1C7F9-F48A-4735-BBBD-ED6B113DC275}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlgernonCommonsPatchingShared", "..\AlgernonCommons\AlgernonCommonsPatchingShared.shproj", "{25AEF446-6F0D-43A8-BB84-D1306789B68C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,15 +16,15 @@ Global
 		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72C99E7C-C11B-4669-90ED-0944DE5B9085}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6BB1C7F9-F48A-4735-BBBD-ED6B113DC275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6BB1C7F9-F48A-4735-BBBD-ED6B113DC275}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6BB1C7F9-F48A-4735-BBBD-ED6B113DC275}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6BB1C7F9-F48A-4735-BBBD-ED6B113DC275}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4780C5DF-A7C7-4D54-8825-207A4970BE40}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\AlgernonCommons\AlgernonCommonsPatchingShared.projitems*{25aef446-6f0d-43a8-bb84-d1306789b68c}*SharedItemsImports = 13
+		..\AlgernonCommons\AlgernonCommonsPatchingShared.projitems*{72c99e7c-c11b-4669-90ed-0944de5b9085}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
