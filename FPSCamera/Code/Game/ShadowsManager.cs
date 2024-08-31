@@ -5,19 +5,19 @@ namespace FPSCamera.Game
 {
     public class ShadowsManager
     {
-        public static IEnumerator ToggleShadowsOptimization(bool status)
+        public static IEnumerator ToggleShadowsOpt(bool status)
         {
             try
             {
                 Logging.Message("-- Setting shadows distance");
                 if (status)
                 {
-                    beforeOptimization = UnityEngine.QualitySettings.shadowDistance;
-                    UnityEngine.QualitySettings.shadowDistance = Optimization;
+                    _cachedDist = UnityEngine.QualitySettings.shadowDistance;
+                    UnityEngine.QualitySettings.shadowDistance = Opt;
                 }
                 else
                 {
-                    UnityEngine.QualitySettings.shadowDistance = beforeOptimization;
+                    UnityEngine.QualitySettings.shadowDistance = _cachedDist;
                 }
             }
 
@@ -27,8 +27,8 @@ namespace FPSCamera.Game
             }
             yield break;
         }
-        private static float beforeOptimization;
-        private const float Optimization = 512f;
+        private static float _cachedDist;
+        private const float Opt = 512f;
     }
 
 }

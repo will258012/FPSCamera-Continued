@@ -11,7 +11,6 @@ namespace FPSCamera.Settings
             new GeneralOptions(tabStrip, 0);
             new CameraOptions(tabStrip, 1);
             new HotKeyOptions(tabStrip, 2);
-            ///TODO:Smooth Transition Options Optimization Options 
 
             // Select first tab.
             tabStrip.selectedIndex = -1;

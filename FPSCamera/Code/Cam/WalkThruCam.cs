@@ -1,15 +1,15 @@
 ﻿using AlgernonCommons;
 using ColossalFramework;
+using ColossalFramework.UI;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using static FPSCamera.Utils.MathUtils;
 
 namespace FPSCamera.Cam
 {
-    /// TODO : WIP
-
     public class WalkThruCam : IFollowCam, IFPSCam
     {
         public WalkThruCam()
@@ -38,7 +38,6 @@ namespace FPSCamera.Cam
                 _elapsedTime > ModSettings.PeriodWalk) status = false;
             if (!status)
             {
-                //status = SetRandomCam() && (_currentCam?.IsVaild() ?? false);
                 SetRandomCam();
                 status = _currentCam?.IsVaild() ?? false;
                 if (!status)
@@ -49,18 +48,18 @@ namespace FPSCamera.Cam
             }
             return status;
         }
-        private bool SetRandomCam()
+        private void SetRandomCam()
         {
             _currentCam = null;
             Logging.Message(" -- switching target");
 
-            var items = GetVehicles((v) =>
+            items = GetVehicles((v) =>
             {
-                if (v.IsFlagSet(VehicleInfo.VehicleCategory.PassengerCar))
+                if (v.IsFlagSet(VehicleInfo.VehicleCategory.PassengerCar) || v.IsFlagSet(VehicleInfo.VehicleCategory.Bicycle))
                     return ModSettings.SelectDriving;
                 if (v.IsFlagSet(VehicleInfo.VehicleCategory.PublicTransport))
                     return ModSettings.SelectPublicTransit;
-                if (v.IsFlagSet(VehicleInfo.VehicleCategory.CityServices))
+                if (v.IsFlagSet(VehicleInfo.VehicleCategory.CityServices) || v.IsFlagSet(CityServiceCopters))
                     return ModSettings.SelectService;
                 if (v.IsFlagSet(VehicleInfo.VehicleCategory.Cargo))
                     return ModSettings.SelectCargo;
@@ -74,20 +73,16 @@ namespace FPSCamera.Cam
                         if (c.IsFlagSet(CitizenInstance.Flags.Transition))
                             return ModSettings.SelectPassenger;
 
-                        if (c.IsFlagSet(CitizenInstance.Flags.EnteringVehicle))
+                        if (c.IsFlagSet(CitizenInstance.Flags.EnteringVehicle) || c.IsFlagSet(CitizenInstance.Flags.RidingBicycle))
                             return false;    // already selected by Vehicle
 
                         if (c.IsFlagSet(CitizenInstance.Flags.WaitingTransport))
                             return ModSettings.SelectWaiting;
 
-                        if (c.IsFlagSet(CitizenInstance.Flags.Created))
-                            return ModSettings.SelectPedestrian;
-
-                        Logging.Error("WalkThru selection: unknown citizen type:" + c);
-                        return false;
+                        return ModSettings.SelectPedestrian;
                     }));
 
-            if (!items.Any()) return false;
+            if (!items.Any()) return;
             Logging.Message("Total: " + items.Count().ToString());
             int attempt = 3;
             do
@@ -99,7 +94,6 @@ namespace FPSCamera.Cam
 
             _elapsedTime = 0f;
             FPSCamController.Instance.SyncCamOffset(_currentCam);
-            return true;
         }
 
 
@@ -109,10 +103,11 @@ namespace FPSCamera.Cam
             _currentCam = null;
             IsActivated = false;
         }
-
+        private const VehicleInfo.VehicleCategory CityServiceCopters = VehicleInfo.VehicleCategory.AmbulanceCopter | VehicleInfo.VehicleCategory.FireCopter | VehicleInfo.VehicleCategory.PoliceCopter | VehicleInfo.VehicleCategory.DisasterCopter;
         private IFollowCam _currentCam;
         private float _elapsedTime;
-        private readonly UnityEngine.AudioClip disabledClickSound = UnityEngine.Object.FindObjectOfType<ColossalFramework.UI.UIView>().defaultDisabledClickSound;
+        private IEnumerable<InstanceID> items;
+        private readonly AudioClip disabledClickSound = UIView.GetAView().defaultDisabledClickSound;
 
         /// <summary>
         /// Get a <see cref="IEnumerable{InstanceID}"/> list of vaild vehicles.
@@ -129,7 +124,7 @@ namespace FPSCamera.Cam
         private IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance.Flags, bool> filter) => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
                 .Select(i => new InstanceID() { CitizenInstance = (ushort)i })
                 .Where(c =>
-                CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance].m_flags != CitizenInstance.Flags.None &&
+                CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance].m_flags.IsFlagSet(CitizenInstance.Flags.Created) &&
                 filter(CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance].m_flags));
 
     }

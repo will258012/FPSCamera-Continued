@@ -9,8 +9,10 @@ namespace FPSCamera.UI
 {
     public class FollowButtons : MonoBehaviour
     {
+        public static FollowButtons Instance { get; private set; }
         private void Awake()
         {
+            Instance = this;
             citizenVehicleInfo_Button = Initialize(ref citizenVehicleInfo_Panel);
             cityServiceVehicleInfo_Button = Initialize(ref cityServiceVehicleInfo_Panel);
             publicTransportVehicleInfo_Button = Initialize(ref publicTransportVehicleInfo_Panel);

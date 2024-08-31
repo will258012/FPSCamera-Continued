@@ -5,7 +5,7 @@ namespace FPSCamera.Game
 {
     public class LodManager
     {
-        public static IEnumerator ToggleLODOptimization(bool status)
+        public static IEnumerator ToggleLODOpt(bool status)
         {
             try
             {
@@ -148,15 +148,14 @@ namespace FPSCamera.Game
                         buildingLodDistance: GetLodDistance(BuildingManager.instance),
                         networkLodDistance: GetLodDistance(NetManager.instance),
                         vehicleLodDistance: GetLodDistance(VehicleManager.instance));
-                    if (Logging.DetailLogging)
-                        Logging.Message($"Saved LOD Config:\n" +
-                            $"  CitizenLodDistance = {savedconfig.CitizenLodDistance}\n" +
-                            $"  TreeLodDistance = {savedconfig.TreeLodDistance}\n" +
-                            $"  PropLodDistance = {savedconfig.PropLodDistance}\n" +
-                            $"  DecalPropFadeDistance = {savedconfig.DecalPropFadeDistance}\n" +
-                            $"  BuildingLodDistance = {savedconfig.BuildingLodDistance}\n" +
-                            $"  NetworkLodDistance = {savedconfig.NetworkLodDistance}\n" +
-                            $"  VehicleLodDistance = {savedconfig.VehicleLodDistance}\n");
+                    Logging.Message($"Saved LOD Config:\n" +
+                        $"  CitizenLodDistance = {savedconfig.CitizenLodDistance}\n" +
+                        $"  TreeLodDistance = {savedconfig.TreeLodDistance}\n" +
+                        $"  PropLodDistance = {savedconfig.PropLodDistance}\n" +
+                        $"  DecalPropFadeDistance = {savedconfig.DecalPropFadeDistance}\n" +
+                        $"  BuildingLodDistance = {savedconfig.BuildingLodDistance}\n" +
+                        $"  NetworkLodDistance = {savedconfig.NetworkLodDistance}\n" +
+                        $"  VehicleLodDistance = {savedconfig.VehicleLodDistance}\n");
 
                 }
                 catch (Exception e)

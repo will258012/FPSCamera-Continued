@@ -75,7 +75,9 @@
             if (cam is IFollowCam followcam)
             {
                 _leftInfos[Translations.Translate("INFO_NAME")] = followcam.GetFollowName();
-                _leftInfos[Translations.Translate("INFO_STATUS")] = followcam.GetStatus();
+                var status = followcam.GetStatus();
+                if (!string.IsNullOrEmpty(status))
+                    _leftInfos[Translations.Translate("INFO_STATUS")] = followcam.GetStatus();
             }
             var geoInfos = FPSCamController.Instance.GetGeoInfos();
 

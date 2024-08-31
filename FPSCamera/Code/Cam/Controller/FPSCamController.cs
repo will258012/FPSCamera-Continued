@@ -35,12 +35,13 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.ShowInfoPanel)
                 CamInfoPanel.Instance.EnableCamInfoPanel();
             if (ModSettings.HideGameUI)
-            {
                 StartCoroutine(UIManager.ToggleUI(false));
-            }
+            if (ModSettings.LodOpt)
+                StartCoroutine(LodManager.ToggleLODOpt(true));
+            if (ModSettings.ShadowsOpt)
+                StartCoroutine(ShadowsManager.ToggleShadowsOpt(true));
+            FollowButtons.Instance.enabled = false;
             GameCamController.Instance.Initialize();
-            //StartCoroutine(ShadowsManager.ToggleShadowsOptimization(true));
-            //StartCoroutine(LodManager.ToggleLODOptimization(true));
         }
 
         /// <summary>
@@ -50,16 +51,20 @@ namespace FPSCamera.Cam.Controller
         {
             FPSCam.StopCam();
             FPSCam = _cachedCam = null;
+            FollowButtons.Instance.enabled = true;
             if (ModSettings.ShowInfoPanel)
-            {
                 CamInfoPanel.Instance.DisableCamInfoPanel();
-            }
+            if (ModSettings.LodOpt)
+                StartCoroutine(LodManager.ToggleLODOpt(false));
+            if (ModSettings.ShadowsOpt)
+                StartCoroutine(ShadowsManager.ToggleShadowsOpt(false));
+
             if (ModSettings.SmoothTransition)
             {
                 if (ModSettings.SetBackCamera)
                     StartTransitioningOnDisabled(GameCamController.Instance._cachedPositioning);
                 else
-                    StartTransitioningOnDisabled(new Positioning(GameCamController.Instance.MainCamera.transform.position, GameCamController.Instance.MainCamera.transform.rotation));
+                    StartTransitioningOnDisabled(new Positioning(GameCamController.Instance.MainCamera.transform.position + new Vector3(0f, 50f, 0f), GameCamController.Instance.MainCamera.transform.rotation));
             }
             else
             {
@@ -153,6 +158,7 @@ namespace FPSCamera.Cam.Controller
             }
             catch (Exception e)
             {
+                Logging.Error("FPSCamController: ");
                 Logging.LogException(e);
             }
         }
@@ -180,7 +186,11 @@ namespace FPSCamera.Cam.Controller
                     HandleInput();
                 }
             }
-            catch (Exception e) { Logging.LogException(e); }
+            catch (Exception e)
+            {
+                Logging.Error("FPSCamController: ");
+                Logging.LogException(e);
+            }
         }
 
         /// <summary>
@@ -205,17 +215,15 @@ namespace FPSCamera.Cam.Controller
         {
             var infos = new Dictionary<string, string>();
 
-            if (!(FPSCam.GetPositioning() is var positioning)) return infos;
+            var pos = FPSCam.GetPositioning().pos;
 
-            var pos = positioning.pos;
-
-            if (MapUtils.RayCastDistrict(pos) is InstanceID disID && disID != default)
+            if (MapUtils.RayCastDistrict(pos) is InstanceID disID && disID.District != default)
             {
                 var name = DistrictManager.instance.GetDistrictName(disID.District);
                 if (!string.IsNullOrEmpty(name))
                     infos[Translations.Translate("INFO_DISTRICT")] = name;
             }
-            if (MapUtils.RayCastPark(pos) is InstanceID parkID && parkID != default)
+            if (MapUtils.RayCastPark(pos) is InstanceID parkID && parkID.Park != default)
             {
                 var name = DistrictManager.instance.GetParkName(parkID.Park);
                 if (!string.IsNullOrEmpty(name))
@@ -245,7 +253,7 @@ namespace FPSCamera.Cam.Controller
                 }
 
             }
-            if (MapUtils.RayCastRoad(pos) is InstanceID segID && segID != default)
+            if (MapUtils.RayCastRoad(pos) is InstanceID segID && segID.NetSegment != default)
             {
                 var name = NetManager.instance.GetSegmentName(segID.NetSegment);
                 if (!string.IsNullOrEmpty(name))
@@ -314,8 +322,7 @@ namespace FPSCamera.Cam.Controller
 
             { // key movement
                 var movementFactor = (InputManager.KeyPressed(ModSettings.KeySpeedUp) ? ModSettings.SpeedUpFactor : 1f)
-                                     * ModSettings.MovementSpeed * Time.deltaTime
-                                     / 1f.ToKilometer();
+                                     * ModSettings.MovementSpeed * Time.deltaTime / MapUtils.ToKilometer(1f);
 
                 var LocalMovement = Vector3.zero;
                 if (InputManager.KeyPressed(ModSettings.KeyMoveForward)) LocalMovement += Vector3.forward * movementFactor;
@@ -500,10 +507,14 @@ namespace FPSCamera.Cam.Controller
 
             // Limit the camera's position to the allowed area.
             instancePos = CameraController.ClampCameraPosition(instancePos);
+
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-                cameraTransform.position = freecam._positioning.pos = Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed);
+                cameraTransform.position = freecam._positioning.pos = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+                                            cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
+                    ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
+                    : instancePos;
                 cameraTransform.rotation = freecam._positioning.rotation = Quaternion.Lerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
@@ -523,13 +534,13 @@ namespace FPSCamera.Cam.Controller
         {
             var cameraTransform = GameCamController.Instance.MainCamera.transform;
 
-            // Apply the calculated position and rotation to the camera.
-            if (cameraTransform.position.DistanceTo(_endPos.pos).AlmostEquals(0f))
+            if (cameraTransform.position.DistanceTo(_endPos.pos) <= ModSettings.MinTransDistance)
             {
                 _isTransitioning = false;
                 AfterTransition();
                 return;
             }
+            // Apply the calculated position and rotation to the camera.
             cameraTransform.position = Vector3.Lerp(cameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
             cameraTransform.rotation = Quaternion.Lerp(cameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
         }

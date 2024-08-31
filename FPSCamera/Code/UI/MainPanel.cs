@@ -30,6 +30,7 @@
             {
                 if (!isVisible)
                 {
+                    ModSettings.Save();
                     Close();
                 }
                 else

@@ -344,7 +344,8 @@ namespace FPSCamera.Settings.Tabs
                 selectCargo_CheckBox.isChecked = true;
 
             smoothTransition_CheckBox.isChecked = true;
-            transSpeed_Slider.value = minTransDistance_Slider.value = 15f;
+            transSpeed_Slider.value = 10f;
+            minTransDistance_Slider.value = 5f;
             maxTransDistance_Slider.value = 500f;
         }
     }

@@ -52,24 +52,16 @@ namespace FPSCamera.Cam.Controller
         {
             if (_camDoF != null) _camDoF.enabled = _IsDoFEnabled;
             if (_camTiltEffect != null) _camTiltEffect.enabled = _IsTiltEffectEnabled;
-
             _mainCamera.fieldOfView = _cachedfieldOfView;
-            _mainCamera.farClipPlane = _cachednearClipPlane;
+            _mainCamera.nearClipPlane = _cachednearClipPlane;
 
+            if (!ModSettings.SetBackCamera)
+            {
+                _controller.m_currentPosition = _controller.m_targetPosition = _mainCamera.transform.position;
+                _controller.m_currentAngle = _controller.m_targetAngle = new Vector2(_mainCamera.transform.eulerAngles.y, _mainCamera.transform.eulerAngles.x);
+                _controller.m_currentHeight = _controller.m_targetHeight = _mainCamera.transform.position.y;
+            }
             _controller.enabled = true;
-            if (ModSettings.SetBackCamera)
-            {
-                _mainCamera.transform.position = _cachedPositioning.pos;
-                _mainCamera.transform.rotation = _cachedPositioning.rotation;
-            }
-            else
-            {
-                _controller.m_targetPosition = _mainCamera.transform.position;
-                _controller.m_targetAngle = new Vector2(
-                     _mainCamera.transform.rotation.eulerAngles.y,
-                     _mainCamera.transform.rotation.eulerAngles.x
-                 );
-            }
         }
         private GameCamController()
         {

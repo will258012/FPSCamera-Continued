@@ -25,7 +25,7 @@ namespace FPSCamera.Cam
         public bool IsVaild() => true;
         public void StopCam() { IsActivated = false; _positioning = _lastPositioning = default; }
 
-        internal Positioning _positioning;
-        private Positioning _lastPositioning;
+        internal Positioning _positioning = new Positioning(Vector3.zero);
+        private Positioning _lastPositioning = new Positioning(Vector3.zero);
     }
 }

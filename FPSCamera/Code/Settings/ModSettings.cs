@@ -215,12 +215,12 @@ namespace FPSCamera.Settings
         [XmlElement("TransSpeed")]
         public float XMLTransSpeed { get => TransSpeed; set => TransSpeed = value; }
         [XmlIgnore]
-        internal static float TransSpeed = 15f;
+        internal static float TransSpeed = 10f;
 
         [XmlElement("MinTransDistance")]
         public float XMLMinTransDistance { get => MinTransDistance; set => MinTransDistance = value; }
         [XmlIgnore]
-        internal static float MinTransDistance = 15f;
+        internal static float MinTransDistance = 5f;
 
 
         [XmlElement("MaxTransDistance")]
@@ -228,6 +228,17 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static float MaxTransDistance = 500f;
 
+        #endregion
+        #region Optimization Options
+        [XmlElement("LodOpt")]
+        public bool XMLLodOpt { get => LodOpt; set => LodOpt = value; }
+        [XmlIgnore]
+        internal static bool LodOpt = false;
+
+        [XmlElement("ShadowsOpt")]
+        public bool XMLShadowsOpt { get => ShadowsOpt; set => ShadowsOpt = value; }
+        [XmlIgnore]
+        internal static bool ShadowsOpt = false;
         #endregion
         #endregion
 
