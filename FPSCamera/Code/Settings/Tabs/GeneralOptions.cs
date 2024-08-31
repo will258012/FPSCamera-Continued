@@ -81,7 +81,7 @@ namespace FPSCamera.Settings.Tabs
             currentY += TitleMargin;
 
             LodOpt_CheckBox = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("SETTINGS_LODOPT"));
-            LodOpt_CheckBox.tooltip = Translations.Translate("SETTINGS_LODOPT_DETAIL");
+            LodOpt_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_LODOPT_DETAIL"),"\n");
             LodOpt_CheckBox.isChecked = ModSettings.LodOpt;
             LodOpt_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.LodOpt = isChecked;
             currentY += LodOpt_CheckBox.height + LeftMargin;
