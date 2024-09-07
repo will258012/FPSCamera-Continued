@@ -9,7 +9,8 @@ namespace FPSCamera.Cam
     {
         public FreeCam()
         {
-            _positioning.pos = GameCamController.Instance.CameraController.transform.position;
+            var transform = GameCamController.Instance.CameraController.transform;
+            _positioning.pos = transform.position;
             _positioning.rotation = Quaternion.identity;
             _lastPositioning = _positioning;
             IsActivated = true;

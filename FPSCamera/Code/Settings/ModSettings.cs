@@ -261,7 +261,7 @@ namespace FPSCamera.Settings
         [XmlElement("KeyCursorToggle")]
         public KeyOnlyBinding XMLKeyCursorToggle { get => KeyCursorToggle; set => KeyCursorToggle = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyCursorToggle = new KeyOnlyBinding(KeyCode.LeftControl);
+        internal static KeyOnlyBinding KeyCursorToggle = new KeyOnlyBinding(KeyCode.Tab);
 
         [XmlElement("KeyAutoMove")]
         public KeyOnlyBinding XMLKeyAutoMove { get => KeyAutoMove; set => KeyAutoMove = value; }

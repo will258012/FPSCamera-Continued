@@ -34,14 +34,21 @@ namespace FPSCamera.Cam.Controller
         public void Initialize()
         {
             _controller.enabled = false;
-            _cachedRect = _mainCamera.rect;
-            _mainCamera.rect = new Rect(0f, 0f, 1f, 1f);
+            _mainCamera.rect = CameraController.kFullScreenRect;
             if (_camTiltEffect != null) _camTiltEffect.enabled = false;
-            if (ModSettings.Dof && _camDoF != null) _camDoF.enabled = true;
-            if (ModSettings.SetBackCamera)
+            if (ModSettings.Dof)
             {
-                _cachedPositioning = new Positioning(_mainCamera.transform.position, _mainCamera.transform.rotation);
+                if (_camDoF != null)
+                    _camDoF.enabled = true;
             }
+            else
+            {
+                if (_camDoF != null && IsDoFEnabled)
+                    _camDoF.enabled = false;
+            }
+
+            if (ModSettings.SetBackCamera) _cachedPositioning = new Positioning(_mainCamera.transform.position, _mainCamera.transform.rotation);
+
             _cachedfieldOfView = _mainCamera.fieldOfView;
             _mainCamera.fieldOfView = ModSettings.CamFieldOfView;
             _cachednearClipPlane = _mainCamera.nearClipPlane;
@@ -50,15 +57,15 @@ namespace FPSCamera.Cam.Controller
 
         public void Restore()
         {
-            if (_camDoF != null) _camDoF.enabled = _IsDoFEnabled;
-            if (_camTiltEffect != null) _camTiltEffect.enabled = _IsTiltEffectEnabled;
+            if (_camDoF != null) _camDoF.enabled = IsDoFEnabled;
+            if (_camTiltEffect != null) _camTiltEffect.enabled = IsTiltEffectEnabled;
             _mainCamera.fieldOfView = _cachedfieldOfView;
             _mainCamera.nearClipPlane = _cachednearClipPlane;
 
             if (!ModSettings.SetBackCamera)
             {
                 _controller.m_currentPosition = _controller.m_targetPosition = _mainCamera.transform.position;
-                _controller.m_currentAngle = _controller.m_targetAngle = new Vector2(_mainCamera.transform.eulerAngles.y, _mainCamera.transform.eulerAngles.x);
+                _controller.m_currentAngle = _controller.m_targetAngle = new Vector2(_mainCamera.transform.eulerAngles.y, _mainCamera.transform.eulerAngles.x).ClampEulerAngles();
                 _controller.m_currentHeight = _controller.m_targetHeight = _mainCamera.transform.position.y;
             }
             _controller.enabled = true;
@@ -72,9 +79,6 @@ namespace FPSCamera.Cam.Controller
 
             _camDoF = GetComponent<DepthOfField>();
             _camTiltEffect = GetComponent<TiltShiftEffect>();
-
-            if (_camDoF != null) _IsDoFEnabled = _camDoF.enabled;
-            if (_camTiltEffect != null) _IsTiltEffectEnabled = _camTiltEffect.enabled;
         }
 
         private readonly CameraController _controller;
@@ -83,11 +87,10 @@ namespace FPSCamera.Cam.Controller
         private readonly DepthOfField _camDoF;
         private readonly TiltShiftEffect _camTiltEffect;
 
-        private readonly bool _IsDoFEnabled;
-        private readonly bool _IsTiltEffectEnabled;
+        private bool IsDoFEnabled => !CameraController.isDepthOfFieldDisabled;
+        private bool IsTiltEffectEnabled => !CameraController.isTiltShiftDisabled;
 
         internal Positioning _cachedPositioning;
-        internal Rect _cachedRect;
         private float _cachedfieldOfView;
         private float _cachednearClipPlane;
     }

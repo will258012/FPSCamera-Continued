@@ -13,9 +13,9 @@ namespace FPSCamera
 
         public string Description => Translations.Translate("MODDESCRIPTION");
 
-        public override void SaveSettings() { ModSettings.Save(); OffsetsSettings.Save(); }
+        public override void SaveSettings() => ModSettings.Save();
 
-        public override void LoadSettings() { ModSettings.Load(); OffsetsSettings.Load(); }
+        public override void LoadSettings() => ModSettings.Load();
 
     }
 }

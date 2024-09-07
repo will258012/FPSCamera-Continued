@@ -44,6 +44,7 @@ namespace FPSCamera
         protected override void LoadedActions(LoadMode mode)
         {
             base.LoadedActions(mode);
+            gameObject = new GameObject();
             ModSupport.Initialize();
             controller = GameCamController.Instance?.AddComponent<FPSCamController>();
             gameObject.AddComponent<CamInfoPanel>();
@@ -53,6 +54,6 @@ namespace FPSCamera
         }
 
         private FPSCamController controller;
-        private readonly GameObject gameObject = new GameObject();
+        private GameObject gameObject = new GameObject();
     }
 }

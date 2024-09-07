@@ -10,6 +10,7 @@ namespace FPSCamera.Utils
     {
         public struct Range
         {
+
             public Range(float min = float.MinValue, float max = float.MaxValue)
             {
                 this.min = float.IsNaN(min) ? float.MinValue : min;
@@ -39,8 +40,16 @@ namespace FPSCamera.Utils
                 this.pos = pos;
                 rotation = Quaternion.identity;
             }
+            public override string ToString() => $"Position: {pos}, Rotation: {rotation}";
         }
         public static float Clamp(this float value, float min, float max) => Mathf.Clamp(value, min, max);
+
+        public static Vector2 ClampEulerAngles(this Vector2 eulerAngles)
+        {
+            for (int i = 0; i < 2; i++)
+                eulerAngles[i] = (eulerAngles[i] > 180) ? eulerAngles[i] - 360 : eulerAngles[i];
+            return eulerAngles;
+        }
         public static float DistanceTo(this Vector3 pos, Vector3 target) => Vector3.Magnitude(new Vector3(target.x - pos.x, target.y - pos.y, target.z - pos.z));
 
         private static readonly System.Random _random = new System.Random();

@@ -115,7 +115,7 @@ namespace FPSCamera.Settings.Tabs
             KeyCamToggle.Binding = new KeyOnlyBinding(KeyCode.BackQuote);
             KeySpeedUp.Binding = new KeyOnlyBinding(KeyCode.CapsLock);
             KeyCamReset.Binding = new KeyOnlyBinding(KeyCode.Minus);
-            KeyCursorToggle.Binding = new KeyOnlyBinding(KeyCode.LeftControl);
+            KeyCursorToggle.Binding = new KeyOnlyBinding(KeyCode.Tab);
             KeyAutoMove.Binding = new KeyOnlyBinding(KeyCode.E);
             KeySaveOffset.Binding = new KeyOnlyBinding(KeyCode.Backslash);
             KeyMoveForward.Binding = new KeyOnlyBinding(KeyCode.W);

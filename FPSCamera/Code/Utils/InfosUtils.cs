@@ -1,11 +1,64 @@
 ﻿using AlgernonCommons;
 using AlgernonCommons.Translation;
+using FPSCamera.Cam;
 using System.Collections.Generic;
 
 namespace FPSCamera.Utils
 {
-    public class InfosUtils
+    public static class InfosUtils
     {
+        /// <summary>
+        /// Retrieves geographical information about the current camera position.
+        /// </summary>
+        /// <returns>A dictionary containing geographical information.</returns>
+        public static Dictionary<string, string> GetGeoInfos(IFPSCam followCam)
+        {
+            var infos = new Dictionary<string, string>();
+            var pos = followCam.GetPositioning().pos;
+            if (MapUtils.RayCastDistrict(pos) is InstanceID disID && disID.District != default)
+            {
+                var name = DistrictManager.instance.GetDistrictName(disID.District);
+                if (!string.IsNullOrEmpty(name))
+                    infos[Translations.Translate("INFO_DISTRICT")] = name;
+            }
+            if (MapUtils.RayCastPark(pos) is InstanceID parkID && parkID.Park != default)
+            {
+                var name = DistrictManager.instance.GetParkName(parkID.Park);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    switch (DistrictPark.GetParkGroup(DistrictManager.instance.m_parks.m_buffer[parkID.Park].m_parkType))
+                    {
+                        case DistrictPark.ParkGroup.ParkLife:
+                            infos[Translations.Translate("INFO_DLCDISTRICT_PARK")] = name;
+                            break;
+                        case DistrictPark.ParkGroup.Industry:
+                            infos[Translations.Translate("INFO_DLCDISTRICT_INDUSTRY")] = name;
+                            break;
+                        case DistrictPark.ParkGroup.Campus:
+                            infos[Translations.Translate("INFO_DLCDISTRICT_CAMPUS")] = name;
+                            break;
+                        case DistrictPark.ParkGroup.Airport:
+                            infos[Translations.Translate("INFO_DLCDISTRICT_AIRPORT")] = name;
+                            break;
+                        case DistrictPark.ParkGroup.PedestrianZone:
+                            infos[Translations.Translate("INFO_DLCDISTRICT_PEDZONE")] = name;
+                            break;
+                        default:
+                            infos["DLC District"] = name;
+                            break;
+                    }
+
+                }
+
+            }
+            if (MapUtils.RayCastRoad(pos) is InstanceID segID && segID.NetSegment != default)
+            {
+                var name = NetManager.instance.GetSegmentName(segID.NetSegment);
+                if (!string.IsNullOrEmpty(name))
+                    infos[Translations.Translate("INFO_ROAD")] = name;
+            }
+            return infos;
+        }
         internal static void GetMoreInfos(ref Dictionary<string, string> infos, Vehicle vehicle, ushort vehicleid)
         {
             var modifyinfos = infos;
