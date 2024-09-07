@@ -80,7 +80,7 @@ namespace FPSCamera.Game
             switch (manager)
             {
                 case BuildingManager buildingManager:
-                    return PrefabCollection<BuildingInfo>.GetPrefab((uint)buildingManager.m_infoCount - 1).m_minLodDistance;
+                    return buildingManager.m_buildings.m_buffer[buildingManager.m_infoCount].Info.m_minLodDistance;
                 case PropManager propManager when !IsPropManager_MaxRenderDistance:
                     return propManager.m_props.m_buffer[propManager.m_infoCount].Info.m_lodRenderDistance;
                 case PropManager propManager when IsPropManager_MaxRenderDistance:
