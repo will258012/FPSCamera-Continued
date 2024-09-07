@@ -1,11 +1,9 @@
 ﻿using AlgernonCommons;
-using AlgernonCommons.Translation;
 using FPSCamera.Game;
 using FPSCamera.Settings;
 using FPSCamera.UI;
 using FPSCamera.Utils;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using static FPSCamera.Utils.MathUtils;
 
@@ -18,7 +16,6 @@ namespace FPSCamera.Cam.Controller
     {
         public static FPSCamController Instance { get; private set; }
         public IFPSCam FPSCam { get; private set; }
-
         /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
@@ -70,14 +67,12 @@ namespace FPSCamera.Cam.Controller
             {
                 AfterTransition();
             }
-            //StartCoroutine(ShadowsManager.ToggleShadowsOptimization(false));
-            //StartCoroutine(LodManager.ToggleLODOptimization(false));
         }
         private void AfterTransition()
         {
             if (ModSettings.HideGameUI)
             {
-                GameCamController.Instance.MainCamera.rect = GameCamController.Instance._cachedRect;
+                GameCamController.Instance.MainCamera.rect = CameraController.kFullScreenWithoutMenuBarRect;
                 StartCoroutine(UIManager.ToggleUI(true));
             }
             GameCamController.Instance.Restore();
@@ -104,6 +99,7 @@ namespace FPSCamera.Cam.Controller
         {
             FPSCam = new FreeCam();
             EnableCam();
+            _offset = new Positioning(Vector3.zero, GameCamController.Instance.MainCamera.transform.rotation);
         }
 
         /// <summary>
@@ -124,7 +120,7 @@ namespace FPSCamera.Cam.Controller
             _targetFoV = ModSettings.CamFieldOfView;
 
             if (!ModSettings.HideGameUI)
-                GameCamController.Instance.MainCamera.rect = GameCamController.Instance._cachedRect;
+                GameCamController.Instance.MainCamera.rect = CameraController.kFullScreenWithoutMenuBarRect;
 
             var cameraTransform = GameCamController.Instance.MainCamera.transform;
             if (cameraTransform.position.DistanceTo(endPos.pos) <= ModSettings.MinTransDistance ||
@@ -207,60 +203,7 @@ namespace FPSCamera.Cam.Controller
             return false;
         }
 
-        /// <summary>
-        /// Retrieves geographical information about the current camera position.
-        /// </summary>
-        /// <returns>A dictionary containing geographical information.</returns>
-        public Dictionary<string, string> GetGeoInfos()
-        {
-            var infos = new Dictionary<string, string>();
 
-            var pos = FPSCam.GetPositioning().pos;
-
-            if (MapUtils.RayCastDistrict(pos) is InstanceID disID && disID.District != default)
-            {
-                var name = DistrictManager.instance.GetDistrictName(disID.District);
-                if (!string.IsNullOrEmpty(name))
-                    infos[Translations.Translate("INFO_DISTRICT")] = name;
-            }
-            if (MapUtils.RayCastPark(pos) is InstanceID parkID && parkID.Park != default)
-            {
-                var name = DistrictManager.instance.GetParkName(parkID.Park);
-                if (!string.IsNullOrEmpty(name))
-                {
-                    switch (DistrictPark.GetParkGroup(DistrictManager.instance.m_parks.m_buffer[parkID.Park].m_parkType))
-                    {
-                        case DistrictPark.ParkGroup.ParkLife:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_PARK")] = name;
-                            break;
-                        case DistrictPark.ParkGroup.Industry:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_INDUSTRY")] = name;
-                            break;
-                        case DistrictPark.ParkGroup.Campus:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_CAMPUS")] = name;
-                            break;
-                        case DistrictPark.ParkGroup.Airport:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_AIRPORT")] = name;
-                            break;
-                        case DistrictPark.ParkGroup.PedestrianZone:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_PEDZONE")] = name;
-                            break;
-                        default:
-                            infos["DLC District"] = name;
-                            break;
-                    }
-
-                }
-
-            }
-            if (MapUtils.RayCastRoad(pos) is InstanceID segID && segID.NetSegment != default)
-            {
-                var name = NetManager.instance.GetSegmentName(segID.NetSegment);
-                if (!string.IsNullOrEmpty(name))
-                    infos[Translations.Translate("INFO_ROAD")] = name;
-            }
-            return infos;
-        }
 
         /// <summary>
         /// Checks if there is another camera to switch to for a citizen camera.
@@ -303,7 +246,7 @@ namespace FPSCamera.Cam.Controller
             {
                 if (FPSCam is WalkThruCam cam)
                     cam.SyncCamOffset();
-                else
+                else if (FPSCam is IFollowCam)
                     SyncCamOffset();
                 if (ModSettings.SmoothTransition)
                     _targetFoV = ModSettings.CamFieldOfView;
@@ -412,13 +355,16 @@ namespace FPSCamera.Cam.Controller
         internal void SyncCamOffset(IFollowCam followCam = null)
         {
             if (followCam == null) followCam = FPSCam as IFollowCam;
+            OffsetsSettings.Load();
 
             var name = followCam?.GetPrefabName() ?? null;
             var newOffset = new Positioning(Vector3.zero);
+
             if (name != null && OffsetsSettings.Offsets.TryGetValue(name, out var offset))
             {
                 newOffset = offset;
             }
+
             newOffset.pos += ModSettings.FollowCamOffset;
             if (followCam is CitizenCam)
                 newOffset.pos += ModSettings.PedestrianFixedOffset;
@@ -443,14 +389,14 @@ namespace FPSCamera.Cam.Controller
             var instancePos = FPSCam.GetPositioning().pos + (FPSCam.GetPositioning().rotation * _offset.pos);
             var instanceRotation = FPSCam.GetPositioning().rotation * _offset.rotation;
 
-            // Adjust the y-axis to ensure the camera is above the terrain or road.
-            var terrainHeight = MapUtils.GetMinHeightAt(instancePos); // Get the minimum height of the terrain at the current position.
+
+            // Adjust the y-axis to ensure the camera is above the road.
             var roadHeight = MapUtils.GetClosestSegmentLevel(instancePos) ?? default; // Get the height of the closest road segment, if available.
-            instancePos.y = Math.Max(instancePos.y, Math.Max(terrainHeight, roadHeight)); // Ensure the camera is at least at the height of the terrain or road.
+            instancePos.y = Math.Max(instancePos.y, roadHeight); // Ensure the camera is at least at the height of the road.
+
 
             // Limit the camera's position to the allowed area.
             instancePos = CameraController.ClampCameraPosition(instancePos);
-
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {

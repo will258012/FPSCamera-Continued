@@ -2,7 +2,8 @@
 using ColossalFramework.IO;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 using UnityEngine;
 using static FPSCamera.Utils.MathUtils;
@@ -10,7 +11,7 @@ using static FPSCamera.Utils.MathUtils;
 namespace FPSCamera.Settings
 {
     [XmlRoot("FPSCameraOffsets")]
-    public sealed class OffsetsSettings : SettingsXMLBase
+    public sealed class OffsetsSettings : SettingsXMLBase, IXmlSerializable
     {
         /// <summary>
         /// Settings file name
@@ -18,12 +19,18 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         private static readonly string SettingsFileName = Path.Combine(DataLocation.localApplicationData, "FPSCamera_Continued_Offsets.xml");
 
-        internal static void Load() => XMLFileUtils.Load<OffsetsSettings>(SettingsFileName);
+        internal static void Load()
+        {
+            if (File.Exists(SettingsFileName))
+                XMLFileUtils.Load<OffsetsSettings>(SettingsFileName);
+            else
+                Save();
+        }
 
         internal static void Save() => XMLFileUtils.Save<OffsetsSettings>(SettingsFileName);
 
         [XmlElement("Offset")]
-        public List<OffsetEntry> XMLOffsets { get => Offsets.Select(kvp => new OffsetEntry { Key = kvp.Key, Value = kvp.Value }).ToList(); set => Offsets = value.ToDictionary(entry => entry.Key, entry => entry.Value); }
+        public Dictionary<string, Positioning> XMLOffsets { get => Offsets; set => Offsets = value; }
         [XmlIgnore]
         internal static Dictionary<string, Positioning> Offsets = new Dictionary<string, Positioning>
         {
@@ -47,15 +54,91 @@ namespace FPSCamera.Settings
             ["Forest Forwarder 01"] = new Positioning(new Vector3(0f, .96f, 1.16f)),
             ["Farm Truck 01"] = new Positioning(new Vector3(0f, .5f, -1f)),
         };
-        /// <summary>
-        /// Make <see cref="Dictionary{TKey, TValue}"/> can be serialized
-        /// </summary>
-        public class OffsetEntry
+
+        public void ReadXml(XmlReader reader)
         {
-            [XmlAttribute("Name")]
-            public string Key { get; set; }
-            public Positioning Value { get; set; }
+            reader.MoveToContent();
+            if (reader.IsEmptyElement) return;
+
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element && reader.Name == "Offset")
+                {
+                    string name = reader.GetAttribute("Name");
+                    var offset = new Positioning(Vector3.zero);
+
+                    while (reader.Read())
+                    {
+
+                        // Positioning
+                        if (reader.NodeType == XmlNodeType.Element)
+                        {
+                            // Position
+                            if (reader.Name == "Position")
+                            {
+                                reader.ReadStartElement("Position");
+                                offset.pos.x = reader.ReadElementContentAsFloat("x", "");
+                                offset.pos.y = reader.ReadElementContentAsFloat("y", "");
+                                offset.pos.z = reader.ReadElementContentAsFloat("z", "");
+                                reader.ReadEndElement();
+                            }
+                            // Rotation
+                            if (reader.Name == "Rotation")
+                            {
+                                reader.ReadStartElement("Rotation");
+                                offset.rotation.x = reader.ReadElementContentAsFloat("x", "");
+                                offset.rotation.y = reader.ReadElementContentAsFloat("y", "");
+                                offset.rotation.z = reader.ReadElementContentAsFloat("z", "");
+                                offset.rotation.w = reader.ReadElementContentAsFloat("w", "");
+                                reader.ReadEndElement();
+                            }
+                        }
+                        else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Offset")
+                        {
+                            break;
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        XMLOffsets[name] = offset;
+                    }
+                }
+            }
         }
+
+
+        public void WriteXml(XmlWriter writer)
+        {
+            foreach (var kvp in XMLOffsets)
+            {
+                writer.WriteStartElement("Offset");
+                writer.WriteAttributeString("Name", kvp.Key);
+
+                writer.WriteStartElement("Positioning");
+
+                // Position
+                writer.WriteStartElement("Position");
+                writer.WriteElementString("x", kvp.Value.pos.x.ToString("F2"));
+                writer.WriteElementString("y", kvp.Value.pos.y.ToString("F2"));
+                writer.WriteElementString("z", kvp.Value.pos.z.ToString("F2"));
+                writer.WriteEndElement(); // Position
+
+                // Rotation
+                writer.WriteStartElement("Rotation");
+                writer.WriteElementString("x", kvp.Value.rotation.x.ToString("F2"));
+                writer.WriteElementString("y", kvp.Value.rotation.y.ToString("F2"));
+                writer.WriteElementString("z", kvp.Value.rotation.z.ToString("F2"));
+                writer.WriteElementString("w", kvp.Value.rotation.w.ToString("F2"));
+                writer.WriteEndElement(); // Rotation
+
+                writer.WriteEndElement(); // Positioning
+
+                writer.WriteEndElement(); // Offset
+            }
+        }
+
+        public XmlSchema GetSchema() => null;
 
         //Ignore not used settings 
         [XmlIgnore]

@@ -20,9 +20,9 @@
 
         public void DisableCamInfoPanel()
         {
-            enabled = false;
             _leftInfos.Clear();
             _rightInfos.Clear();
+            enabled = false;
         }
         private void Awake()
         {
@@ -43,16 +43,15 @@
 
         private void Update()
         {
-            var cam = FPSCamController.Instance.FPSCam;
-            if (cam.IsVaild())
+            if (Cam.IsVaild())
             {
                 _elapsedTime += Time.deltaTime;
                 if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval)
                 {
-                    UpdateStatus(cam); UpdateTargetInfos(cam); UpdateSpeed(cam);
+                    UpdateStatus(); UpdateTargetInfos(); UpdateSpeed();
 
                     _footer = Translations.Translate("INFO_TIME");
-                    if (cam is WalkThruCam walkThruCam)
+                    if (Cam is WalkThruCam walkThruCam)
                     {
                         var time = walkThruCam.GetElapsedTime();
                         _footer += $"{(uint)time / 60:00}:{(uint)time % 60:00} / ";
@@ -69,35 +68,31 @@
             }
         }
 
-        private void UpdateStatus(IFPSCam cam)
+        private void UpdateStatus()
         {
             _leftInfos.Clear();
-            if (cam is IFollowCam followcam)
+
+            _leftInfos = InfosUtils.GetGeoInfos(Cam);
+
+            if (Cam is IFollowCam followcam)
             {
                 _leftInfos[Translations.Translate("INFO_NAME")] = followcam.GetFollowName();
                 var status = followcam.GetStatus();
                 if (!string.IsNullOrEmpty(status))
                     _leftInfos[Translations.Translate("INFO_STATUS")] = followcam.GetStatus();
             }
-            var geoInfos = FPSCamController.Instance.GetGeoInfos();
-
-            foreach (var kvp in geoInfos)
-            {
-                _leftInfos[kvp.Key] = kvp.Value;
-            }
-
         }
-        private void UpdateTargetInfos(IFPSCam cam)
+        private void UpdateTargetInfos()
         {
-            if (cam is IFollowCam followCam)
+            if (Cam is IFollowCam followCam)
             {
                 _rightInfos = followCam.GetInfos();
             }
             else _rightInfos.Clear();
         }
-        private void UpdateSpeed(IFPSCam cam)
+        private void UpdateSpeed()
             => _mid = string.Format("{0,5:F1} {1}",
-                ModSettings.UseMetricUnit ? cam.GetSpeed().ToKilometer() : cam.GetSpeed().ToMile(),
+                ModSettings.UseMetricUnit ? Cam.GetSpeed().ToKilometer() : Cam.GetSpeed().ToMile(),
                 ModSettings.UseMetricUnit ? "km/h" : "mph");
 
         private void OnGUI()
@@ -190,5 +185,6 @@
         private string _mid, _footer;
         private Dictionary<string, string> _leftInfos, _rightInfos;
         private Texture2D _panelTexture, _infoFieldTexture;
+        private IFPSCam Cam => FPSCamController.Instance.FPSCam;
     }
 }
