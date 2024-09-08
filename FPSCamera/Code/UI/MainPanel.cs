@@ -144,7 +144,7 @@
             groundCliping_dropDown.canFocus = false;
             currentY += groundCliping_dropDown.parent.height + Margin;
 
-            if (GameUtils.InGameMode)
+            if (ToolsModifierControl.isGame)
             {
                 var stickToFrontVehicle_CheckBox = UICheckBoxes.AddPlainCheckBox(Panel, Margin, currentY, Translations.Translate("SETTINGS_STICKTOFRONTVEHICLE"), Panel.width - Margin);
                 stickToFrontVehicle_CheckBox.isChecked = ModSettings.StickToFrontVehicle;

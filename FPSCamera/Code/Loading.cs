@@ -49,7 +49,7 @@ namespace FPSCamera
             controller = GameCamController.Instance?.AddComponent<FPSCamController>();
             gameObject.AddComponent<CamInfoPanel>();
             gameObject.AddComponent<MainPanel>();
-            if (GameUtils.InGameMode)
+            if (ToolsModifierControl.isGame)
                 gameObject.AddComponent<FollowButtons>();
         }
 

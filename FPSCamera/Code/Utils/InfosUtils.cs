@@ -61,7 +61,7 @@ namespace FPSCamera.Utils
         }
         internal static void GetMoreInfos(ref Dictionary<string, string> infos, Vehicle vehicle, ushort vehicleid)
         {
-            var modifyinfos = infos;
+            var modifyInfos = infos;
             var ai = vehicle.Info.m_vehicleAI;
             switch (ai)
             {
@@ -134,37 +134,39 @@ namespace FPSCamera.Utils
                     Logging.Error($"Vehicle(ID:{vehicleid} of type [{ai.GetType().Name}] is not recognized.");
                     return;
             }
-            infos = modifyinfos;
+            infos = modifyInfos;
             return;
 
-            void TransitInfos(string typename)
+            void TransitInfos(string typeName)
             {
                 var transitID = vehicle.m_transportLine;
                 var transitTypeKey = GetTranslateKey();
                 var transitLineName = transitID != default ? TransportManager.instance.GetLineName(transitID) : Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_IRREGULAR");
 
-                modifyinfos[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_TRANSIT")] = $"{typename}> {transitLineName}";
+                modifyInfos[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_TRANSIT")] = $"{typeName}> {transitLineName}";
+
                 var hasNextStation = TryGetNextStation(out var name);
-                if (hasNextStation == true)
-                    modifyinfos[Translations.Translate(transitTypeKey)] = name;
+                if (hasNextStation)
+                    modifyInfos[Translations.Translate(transitTypeKey)] = name;
+
                 vehicle.Info.m_vehicleAI.GetBufferStatus(vehicleid, ref vehicle, out _, out var load, out var capacity);
-                modifyinfos[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_PASSENGER")] = $"{load,4} /{capacity,4}";
+                modifyInfos[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_PASSENGER")] = $"{load,4} /{capacity,4}";
 
                 string GetTranslateKey() =>
-                    typename == Translations.Translate("VEHICLE_AITYPE_TRAM") ||
-                    typename == Translations.Translate("VEHICLE_AITYPE_BUS") ||
-                    typename == Translations.Translate("VEHICLE_AITYPE_TROLLEYBUS")
+                    typeName == Translations.Translate("VEHICLE_AITYPE_TRAM") ||
+                    typeName == Translations.Translate("VEHICLE_AITYPE_BUS") ||
+                    typeName == Translations.Translate("VEHICLE_AITYPE_TROLLEYBUS")
                        ? "INFO_VEHICLE_PUBLICTRANSIT_NEXTSTOP"
                        : "INFO_VEHICLE_PUBLICTRANSIT_NEXTSTATIION";
 
-                bool TryGetNextStation(out string stopname)
+                bool TryGetNextStation(out string stopName)
                 {
                     if (transitID != default)
                     {
-                        stopname = StationUtils.GetStationName(vehicle.m_targetBuilding);
+                        stopName = StationUtils.GetStationName(vehicle.m_targetBuilding, transitID);
                         return true;
                     }
-                    stopname = null;
+                    stopName = null;
                     return false;
                 }
 
@@ -172,20 +174,20 @@ namespace FPSCamera.Utils
             void CargoInfos()
             {
                 vehicle.Info.m_vehicleAI.GetBufferStatus(vehicleid, ref vehicle, out _, out var load, out var capacity);
-                modifyinfos[Translations.Translate("INFO_VEHICLE_LOAD")] = capacity > 0 ? ((float)load / capacity).ToString("P1")
+                modifyInfos[Translations.Translate("INFO_VEHICLE_LOAD")] = capacity > 0 ? ((float)load / capacity).ToString("P1")
                                              : Translations.Translate("INVALID");
             }
             void ServiceInfos(string typename, bool work_shift = false)
             {
-                modifyinfos[Translations.Translate("INFO_VEHICLE_SERVICE")] = typename;
+                modifyInfos[Translations.Translate("INFO_VEHICLE_SERVICE")] = typename;
                 vehicle.Info.m_vehicleAI.GetBufferStatus(vehicleid, ref vehicle, out _, out var load, out var capacity);
                 if (work_shift)
                 {
-                    if (capacity > 0) modifyinfos[Translations.Translate("INFO_VEHICLE_WORKSHIFT")] = ((float)load / capacity).ToString("P1");
+                    if (capacity > 0) modifyInfos[Translations.Translate("INFO_VEHICLE_WORKSHIFT")] = ((float)load / capacity).ToString("P1");
                 }
                 else
                 {
-                    if (capacity > 0) modifyinfos[Translations.Translate("INFO_VEHICLE_LOAD")] = ((float)load / capacity).ToString("P1");
+                    if (capacity > 0) modifyInfos[Translations.Translate("INFO_VEHICLE_LOAD")] = ((float)load / capacity).ToString("P1");
                 }
             }
         }

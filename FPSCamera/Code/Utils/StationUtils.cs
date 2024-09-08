@@ -1,4 +1,5 @@
 ﻿using ColossalFramework;
+using System;
 using UnityEngine;
 
 namespace FPSCamera.Utils
@@ -17,6 +18,8 @@ namespace FPSCamera.Utils
             TransportInfo.TransportType.Ship,
             TransportInfo.TransportType.Trolleybus,
             };
+
+
         private static string GetStopName(ushort stopId)
         {
             var id = new InstanceID() { NetNode = stopId };
@@ -42,8 +45,14 @@ namespace FPSCamera.Utils
             {
                 return savedName;
             }
+            //park
+            savedName = GetStationParkName(pos);
+            if (!savedName.IsNullOrWhiteSpace())
+            {
+                return savedName;
+            }
             //district
-            savedName = $"{GetStationDistrictName(pos)}";
+            savedName = GetStationDistrictName(pos);
             if (!savedName.IsNullOrWhiteSpace())
             {
                 return savedName;
@@ -57,17 +66,47 @@ namespace FPSCamera.Utils
             bid.Building = buildingId;
             return Singleton<BuildingManager>.instance.GetBuildingName(buildingId, bid);
         }
-        public static string GetStationName(ushort stopId) => GetStopName(stopId) ?? "(" + stopId + ")";
+        public static string GetStationName(ushort stopId, ushort lineid)
+        {
+
+            if (ModSupport.FoundTLM)
+            {
+                object subServiceResult = AccessUtils.InvokeMethod(
+                    "TransportLinesManager.Data.Tsd.TransportSystemDefinition, TransportLinesManager",
+                    "GetDefinitionForLine",
+                    new object[] { lineid, false },
+                    new Type[] { typeof(ushort), typeof(bool) }
+                    );
+                var subService = AccessUtils.GetPropertyValue<ItemClass.SubService>(subServiceResult, "SubService");
+
+                object result = AccessUtils.InvokeMethod(
+                    "TransportLinesManager.Utils.TLMStationUtils, TransportLinesManager",
+                    "GetStationName",
+                    new object[] { stopId, lineid, subService, false },
+                    new Type[] { typeof(ushort), typeof(ushort), typeof(ItemClass.SubService), typeof(bool) }
+                    );
+                return result?.ToString() ?? GetStopName(stopId);
+            }
+            return GetStopName(stopId);
+        }
+
+
         private static string GetStationRoadName(Vector3 pos)
         {
             var segmentid = MapUtils.RayCastRoad(pos);
             var name = NetManager.instance.GetSegmentName(segmentid.NetSegment);
             return name;
         }
-        private static object GetStationDistrictName(Vector3 pos)
+        private static string GetStationDistrictName(Vector3 pos)
         {
             var districtId = MapUtils.RayCastDistrict(pos);
             var name = DistrictManager.instance.GetDistrictName(districtId.District);
+            return name;
+        }
+        private static string GetStationParkName(Vector3 pos)
+        {
+            var parkId = MapUtils.RayCastPark(pos);
+            var name = DistrictManager.instance.GetParkName(parkId.Park);
             return name;
         }
         private static ushort FindTransportBuilding(Vector3 pos, float maxDistance)
