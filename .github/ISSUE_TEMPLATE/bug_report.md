@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a report to help us improve.
 title: ''
 labels: bug
 assignees: ''
@@ -19,7 +19,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 ## Screenshots
-If applicable, add screenshots to help explain your problem.
+If applicable, add screenshots to help explain your issue.
 
 ## Log files
-Please attach the relevant part of the log file from both `.../Steam/steamapps/common/Cities_Skylines/FPSCamera.log` and `.../Cities_Skylines/Cities_Data/output_log.txt`
+Please attach the relevant part of the log file from `.../Cities_Skylines/Cities_Data/output_log.txt`.

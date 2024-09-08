@@ -1,17 +1,30 @@
 ---
-name: Suggest default camera settings
-about: Offer missing or better default camera position offsets & angles for some followed targets
-title: 'Default camera settings for ...'
+name: Suggest Default Camera Offset Settings
+about: Offer missing or better default camera position offsets and rotation for some followed targets.
+title: 'Default Camera Settings for ...'
 labels: enhancement
 assignees: ''
 
 ---
 
 ## Setting Entries
-The settings from `FPSCameraOffset.xml`:
+Please attach the relevant settings from `%LocalAppdata%\Colossal Order\Cities_Skylines\FPSCamera_Continued_Offsets.xml`,as shown below:
 ```
-<_Bus>2.55,0.42,0,0,0</_Bus>
-<_Biofuel_032Bus_03201>2.1,0.2,0,0,0</_Biofuel_032Bus_03201>
+  <Offset Name="Target's prefab name">
+    <Positioning>
+      <Position>
+        <x>0.00</x>
+        <y>0.00</y>
+        <z>0.00</z>
+      </Position>
+      <Rotation>
+        <x>0.00</x>
+        <y>0.00</y>
+        <z>0.00</z>
+        <w>1.00</w>
+      </Rotation>
+    </Positioning>
+  </Offset>
 ...
 ```
 
