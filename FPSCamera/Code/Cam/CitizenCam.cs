@@ -126,7 +126,7 @@ namespace FPSCamera.Cam
         public bool IsVaild()
         {
             var flags = GetCitizenInstance().m_flags;
-            return IsActivated && flags.IsFlagSet(CitizenInstance.Flags.Created) && !flags.IsFlagSet(CitizenInstance.Flags.Deleted);
+            return IsActivated && ((flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) == CitizenInstance.Flags.Created);
         }
         public void StopCam()
         {
