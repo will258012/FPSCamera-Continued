@@ -71,14 +71,7 @@ namespace FPSCamera.Utils
 
             if (ModSupport.FoundTLM)
             {
-                object subServiceResult = AccessUtils.InvokeMethod(
-                    "TransportLinesManager.Data.Tsd.TransportSystemDefinition, TransportLinesManager",
-                    "GetDefinitionForLine",
-                    new object[] { lineid, false },
-                    new Type[] { typeof(ushort), typeof(bool) }
-                    );
-                var subService = AccessUtils.GetPropertyValue<ItemClass.SubService>(subServiceResult, "SubService");
-
+                var subService = TransportManager.instance.m_lines.m_buffer[lineid].Info.m_netSubService;
                 object result = AccessUtils.InvokeMethod(
                     "TransportLinesManager.Utils.TLMStationUtils, TransportLinesManager",
                     "GetStationName",

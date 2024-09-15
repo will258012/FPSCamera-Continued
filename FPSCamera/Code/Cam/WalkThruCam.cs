@@ -68,15 +68,19 @@ namespace FPSCamera.Cam
 
             }).Concat(GetCitizenInstances((c) =>
                     {
-                        if (c.IsFlagSet(CitizenInstance.Flags.HangAround))
+                        if (c.m_flags.IsFlagSet(CitizenInstance.Flags.HangAround))
                             return false;
-                        if (c.IsFlagSet(CitizenInstance.Flags.Transition))
-                            return ModSettings.SelectPassenger;
 
-                        if (c.IsFlagSet(CitizenInstance.Flags.EnteringVehicle) || c.IsFlagSet(CitizenInstance.Flags.RidingBicycle))
-                            return false;    // already selected by Vehicle
+                        var vehicleId = CitizenManager.instance.m_citizens.m_buffer[c.m_citizen].m_vehicle;
+                        if (vehicleId != default)
+                        {
+                            var category = VehicleManager.instance.m_vehicles.m_buffer[vehicleId].Info.vehicleCategory;
+                            if (category.IsFlagSet(VehicleInfo.VehicleCategory.PublicTransport))
+                                return ModSettings.SelectPassenger;
+                            else return false; // already selected by Vehicle
+                        }
 
-                        if (c.IsFlagSet(CitizenInstance.Flags.WaitingTransport))
+                        if (c.m_flags.IsFlagSet(CitizenInstance.Flags.WaitingTransport))
                             return ModSettings.SelectWaiting;
 
                         return ModSettings.SelectPedestrian;
@@ -121,11 +125,11 @@ namespace FPSCamera.Cam
         /// <summary>
         /// Get a <see cref="IEnumerable{InstanceID}"/> list of vaild citizen instances.
         /// </summary>
-        private IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance.Flags, bool> filter) => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
+        private IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance, bool> filter) => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
                 .Select(i => new InstanceID() { CitizenInstance = (ushort)i })
                 .Where(c =>
                 CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance].m_flags.IsFlagSet(CitizenInstance.Flags.Created) &&
-                filter(CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance].m_flags));
+                filter(CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance]));
 
     }
 

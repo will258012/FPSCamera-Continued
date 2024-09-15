@@ -20,16 +20,20 @@
 
         public static float? GetClosestSegmentLevel(Vector3 pos)
         {
+
             var input = Tool.GetRaycastInput(pos, new Range(-100f, 2f));
             input.m_netService.m_service = ItemClass.Service.Road;
             input.m_netService.m_itemLayers = ItemClass.Layer.Default |
                                               ItemClass.Layer.PublicTransport |
                                               ItemClass.Layer.MetroTunnels;
-            input.m_ignoreSegmentFlags = NetSegment.Flags.Deleted |
-                                         NetSegment.Flags.Collapsed | NetSegment.Flags.Flooded;
 
+            input.m_netService2.m_service = ItemClass.Service.Beautification;
+
+            input.m_ignoreSegmentFlags = NetSegment.Flags.Deleted |
+                                                 NetSegment.Flags.Collapsed |
+                                               NetSegment.Flags.Flooded;
             return Tool.RayCast(input, 5f) is ToolBase.RaycastOutput result ?
-                   (float?)result.m_hitPos.y + defaultHeightOffset : null;
+                    (float?)result.m_hitPos.y + defaultHeightOffset : null;
         }
 
         public static float GetMinHeightAt(Vector3 position)
@@ -41,8 +45,10 @@
             input.m_netService.m_service = ItemClass.Service.Road;
             input.m_netService.m_itemLayers = ItemClass.Layer.Default |
                                               ItemClass.Layer.PublicTransport;
-            input.m_ignoreSegmentFlags = NetSegment.Flags.None;
 
+            input.m_netService2.m_service = ItemClass.Service.Beautification;
+
+            input.m_ignoreSegmentFlags = NetSegment.Flags.None;
             return Tool.RayCast(input, 5f) is ToolBase.RaycastOutput result ?
                    new InstanceID() { NetSegment = result.m_netSegment } : default;
         }

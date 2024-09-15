@@ -19,10 +19,7 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
-        private void Awake()
-        {
-            Instance = this;
-        }
+        private void Awake() => Instance = this;
 
         /// <summary>
         /// Enables the camera and associated UI elements or settings.
@@ -46,8 +43,9 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void DisableCam()
         {
-            FPSCam.StopCam();
-            FPSCam = _cachedCam = null;
+            Logging.KeyMessage("Disabling FPS Camera");
+            FPSCam?.StopCam();
+            FPSCam = null;
             FollowButtons.Instance.enabled = true;
             if (ModSettings.ShowInfoPanel)
                 CamInfoPanel.Instance.DisableCamInfoPanel();
@@ -83,6 +81,7 @@ namespace FPSCamera.Cam.Controller
         /// <param name="instanceID">The instance ID to follow.</param>
         public void StartFollowing(InstanceID instanceID)
         {
+            Logging.KeyMessage("Starting Follow mode");
             switch (instanceID.Type)
             {
                 case InstanceType.Vehicle: { FPSCam = new VehicleCam(instanceID); break; }
@@ -97,6 +96,7 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void StartFreeCam()
         {
+            Logging.KeyMessage("Starting Free-Camera mode");
             FPSCam = new FreeCam();
             EnableCam();
             _offset = new Positioning(Vector3.zero, GameCamController.Instance.MainCamera.transform.rotation);
@@ -107,6 +107,7 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void StartWalkThruCam()
         {
+            Logging.KeyMessage("Starting Walk-Through mode");
             FPSCam = new WalkThruCam();
             EnableCam();
 
@@ -118,10 +119,6 @@ namespace FPSCamera.Cam.Controller
         public void StartTransitioningOnDisabled(Positioning endPos)
         {
             _targetFoV = ModSettings.CamFieldOfView;
-
-            if (!ModSettings.HideGameUI)
-                GameCamController.Instance.MainCamera.rect = CameraController.kFullScreenWithoutMenuBarRect;
-
             var cameraTransform = GameCamController.Instance.MainCamera.transform;
             if (cameraTransform.position.DistanceTo(endPos.pos) <= ModSettings.MinTransDistance ||
                     cameraTransform.position.DistanceTo(endPos.pos) > ModSettings.MaxTransDistance)
@@ -142,20 +139,16 @@ namespace FPSCamera.Cam.Controller
                 if (FPSCam != null && FPSCam.IsActivated)
                 {
                     if (!FPSCam.IsVaild()) { DisableCam(); return; }
-                    if (FPSCam is CitizenCam citizenCamera)
-                        CheckAnotherCam(citizenCamera);
-                    if (_cachedCam != null)
-                    {
-                        CheckAnotherCam(_cachedCam);
-                    }
                     if (FPSCam is WalkThruCam walkThruCam)
                         walkThruCam.ElapseTime(Time.deltaTime);
                 }
             }
             catch (Exception e)
             {
-                Logging.Error("FPSCamController: ");
+                Logging.Error("FPS Camera is about to exit due to some issues");
+                Logging.Error("at FPSCamController.Update()");
                 Logging.LogException(e);
+                DisableCam();
             }
         }
 
@@ -181,11 +174,14 @@ namespace FPSCamera.Cam.Controller
                     }
                     HandleInput();
                 }
+
             }
             catch (Exception e)
             {
-                Logging.Error("FPSCamController: ");
+                Logging.Error("FPS Camera is about to exit due to some issues");
+                Logging.Error("at FPSCamController.LateUpdate()");
                 Logging.LogException(e);
+                DisableCam();
             }
         }
 
@@ -201,32 +197,6 @@ namespace FPSCamera.Cam.Controller
                 return true;
             }
             return false;
-        }
-
-
-
-        /// <summary>
-        /// Checks if there is another camera to switch to for a citizen camera.
-        /// </summary>
-        /// <param name="citizenCamera">The citizen camera to check.</param>
-        private void CheckAnotherCam(CitizenCam citizenCamera)
-        {
-            if (citizenCamera.CheckAnotherCam())
-            {
-                if (_cachedCam == null)
-                {
-                    _cachedCam = citizenCamera;
-                    FPSCam = citizenCamera.AnotherCam;
-                }
-            }
-            else
-            {
-                if (_cachedCam != null)
-                {
-                    FPSCam = _cachedCam;
-                    _cachedCam = null;
-                }
-            }
         }
 
         /// <summary>
@@ -319,11 +289,10 @@ namespace FPSCamera.Cam.Controller
             {
                 var nowFoV = GameCamController.Instance.MainCamera.fieldOfView;
                 if (scroll > 0f && nowFoV > 10f)
-                    _targetFoV = nowFoV / (ModSettings.FoViewScrollfactor * ModSettings.FoViewScrollfactor);
+                    _targetFoV = nowFoV / ModSettings.FoViewScrollfactor;
                 else if (scroll < 0f && nowFoV < 75f)
-                    _targetFoV = nowFoV * (ModSettings.FoViewScrollfactor * ModSettings.FoViewScrollfactor);
-
-                GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(nowFoV, _targetFoV, Time.deltaTime * ModSettings.TransSpeed);
+                    _targetFoV = nowFoV * ModSettings.FoViewScrollfactor;
+                _isScrollTransitioning = true;
             }
             else
             {
@@ -333,6 +302,15 @@ namespace FPSCamera.Cam.Controller
                     GameCamController.Instance.MainCamera.fieldOfView = FoV / ModSettings.FoViewScrollfactor;
                 else if (scroll < 0f && FoV < 75f)
                     GameCamController.Instance.MainCamera.fieldOfView = FoV * ModSettings.FoViewScrollfactor;
+            }
+            if (_isScrollTransitioning)
+            {
+                if (GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(_targetFoV))
+                {
+                    GameCamController.Instance.MainCamera.fieldOfView = _targetFoV;
+                    _isScrollTransitioning = false;
+                }
+                GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(GameCamController.Instance.MainCamera.fieldOfView, _targetFoV, Time.deltaTime * ModSettings.TransSpeed);
             }
         }
         /// <summary>
@@ -404,7 +382,7 @@ namespace FPSCamera.Cam.Controller
                                             cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
                     ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                     : instancePos;
-                cameraTransform.rotation = Quaternion.Lerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
+                cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
             {
@@ -422,8 +400,12 @@ namespace FPSCamera.Cam.Controller
 
             // Automatically move the camera forward if AutoMove is enabled and the secondary mouse button is not pressed.
             if (freecam.AutoMove && !InputManager.MousePressed(InputManager.MouseButton.Secondary))
-                _offset.pos.x += Time.deltaTime * ModSettings.MovementSpeed / MapUtils.ToKilometer(1f);
+            {
+                var movement = Vector3.zero;
+                movement.z += Time.deltaTime * ModSettings.MovementSpeed / MapUtils.ToKilometer(1f);
+                _offset.pos += _offset.rotation * movement;
 
+            }
             var cameraTransform = GameCamController.Instance.MainCamera.transform;
 
             freecam.RecordLastPositioning();
@@ -461,7 +443,7 @@ namespace FPSCamera.Cam.Controller
                                             cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
                     ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                     : instancePos;
-                cameraTransform.rotation = freecam._positioning.rotation = Quaternion.Lerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
+                cameraTransform.rotation = freecam._positioning.rotation = Quaternion.Slerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
             {
@@ -483,16 +465,19 @@ namespace FPSCamera.Cam.Controller
             if (cameraTransform.position.DistanceTo(_endPos.pos) <= ModSettings.MinTransDistance)
             {
                 _isTransitioning = false;
+                cameraTransform.position = _endPos.pos;
+                cameraTransform.rotation = _endPos.rotation;
+                _endPos = new Positioning(Vector3.zero);
                 AfterTransition();
                 return;
             }
             // Apply the calculated position and rotation to the camera.
             cameraTransform.position = Vector3.Lerp(cameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
-            cameraTransform.rotation = Quaternion.Lerp(cameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
+            cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
         }
         private bool _isTransitioning = false;
+        private bool _isScrollTransitioning = false;
         private Positioning _endPos = new Positioning(Vector3.zero);
-        private CitizenCam _cachedCam = null;
         private Positioning _offset = new Positioning(Vector3.zero);
         private float _targetFoV = ModSettings.CamFieldOfView;
     }

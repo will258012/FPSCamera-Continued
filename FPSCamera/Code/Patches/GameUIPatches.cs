@@ -1,5 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
+using FPSCamera.Cam.Controller;
 using FPSCamera.Utils;
 using HarmonyLib;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace FPSCamera.Patches.GameUIPatches
             if (__instance.m_freeCamera != AccessUtils.GetFieldValue<bool>(__instance, "m_cachedFreeCamera"))
             {
                 AccessUtils.SetFieldValue(__instance, "m_cachedFreeCamera", __instance.m_freeCamera);
-                UIView.GetAView().uiCamera.enabled = UIView.HasModalInput() || !__instance.m_freeCamera; //UIView.Show(UIView.HasModalInput() || !m_freeCamera);
+                GameCamController.Instance.UICamera.enabled = UIView.HasModalInput() || !__instance.m_freeCamera; //UIView.Show(UIView.HasModalInput() || !m_freeCamera);
                 Singleton<NotificationManager>.instance.NotificationsVisible = !__instance.m_freeCamera;
                 Singleton<GameAreaManager>.instance.BordersVisible = !__instance.m_freeCamera;
                 Singleton<DistrictManager>.instance.NamesVisible = !__instance.m_freeCamera;
@@ -37,7 +38,7 @@ namespace FPSCamera.Patches.GameUIPatches
     {
         internal static bool Prefix(bool visible)
         {
-            UIView.GetAView().uiCamera.enabled = visible; // UIView.Show(visible);
+            GameCamController.Instance.UICamera.enabled = visible; // UIView.Show(visible);
             Singleton<NotificationManager>.instance.NotificationsVisible = visible;
             Singleton<GameAreaManager>.instance.BordersVisible = visible;
             Singleton<DistrictManager>.instance.NamesVisible = visible;

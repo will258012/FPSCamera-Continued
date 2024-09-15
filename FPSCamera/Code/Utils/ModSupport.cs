@@ -1,11 +1,10 @@
 ﻿using AlgernonCommons;
-using ColossalFramework.Plugins;
+using System;
 namespace FPSCamera.Utils
 {
     public class ModSupport
     {
         public static bool FoundToggleIt { get; private set; }
-        //public static bool FoundTrainDisplay { get; private set; }
         public static bool FoundUUI { get; private set; }
         public static bool FoundTLM { get; private set; }
 
@@ -13,43 +12,35 @@ namespace FPSCamera.Utils
         {
             try
             {
-                var infos = PluginManager.instance.GetPluginsInfo();
-                foreach (var info in infos)
+                if (AssemblyUtils.IsAssemblyPresent("ToggleIt"))
+                    FoundToggleIt = true;
+
+                if (AssemblyUtils.IsAssemblyPresent("UnifiedUILib"))
+                    FoundUUI = true;
+
+                var assembly = AssemblyUtils.GetEnabledAssembly("TransportLinesManager");
+
+                if (assembly != null)
                 {
-                    if ((info.publishedFileID.AsUInt64 == 1764637396 || info.publishedFileID.AsUInt64 == 2573796841) && info.isEnabled)
+                    var n = assembly?.GetType("Klyte.TransportLinesManager.TLMController");
+
+                    if (n != null)
                     {
-                        Logging.Message("ModSupport: \"Toggle It!\" (or its CHS version) was found!");
-                        FoundToggleIt = true;
-                        continue;
+                        Logging.Error("ModSupport: Found an older version of Transport Lines Manager by Klyte45. Please update to the version by t1a2l for full feature support");
                     }
-                    /*
-                    if ((info.publishedFileID.AsUInt64 == 3233229958 || info.name.Contains("TrainDisplay")) && info.isEnabled)
+                    else
                     {
-                        Logging.Message("ModSupport: \"Train Display - Update\" was found!");
-                        FoundTrainDisplay = true;
-                        continue;
-                    }
-                    */
-                    if ((info.publishedFileID.AsUInt64 == 2966990700 || info.publishedFileID.AsUInt64 == 2255219025) && info.isEnabled)
-                    {
-                        Logging.Message("ModSupport: \"UnifiedUI \" was found!");
-                        FoundUUI = true;
-                        continue;
-                    }
-                    if (info.publishedFileID.AsUInt64 == 3007903394 && info.isEnabled)
-                    {
-                        Logging.Message("ModSupport: \"Transport Lines Manager by t1a2l\" was found!");
                         FoundTLM = true;
-                        continue;
                     }
                 }
             }
 
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                Logging.Error($"ModSupport: Falled to finding the mod: ");
+                Logging.Error($"ModSupport: Falled to finding the mod");
                 Logging.LogException(e);
             }
         }
     }
 }
+

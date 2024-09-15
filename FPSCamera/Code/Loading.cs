@@ -26,17 +26,6 @@ namespace FPSCamera
             Object.Destroy(gameObject);
             base.OnLevelUnloading();
         }
-
-        /// <summary>
-        /// Performs any actions upon successful creation of the mod.
-        /// E.g. Can be used to patch any other mods.
-        /// </summary>
-        /// <param name="loading">Loading mode (e.g. game or editor).</param>
-        protected override void CreatedActions(ILoading loading)
-        {
-            base.CreatedActions(loading);
-        }
-
         /// <summary>
         /// Performs any actions upon successful level loading completion.
         /// </summary>
@@ -45,10 +34,10 @@ namespace FPSCamera
         {
             base.LoadedActions(mode);
             gameObject = new GameObject();
-            ModSupport.Initialize();
             controller = GameCamController.Instance?.AddComponent<FPSCamController>();
             gameObject.AddComponent<CamInfoPanel>();
             gameObject.AddComponent<MainPanel>();
+            ModSupport.Initialize();
             if (ToolsModifierControl.isGame)
                 gameObject.AddComponent<FollowButtons>();
         }

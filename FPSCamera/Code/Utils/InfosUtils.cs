@@ -26,7 +26,8 @@ namespace FPSCamera.Utils
                 var name = DistrictManager.instance.GetParkName(parkID.Park);
                 if (!string.IsNullOrEmpty(name))
                 {
-                    switch (DistrictPark.GetParkGroup(DistrictManager.instance.m_parks.m_buffer[parkID.Park].m_parkType))
+                    var parkGruop = DistrictPark.GetParkGroup(DistrictManager.instance.m_parks.m_buffer[parkID.Park].m_parkType);
+                    switch (parkGruop)
                     {
                         case DistrictPark.ParkGroup.ParkLife:
                             infos[Translations.Translate("INFO_DLCDISTRICT_PARK")] = name;
@@ -44,7 +45,7 @@ namespace FPSCamera.Utils
                             infos[Translations.Translate("INFO_DLCDISTRICT_PEDZONE")] = name;
                             break;
                         default:
-                            infos["DLC District"] = name;
+                            Logging.Error($"Unknown parkGruop: {parkGruop}");
                             break;
                     }
 

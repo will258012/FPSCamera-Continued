@@ -1,4 +1,5 @@
-﻿using FPSCamera.Settings;
+﻿using ColossalFramework.UI;
+using FPSCamera.Settings;
 using FPSCamera.Utils;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
@@ -26,6 +27,7 @@ namespace FPSCamera.Cam.Controller
 
         public Camera MainCamera => Camera.main;
         public CameraController CameraController => ToolsModifierControl.cameraController;
+        public Camera UICamera { get; private set; }
         private bool IsDoFEnabled => !CameraController.isDepthOfFieldDisabled;
         private bool IsTiltEffectEnabled => !CameraController.isTiltShiftDisabled;
 
@@ -36,7 +38,8 @@ namespace FPSCamera.Cam.Controller
         public void Initialize()
         {
             CameraController.enabled = false;
-            MainCamera.rect = CameraController.kFullScreenRect;
+            if (ModSettings.HideGameUI)
+                MainCamera.rect = CameraController.kFullScreenRect;
             if (_camTiltEffect != null) _camTiltEffect.enabled = false;
             if (ModSettings.Dof)
             {
@@ -74,7 +77,7 @@ namespace FPSCamera.Cam.Controller
         private GameCamController()
         {
             if (CameraController == null) return;
-
+            UICamera = UIView.GetAView().uiCamera;
             _camDoF = GetComponent<DepthOfField>();
             _camTiltEffect = GetComponent<TiltShiftEffect>();
         }
