@@ -1,5 +1,7 @@
 ﻿using AlgernonCommons;
+using HarmonyLib;
 using System;
+using System.Collections.Generic;
 namespace FPSCamera.Utils
 {
     public class ModSupport
@@ -7,7 +9,13 @@ namespace FPSCamera.Utils
         public static bool FoundToggleIt { get; private set; }
         public static bool FoundUUI { get; private set; }
         public static bool FoundTLM { get; private set; }
-
+        internal static List<string> CheckModConflicts()
+        {
+            var list = new List<string>();
+            if (AccessTools.TypeByName("FPSCamera.FPSCamera") != null) list.Add("First Person Camera: Updated");
+            if (AccessTools.TypeByName("FPSCamera.Controller") != null) list.Add("First Person Camera v2.x");
+            return list;
+        }
         internal static void Initialize()
         {
             try
