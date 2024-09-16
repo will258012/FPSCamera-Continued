@@ -1,7 +1,6 @@
 ﻿using AlgernonCommons;
 using ColossalFramework;
 using ColossalFramework.UI;
-using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,30 +15,32 @@ namespace FPSCamera.Cam
         {
             IsActivated = true;
         }
-        public uint FollowID => _currentCam.FollowID;
-        public InstanceID FollowInstance => _currentCam.FollowInstance;
+        public IFollowCam CurrentCam { get; private set; } = null;
+        public uint FollowID => CurrentCam.FollowID;
+        public InstanceID FollowInstance => CurrentCam.FollowInstance;
         public bool IsActivated { get; private set; }
-        public float GetSpeed() => _currentCam.GetSpeed();
-        public string GetFollowName() => _currentCam?.GetFollowName();
-        public string GetPrefabName() => _currentCam?.GetPrefabName();
-        public Dictionary<string, string> GetInfos() => _currentCam?.GetInfos();
-        public string GetStatus() => _currentCam?.GetStatus();
-        public Positioning GetPositioning() => _currentCam.GetPositioning();
+        public float GetSpeed() => CurrentCam.GetSpeed();
+        public string GetFollowName() => CurrentCam?.GetFollowName();
+        public string GetPrefabName() => CurrentCam?.GetPrefabName();
+        public Dictionary<string, string> GetInfos() => CurrentCam?.GetInfos();
+        public string GetStatus() => CurrentCam?.GetStatus();
+        public Positioning GetPositioning() => CurrentCam.GetPositioning();
         public void SwitchTarget() => SetRandomCam();
         public void ElapseTime(float seconds) => _elapsedTime += seconds;
         public float GetElapsedTime() => _elapsedTime;
-        public void SyncCamOffset() => FPSCamController.Instance.SyncCamOffset(_currentCam);
+        public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
+        public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
         public bool IsVaild()
         {
             if (!IsActivated) return false;
 
-            var status = _currentCam?.IsVaild() ?? false;
+            var status = CurrentCam?.IsVaild() ?? false;
             if (!ModSettings.ManualSwitchWalk &&
                 _elapsedTime > ModSettings.PeriodWalk) status = false;
             if (!status)
             {
                 SetRandomCam();
-                status = _currentCam?.IsVaild() ?? false;
+                status = CurrentCam?.IsVaild() ?? false;
                 if (!status)
                 {
                     Logging.Error("no target for Walk-Thru mode");
@@ -50,7 +51,7 @@ namespace FPSCamera.Cam
         }
         private void SetRandomCam()
         {
-            _currentCam = null;
+            CurrentCam = null;
             Logging.Message(" -- switching target");
 
             items = GetVehicles((v) =>
@@ -92,23 +93,22 @@ namespace FPSCamera.Cam
             do
             {
                 var followInstance = items.GetRandomOne();
-                _currentCam = followInstance.Type == InstanceType.CitizenInstance ? new CitizenCam(followInstance) : new VehicleCam(followInstance) as IFollowCam;
+                CurrentCam = followInstance.Type == InstanceType.CitizenInstance ? new CitizenCam(followInstance) : new VehicleCam(followInstance) as IFollowCam;
             }
-            while (!(_currentCam?.IsVaild() ?? false) && --attempt >= 0);
+            while (!(CurrentCam?.IsVaild() ?? false) && --attempt >= 0);
 
             _elapsedTime = 0f;
-            FPSCamController.Instance.SyncCamOffset(_currentCam);
+            SyncCamOffset();
         }
 
 
         public void StopCam()
         {
-            _currentCam?.StopCam();
-            _currentCam = null;
+            CurrentCam?.StopCam();
+            CurrentCam = null;
             IsActivated = false;
         }
         private const VehicleInfo.VehicleCategory CityServiceCopters = VehicleInfo.VehicleCategory.AmbulanceCopter | VehicleInfo.VehicleCategory.FireCopter | VehicleInfo.VehicleCategory.PoliceCopter | VehicleInfo.VehicleCategory.DisasterCopter;
-        private IFollowCam _currentCam;
         private float _elapsedTime;
         private IEnumerable<InstanceID> items;
         private readonly AudioClip disabledClickSound = UIView.GetAView().defaultDisabledClickSound;

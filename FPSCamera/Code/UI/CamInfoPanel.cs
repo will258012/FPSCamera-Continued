@@ -82,7 +82,7 @@
                     _leftInfos[Translations.Translate("INFO_STATUS")] = followcam.GetStatus();
                 if (Cam is CitizenCam citizenCam)
                 {
-                    var anotherStatus = citizenCam.GetAnotherCamStatus();
+                    var anotherStatus = citizenCam.AnotherCam?.GetStatus();
                     if (!string.IsNullOrEmpty(anotherStatus))
                         _leftInfos[Translations.Translate("INFO_VSTATUS")] = anotherStatus;
                 }

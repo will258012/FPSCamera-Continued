@@ -1,6 +1,7 @@
 ﻿using AlgernonCommons.Translation;
 using ColossalFramework;
 using ColossalFramework.Math;
+using FPSCamera.Cam.Controller;
 using System.Collections.Generic;
 using System.Linq;
 using static FPSCamera.Utils.MathUtils;
@@ -31,27 +32,24 @@ namespace FPSCamera.Cam
         public uint FollowID { get; private set; }
         public bool IsActivated { get; private set; }
         public InstanceID FollowInstance { get; private set; }
+        public VehicleCam AnotherCam { get; private set; } = null;
         private void CheckAnotherCam()
         {
-            var flags = GetCitizenInstance().m_flags;
             if (IsinVehicle)
             {
-                if (GetCitizen().m_vehicle == default)
+                if (GetCitizen().m_vehicle == default && AnotherCam.IsVaild())
                 {
                     IsinVehicle = false;
                     AnotherCam.StopCam();
                     AnotherCam = null;
                 }
             }
-
-            if (flags.IsFlagSet(CitizenInstance.Flags.EnteringVehicle))
+            else if (GetCitizen().m_vehicle != default)
             {
-                if (GetCitizen().m_vehicle != default)
-                {
-                    ushort vehicleId = GetCitizen().m_vehicle;
-                    IsinVehicle = true;
-                    AnotherCam = new VehicleCam(new InstanceID() { Vehicle = vehicleId });
-                }
+                ushort vehicleId = GetCitizen().m_vehicle;
+                IsinVehicle = true;
+                AnotherCam = new VehicleCam(new InstanceID() { Vehicle = vehicleId });
+                SyncCamOffset();
             }
         }
         public Dictionary<string, string> GetInfos()
@@ -77,7 +75,7 @@ namespace FPSCamera.Cam
 
         public Positioning GetPositioning()
         {
-            if (AnotherCam != null)
+            if (IsinVehicle)
                 return AnotherCam.GetPositioning();
             GetCitizenInstance().GetSmoothPosition(GetCitizen().m_instance, out var pos, out var rotation);
             return new Positioning(pos, rotation);
@@ -100,7 +98,6 @@ namespace FPSCamera.Cam
             return status;
 
         }
-        public string GetAnotherCamStatus() => AnotherCam?.GetStatus();
         public float GetSpeed() => GetCitizenInstance().GetLastFrameData().m_velocity.magnitude;
 
         public bool IsVaild()
@@ -108,6 +105,18 @@ namespace FPSCamera.Cam
             CheckAnotherCam();
             var flags = GetCitizenInstance().m_flags;
             return IsActivated && ((flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) == CitizenInstance.Flags.Created);
+        }
+        public void SyncCamOffset()
+        {
+            if (IsinVehicle)
+                FPSCamController.Instance.SyncCamOffset(AnotherCam);
+            else FPSCamController.Instance.SyncCamOffset(this);
+        }
+        public void SaveCamOffset()
+        {
+            if (IsinVehicle)
+                FPSCamController.Instance.SaveCamOffset(AnotherCam);
+            else FPSCamController.Instance.SaveCamOffset(this);
         }
         public void StopCam()
         {
@@ -123,7 +132,7 @@ namespace FPSCamera.Cam
 
 
 
-        private VehicleCam AnotherCam = null;
+
         private bool IsinVehicle = false;
 
         private Citizen GetCitizen() => CitizenManager.instance.m_citizens.m_buffer[FollowID];

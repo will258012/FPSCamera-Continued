@@ -28,7 +28,7 @@ namespace FPSCamera.Cam
             FollowID = id;
             FollowInstance = new InstanceID() { Vehicle = id };
             if (!IsVaild()) return false;
-            FPSCamController.Instance.SyncCamOffset();
+            SyncCamOffset();
             return true;
         }
 
@@ -102,6 +102,8 @@ namespace FPSCamera.Cam
             }
             return true;
         }
+        public void SyncCamOffset() => FPSCamController.Instance.SyncCamOffset(this);
+        public void SaveCamOffset() => FPSCamController.Instance.SaveCamOffset(this);
         public void StopCam()
         {
             FollowID = default;
