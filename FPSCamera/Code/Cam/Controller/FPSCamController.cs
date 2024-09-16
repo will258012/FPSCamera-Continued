@@ -34,7 +34,8 @@ namespace FPSCamera.Cam.Controller
                 StartCoroutine(LodManager.ToggleLODOpt(true));
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(true));
-            FollowButtons.Instance.enabled = false;
+            if (FollowButtons.Instance != null)
+                FollowButtons.Instance.enabled = false;
             GameCamController.Instance.Initialize();
         }
 
@@ -46,7 +47,8 @@ namespace FPSCamera.Cam.Controller
             Logging.KeyMessage("Disabling FPS Camera");
             FPSCam?.StopCam();
             FPSCam = null;
-            FollowButtons.Instance.enabled = true;
+            if (FollowButtons.Instance != null)
+                FollowButtons.Instance.enabled = true;
             if (ModSettings.ShowInfoPanel)
                 CamInfoPanel.Instance.DisableCamInfoPanel();
             if (ModSettings.LodOpt)
@@ -378,7 +380,8 @@ namespace FPSCamera.Cam.Controller
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-                cameraTransform.position = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+
+                GameCamController.Instance.CameraController.m_targetPosition = cameraTransform.position = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
                                             cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
                     ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                     : instancePos;
@@ -386,7 +389,9 @@ namespace FPSCamera.Cam.Controller
             }
             else
             {
-                cameraTransform.position = instancePos;
+                GameCamController.Instance.CameraController.m_targetPosition =
+                    cameraTransform.position =
+                    instancePos;
                 cameraTransform.rotation = instanceRotation;
             }
         }
@@ -439,7 +444,7 @@ namespace FPSCamera.Cam.Controller
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-                cameraTransform.position = freecam._positioning.pos = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+                GameCamController.Instance.CameraController.m_targetPosition = cameraTransform.position = freecam._positioning.pos = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
                                             cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
                     ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                     : instancePos;
@@ -447,7 +452,10 @@ namespace FPSCamera.Cam.Controller
             }
             else
             {
-                cameraTransform.position = freecam._positioning.pos = instancePos;
+                GameCamController.Instance.CameraController.m_targetPosition =
+                    cameraTransform.position =
+                    freecam._positioning.pos =
+                    instancePos;
                 cameraTransform.rotation = freecam._positioning.rotation = instanceRotation;
             }
 
@@ -472,7 +480,8 @@ namespace FPSCamera.Cam.Controller
                 return;
             }
             // Apply the calculated position and rotation to the camera.
-            cameraTransform.position = Vector3.Lerp(cameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
+            cameraTransform.position =
+                Vector3.Lerp(cameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
             cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
         }
         private bool _isTransitioning = false;
