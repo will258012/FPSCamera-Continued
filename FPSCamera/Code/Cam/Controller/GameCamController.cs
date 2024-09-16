@@ -1,4 +1,5 @@
-﻿using ColossalFramework.UI;
+﻿using AlgernonCommons;
+using ColossalFramework.UI;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
 using UnityEngine;
@@ -84,7 +85,27 @@ namespace FPSCamera.Cam.Controller
         private GameCamController()
         {
             if (CameraController == null) return;
-            UICamera = UIView.GetAView().uiCamera;
+            var view = UIView.GetAView();
+            UICamera = view.uiCamera ?? view.GetComponent<Camera>();
+
+            if (UICamera == null)
+            {
+                Logging.Error("Failed to find UICamera. Retry with all cameras..");
+                var cameras = Object.FindObjectsOfType<Camera>();
+                foreach (var cam in cameras)
+                {
+                    if (cam.name == "UIView")
+                    {
+                        UICamera = cam;
+                        break;
+                    }
+                }
+            }
+
+            if (UICamera == null)
+            {
+                Logging.Error("Failed to find UICamera. UI toggling may slower or wrong.");
+            }
             _camDoF = GetComponent<DepthOfField>();
             _camTiltEffect = GetComponent<TiltShiftEffect>();
         }

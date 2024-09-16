@@ -1,4 +1,5 @@
 ﻿using AlgernonCommons;
+using ColossalFramework.UI;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Utils;
 using System.Collections;
@@ -92,7 +93,11 @@ namespace FPSCamera.Game
             PropManager.instance.MarkersVisible = visibility;
             GuideManager.instance.TutorialDisabled = !visibility;
             DisasterManager.instance.MarkersVisible = visibility;
-            GameCamController.Instance.UICamera.enabled = visibility;
+            var uiCamera = GameCamController.Instance.UICamera;
+            if (uiCamera != null)
+                uiCamera.enabled = visibility;
+            else
+                UIView.Show(visibility);
 
         }
 
@@ -105,7 +110,11 @@ namespace FPSCamera.Game
             GuideManager.instance.TutorialDisabled = !visibility;
             DisasterManager.instance.MarkersVisible = visibility;
             NetManager.instance.RoadNamesVisible = visibility;
-            GameCamController.Instance.UICamera.enabled = visibility;
+            var uiCamera = GameCamController.Instance.UICamera;
+            if (uiCamera != null)
+                uiCamera.enabled = visibility;
+            else
+                UIView.Show(visibility);
             if (!visibility)
                 Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
         }

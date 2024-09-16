@@ -16,7 +16,12 @@ namespace FPSCamera.Patches.GameUIPatches
             if (__instance.m_freeCamera != AccessUtils.GetFieldValue<bool>(__instance, "m_cachedFreeCamera"))
             {
                 AccessUtils.SetFieldValue(__instance, "m_cachedFreeCamera", __instance.m_freeCamera);
-                GameCamController.Instance.UICamera.enabled = UIView.HasModalInput() || !__instance.m_freeCamera; //UIView.Show(UIView.HasModalInput() || !m_freeCamera);
+                var visibility = UIView.HasModalInput() || !__instance.m_freeCamera; //UIView.Show(UIView.HasModalInput() || !m_freeCamera);
+                var uiCamera = GameCamController.Instance.UICamera;
+                if (uiCamera != null)
+                    uiCamera.enabled = visibility;
+                else
+                    UIView.Show(visibility);
                 Singleton<NotificationManager>.instance.NotificationsVisible = !__instance.m_freeCamera;
                 Singleton<GameAreaManager>.instance.BordersVisible = !__instance.m_freeCamera;
                 Singleton<DistrictManager>.instance.NamesVisible = !__instance.m_freeCamera;
@@ -38,7 +43,11 @@ namespace FPSCamera.Patches.GameUIPatches
     {
         internal static bool Prefix(bool visible)
         {
-            GameCamController.Instance.UICamera.enabled = visible; // UIView.Show(visible);
+            var uiCamera = GameCamController.Instance.UICamera;
+            if (uiCamera != null)
+                uiCamera.enabled = visible;
+            else
+                UIView.Show(visible);
             Singleton<NotificationManager>.instance.NotificationsVisible = visible;
             Singleton<GameAreaManager>.instance.BordersVisible = visible;
             Singleton<DistrictManager>.instance.NamesVisible = visible;
