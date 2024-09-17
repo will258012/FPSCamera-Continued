@@ -9,7 +9,8 @@ namespace FPSCamera.Cam
         Positioning GetPositioning();
         bool IsVaild();
         void StopCam();
-
+        void SyncCamOffset();
+        void SaveCamOffset();
     }
     public interface IFollowCam : IFPSCam
     {

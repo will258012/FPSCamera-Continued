@@ -50,7 +50,7 @@ namespace FPSCamera.Utils
                 eulerAngles[i] = (eulerAngles[i] > 180) ? eulerAngles[i] - 360 : eulerAngles[i];
             return eulerAngles;
         }
-        public static float DistanceTo(this Vector3 pos, Vector3 target) => Vector3.Magnitude(new Vector3(target.x - pos.x, target.y - pos.y, target.z - pos.z));
+        public static float DistanceTo(this Vector3 pos, Vector3 target) => Vector3.Distance(pos, target);
 
         private static readonly System.Random _random = new System.Random();
         public static T GetRandomOne<T>(this IEnumerable<T> list) => list.Any() ? list.ElementAt(_random.Next(list.Count())) : default;

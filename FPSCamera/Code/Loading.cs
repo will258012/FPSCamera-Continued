@@ -18,6 +18,12 @@ namespace FPSCamera
         protected override List<AppMode> PermittedModes => new List<AppMode> { AppMode.Game, AppMode.MapEditor, AppMode.AssetEditor };
 
         /// <summary>
+        /// Checks for any mod conflicts.
+        /// Called as part of checking prior to executing any OnCreated actions.
+        /// </summary>
+        /// <returns>A list of conflicting mod names (null or empty if none).</returns>
+        protected override List<string> CheckModConflicts() => ModSupport.CheckModConflicts();
+        /// <summary>
         /// Called by the game when exiting a level.
         /// </summary>
         public override void OnLevelUnloading()
@@ -26,17 +32,6 @@ namespace FPSCamera
             Object.Destroy(gameObject);
             base.OnLevelUnloading();
         }
-
-        /// <summary>
-        /// Performs any actions upon successful creation of the mod.
-        /// E.g. Can be used to patch any other mods.
-        /// </summary>
-        /// <param name="loading">Loading mode (e.g. game or editor).</param>
-        protected override void CreatedActions(ILoading loading)
-        {
-            base.CreatedActions(loading);
-        }
-
         /// <summary>
         /// Performs any actions upon successful level loading completion.
         /// </summary>
@@ -45,11 +40,11 @@ namespace FPSCamera
         {
             base.LoadedActions(mode);
             gameObject = new GameObject();
-            ModSupport.Initialize();
             controller = GameCamController.Instance?.AddComponent<FPSCamController>();
             gameObject.AddComponent<CamInfoPanel>();
             gameObject.AddComponent<MainPanel>();
-            if (GameUtils.InGameMode)
+            ModSupport.Initialize();
+            if (ToolsModifierControl.isGame)
                 gameObject.AddComponent<FollowButtons>();
         }
 

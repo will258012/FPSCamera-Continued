@@ -43,7 +43,7 @@
 
         private void Update()
         {
-            if (Cam.IsVaild())
+            if (Cam != null && Cam.IsVaild())
             {
                 _elapsedTime += Time.deltaTime;
                 if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval)
@@ -80,6 +80,12 @@
                 var status = followcam.GetStatus();
                 if (!string.IsNullOrEmpty(status))
                     _leftInfos[Translations.Translate("INFO_STATUS")] = followcam.GetStatus();
+                if (Cam is CitizenCam citizenCam)
+                {
+                    var anotherStatus = citizenCam.AnotherCam?.GetStatus();
+                    if (!string.IsNullOrEmpty(anotherStatus))
+                        _leftInfos[Translations.Translate("INFO_VSTATUS")] = anotherStatus;
+                }
             }
         }
         private void UpdateTargetInfos()

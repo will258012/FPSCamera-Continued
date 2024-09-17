@@ -19,10 +19,7 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
-        private void Awake()
-        {
-            Instance = this;
-        }
+        private void Awake() => Instance = this;
 
         /// <summary>
         /// Enables the camera and associated UI elements or settings.
@@ -37,7 +34,8 @@ namespace FPSCamera.Cam.Controller
                 StartCoroutine(LodManager.ToggleLODOpt(true));
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(true));
-            FollowButtons.Instance.enabled = false;
+            if (FollowButtons.Instance != null)
+                FollowButtons.Instance.enabled = false;
             GameCamController.Instance.Initialize();
         }
 
@@ -46,9 +44,11 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void DisableCam()
         {
-            FPSCam.StopCam();
-            FPSCam = _cachedCam = null;
-            FollowButtons.Instance.enabled = true;
+            Logging.KeyMessage("Disabling FPS Camera");
+            FPSCam?.StopCam();
+            FPSCam = null;
+            if (FollowButtons.Instance != null)
+                FollowButtons.Instance.enabled = true;
             if (ModSettings.ShowInfoPanel)
                 CamInfoPanel.Instance.DisableCamInfoPanel();
             if (ModSettings.LodOpt)
@@ -83,13 +83,14 @@ namespace FPSCamera.Cam.Controller
         /// <param name="instanceID">The instance ID to follow.</param>
         public void StartFollowing(InstanceID instanceID)
         {
+            Logging.KeyMessage("Starting Follow mode");
             switch (instanceID.Type)
             {
                 case InstanceType.Vehicle: { FPSCam = new VehicleCam(instanceID); break; }
                 case InstanceType.Citizen: { FPSCam = new CitizenCam(instanceID); break; }
             }
             EnableCam();
-            SyncCamOffset();
+            FPSCam.SyncCamOffset();
         }
 
         /// <summary>
@@ -97,6 +98,7 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void StartFreeCam()
         {
+            Logging.KeyMessage("Starting Free-Camera mode");
             FPSCam = new FreeCam();
             EnableCam();
             _offset = new Positioning(Vector3.zero, GameCamController.Instance.MainCamera.transform.rotation);
@@ -107,6 +109,7 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void StartWalkThruCam()
         {
+            Logging.KeyMessage("Starting Walk-Through mode");
             FPSCam = new WalkThruCam();
             EnableCam();
 
@@ -118,10 +121,6 @@ namespace FPSCamera.Cam.Controller
         public void StartTransitioningOnDisabled(Positioning endPos)
         {
             _targetFoV = ModSettings.CamFieldOfView;
-
-            if (!ModSettings.HideGameUI)
-                GameCamController.Instance.MainCamera.rect = CameraController.kFullScreenWithoutMenuBarRect;
-
             var cameraTransform = GameCamController.Instance.MainCamera.transform;
             if (cameraTransform.position.DistanceTo(endPos.pos) <= ModSettings.MinTransDistance ||
                     cameraTransform.position.DistanceTo(endPos.pos) > ModSettings.MaxTransDistance)
@@ -142,20 +141,16 @@ namespace FPSCamera.Cam.Controller
                 if (FPSCam != null && FPSCam.IsActivated)
                 {
                     if (!FPSCam.IsVaild()) { DisableCam(); return; }
-                    if (FPSCam is CitizenCam citizenCamera)
-                        CheckAnotherCam(citizenCamera);
-                    if (_cachedCam != null)
-                    {
-                        CheckAnotherCam(_cachedCam);
-                    }
                     if (FPSCam is WalkThruCam walkThruCam)
                         walkThruCam.ElapseTime(Time.deltaTime);
                 }
             }
             catch (Exception e)
             {
-                Logging.Error("FPSCamController: ");
+                Logging.Error("FPS Camera is about to exit due to some issues");
+                Logging.Error("at FPSCamController.Update()");
                 Logging.LogException(e);
+                DisableCam();
             }
         }
 
@@ -181,11 +176,14 @@ namespace FPSCamera.Cam.Controller
                     }
                     HandleInput();
                 }
+
             }
             catch (Exception e)
             {
-                Logging.Error("FPSCamController: ");
+                Logging.Error("FPS Camera is about to exit due to some issues");
+                Logging.Error("at FPSCamController.LateUpdate()");
                 Logging.LogException(e);
+                DisableCam();
             }
         }
 
@@ -203,32 +201,6 @@ namespace FPSCamera.Cam.Controller
             return false;
         }
 
-
-
-        /// <summary>
-        /// Checks if there is another camera to switch to for a citizen camera.
-        /// </summary>
-        /// <param name="citizenCamera">The citizen camera to check.</param>
-        private void CheckAnotherCam(CitizenCam citizenCamera)
-        {
-            if (citizenCamera.CheckAnotherCam())
-            {
-                if (_cachedCam == null)
-                {
-                    _cachedCam = citizenCamera;
-                    FPSCam = citizenCamera.AnotherCam;
-                }
-            }
-            else
-            {
-                if (_cachedCam != null)
-                {
-                    FPSCam = _cachedCam;
-                    _cachedCam = null;
-                }
-            }
-        }
-
         /// <summary>
         /// Handles user input for camera control.
         /// </summary>
@@ -244,10 +216,7 @@ namespace FPSCamera.Cam.Controller
             if (InputManager.MouseTriggered(InputManager.MouseButton.Middle) ||
                 InputManager.KeyTriggered(ModSettings.KeyCamReset))
             {
-                if (FPSCam is WalkThruCam cam)
-                    cam.SyncCamOffset();
-                else if (FPSCam is IFollowCam)
-                    SyncCamOffset();
+                FPSCam.SyncCamOffset();
                 if (ModSettings.SmoothTransition)
                     _targetFoV = ModSettings.CamFieldOfView;
                 else
@@ -258,10 +227,8 @@ namespace FPSCamera.Cam.Controller
                 (FPSCam as WalkThruCam)?.SwitchTarget();
             if (InputManager.KeyTriggered(ModSettings.KeyAutoMove))
                 (FPSCam as FreeCam)?.ToggleAutoMove();
-            if (InputManager.KeyTriggered(ModSettings.KeySaveOffset) && (FPSCam is IFollowCam))
-            {
-                SaveCamOffset();
-            }
+            if (InputManager.KeyTriggered(ModSettings.KeySaveOffset))
+                FPSCam.SaveCamOffset();
 
             { // key movement
                 var movementFactor = (InputManager.KeyPressed(ModSettings.KeySpeedUp) ? ModSettings.SpeedUpFactor : 1f)
@@ -319,11 +286,10 @@ namespace FPSCamera.Cam.Controller
             {
                 var nowFoV = GameCamController.Instance.MainCamera.fieldOfView;
                 if (scroll > 0f && nowFoV > 10f)
-                    _targetFoV = nowFoV / (ModSettings.FoViewScrollfactor * ModSettings.FoViewScrollfactor);
+                    _targetFoV = nowFoV / ModSettings.FoViewScrollfactor;
                 else if (scroll < 0f && nowFoV < 75f)
-                    _targetFoV = nowFoV * (ModSettings.FoViewScrollfactor * ModSettings.FoViewScrollfactor);
-
-                GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(nowFoV, _targetFoV, Time.deltaTime * ModSettings.TransSpeed);
+                    _targetFoV = nowFoV * ModSettings.FoViewScrollfactor;
+                _isScrollTransitioning = true;
             }
             else
             {
@@ -334,13 +300,24 @@ namespace FPSCamera.Cam.Controller
                 else if (scroll < 0f && FoV < 75f)
                     GameCamController.Instance.MainCamera.fieldOfView = FoV * ModSettings.FoViewScrollfactor;
             }
+            if (_isScrollTransitioning)
+            {
+                if (GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(_targetFoV))
+                {
+                    GameCamController.Instance.MainCamera.fieldOfView = _targetFoV;
+                    _isScrollTransitioning = false;
+                }
+                GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(GameCamController.Instance.MainCamera.fieldOfView, _targetFoV, Time.deltaTime * ModSettings.TransSpeed);
+            }
         }
         /// <summary>
-        /// Saves the current camera offset.
+        /// Saves the given camera offset.
         /// </summary>
-        private void SaveCamOffset()
+        /// <param name="followCam">Given camera.</param>
+        internal void SaveCamOffset(IFollowCam followCam)
         {
-            var name = (FPSCam as IFollowCam)?.GetPrefabName() ?? null;
+            if (followCam == null) followCam = FPSCam as IFollowCam;
+            var name = followCam?.GetPrefabName();
             if (name != null)
             {
                 OffsetsSettings.Offsets[name] = _offset;
@@ -351,13 +328,13 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Synchronizes the camera offset based on the given camera.
         /// </summary>
-        /// <param name="followCam">Given camera. If not provided, synchronize based on the current camera.</param>
-        internal void SyncCamOffset(IFollowCam followCam = null)
+        /// <param name="followCam">Given camera.</param>
+        internal void SyncCamOffset(IFollowCam followCam)
         {
             if (followCam == null) followCam = FPSCam as IFollowCam;
             OffsetsSettings.Load();
 
-            var name = followCam?.GetPrefabName() ?? null;
+            var name = followCam?.GetPrefabName();
             var newOffset = new Positioning(Vector3.zero);
 
             if (name != null && OffsetsSettings.Offsets.TryGetValue(name, out var offset))
@@ -400,15 +377,18 @@ namespace FPSCamera.Cam.Controller
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-                cameraTransform.position = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+
+                GameCamController.Instance.CameraController.m_targetPosition = cameraTransform.position = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
                                             cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
                     ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                     : instancePos;
-                cameraTransform.rotation = Quaternion.Lerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
+                cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
             {
-                cameraTransform.position = instancePos;
+                GameCamController.Instance.CameraController.m_targetPosition =
+                    cameraTransform.position =
+                    instancePos;
                 cameraTransform.rotation = instanceRotation;
             }
         }
@@ -422,8 +402,12 @@ namespace FPSCamera.Cam.Controller
 
             // Automatically move the camera forward if AutoMove is enabled and the secondary mouse button is not pressed.
             if (freecam.AutoMove && !InputManager.MousePressed(InputManager.MouseButton.Secondary))
-                _offset.pos.x += Time.deltaTime * ModSettings.MovementSpeed / MapUtils.ToKilometer(1f);
+            {
+                var movement = Vector3.zero;
+                movement.z += Time.deltaTime * ModSettings.MovementSpeed / MapUtils.ToKilometer(1f);
+                _offset.pos += _offset.rotation * movement;
 
+            }
             var cameraTransform = GameCamController.Instance.MainCamera.transform;
 
             freecam.RecordLastPositioning();
@@ -457,15 +441,18 @@ namespace FPSCamera.Cam.Controller
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-                cameraTransform.position = freecam._positioning.pos = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+                GameCamController.Instance.CameraController.m_targetPosition = cameraTransform.position = freecam._positioning.pos = cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
                                             cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
                     ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                     : instancePos;
-                cameraTransform.rotation = freecam._positioning.rotation = Quaternion.Lerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
+                cameraTransform.rotation = freecam._positioning.rotation = Quaternion.Slerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
             {
-                cameraTransform.position = freecam._positioning.pos = instancePos;
+                GameCamController.Instance.CameraController.m_targetPosition =
+                    cameraTransform.position =
+                    freecam._positioning.pos =
+                    instancePos;
                 cameraTransform.rotation = freecam._positioning.rotation = instanceRotation;
             }
 
@@ -483,16 +470,20 @@ namespace FPSCamera.Cam.Controller
             if (cameraTransform.position.DistanceTo(_endPos.pos) <= ModSettings.MinTransDistance)
             {
                 _isTransitioning = false;
+                cameraTransform.position = _endPos.pos;
+                cameraTransform.rotation = _endPos.rotation;
+                _endPos = new Positioning(Vector3.zero);
                 AfterTransition();
                 return;
             }
             // Apply the calculated position and rotation to the camera.
-            cameraTransform.position = Vector3.Lerp(cameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
-            cameraTransform.rotation = Quaternion.Lerp(cameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
+            cameraTransform.position =
+                Vector3.Lerp(cameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
+            cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
         }
         private bool _isTransitioning = false;
+        private bool _isScrollTransitioning = false;
         private Positioning _endPos = new Positioning(Vector3.zero);
-        private CitizenCam _cachedCam = null;
         private Positioning _offset = new Positioning(Vector3.zero);
         private float _targetFoV = ModSettings.CamFieldOfView;
     }

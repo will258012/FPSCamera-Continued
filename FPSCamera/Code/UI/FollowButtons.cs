@@ -79,7 +79,7 @@ namespace FPSCamera.UI
             }
         }
 
-        private InstanceID GetPanelInstanceID<T>(T panel) where T : WorldInfoPanel => PrivateField.GetValue<InstanceID>(panel, "m_InstanceID");
+        private InstanceID GetPanelInstanceID<T>(T panel) where T : WorldInfoPanel => AccessUtils.GetFieldValue<InstanceID>(panel, "m_InstanceID");
 
         private CitizenVehicleWorldInfoPanel citizenVehicleInfo_Panel;
         private UIButton citizenVehicleInfo_Button;

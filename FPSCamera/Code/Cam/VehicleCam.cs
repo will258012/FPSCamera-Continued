@@ -28,7 +28,7 @@ namespace FPSCamera.Cam
             FollowID = id;
             FollowInstance = new InstanceID() { Vehicle = id };
             if (!IsVaild()) return false;
-            FPSCamController.Instance.SyncCamOffset();
+            SyncCamOffset();
             return true;
         }
 
@@ -102,16 +102,18 @@ namespace FPSCamera.Cam
             }
             return true;
         }
+        public void SyncCamOffset() => FPSCamController.Instance.SyncCamOffset(this);
+        public void SaveCamOffset() => FPSCamController.Instance.SaveCamOffset(this);
         public void StopCam()
         {
             FollowID = default;
             FollowInstance = default;
             IsActivated = false;
         }
-        internal ushort GetHeadVehicleID() => GetVehicle().GetFirstVehicle((ushort)FollowID);
-        internal ushort GetFrontVehicleID() => (GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed)) ? GetVehicle().GetLastVehicle((ushort)FollowID) : GetHeadVehicleID();
-        internal Vehicle GetVehicle() => VehicleManager.instance.m_vehicles.m_buffer[FollowID];
-        internal Vehicle GetVehicle(ushort id) => VehicleManager.instance.m_vehicles.m_buffer[id];
+        public ushort GetHeadVehicleID() => GetVehicle().GetFirstVehicle((ushort)FollowID);
+        public ushort GetFrontVehicleID() => GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed) ? GetVehicle().GetLastVehicle((ushort)FollowID) : GetHeadVehicleID();
+        public Vehicle GetVehicle() => VehicleManager.instance.m_vehicles.m_buffer[FollowID];
+        public Vehicle GetVehicle(ushort id) => VehicleManager.instance.m_vehicles.m_buffer[id];
         bool hasReversed = false;
     }
 
