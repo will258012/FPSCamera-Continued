@@ -14,6 +14,7 @@ namespace FPSCamera.Utils
             var list = new List<string>();
             if (AccessTools.TypeByName("FPSCamera.FPSCamera") != null) list.Add("First Person Camera: Updated");
             if (AccessTools.TypeByName("FPSCamera.Controller") != null) list.Add("First Person Camera v2.x");
+            if (AccessTools.TypeByName("EnhancedZoomContinued.EnhancedZoomMod") != null) list.Add("Enhanced Zoom Continued");
             return list;
         }
         internal static void Initialize()
