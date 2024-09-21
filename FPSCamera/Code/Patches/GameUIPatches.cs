@@ -1,6 +1,5 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
-using FPSCamera.Cam.Controller;
 using FPSCamera.Utils;
 using HarmonyLib;
 using UnityEngine;
@@ -17,11 +16,15 @@ namespace FPSCamera.Patches.GameUIPatches
             {
                 AccessUtils.SetFieldValue(__instance, "m_cachedFreeCamera", __instance.m_freeCamera);
                 var visibility = UIView.HasModalInput() || !__instance.m_freeCamera; //UIView.Show(UIView.HasModalInput() || !m_freeCamera);
-                var uiCamera = GameCamController.Instance.UICamera;
-                if (uiCamera != null)
-                    uiCamera.enabled = visibility;
-                else
-                    UIView.Show(visibility);
+                var cameras = Object.FindObjectsOfType<Camera>();
+                foreach (var cam in cameras)
+                {
+                    if (cam.name == "UIView")
+                    {
+                        cam.enabled = visibility;
+                        break;
+                    }
+                }
                 Singleton<NotificationManager>.instance.NotificationsVisible = !__instance.m_freeCamera;
                 Singleton<GameAreaManager>.instance.BordersVisible = !__instance.m_freeCamera;
                 Singleton<DistrictManager>.instance.NamesVisible = !__instance.m_freeCamera;
@@ -43,11 +46,15 @@ namespace FPSCamera.Patches.GameUIPatches
     {
         internal static bool Prefix(bool visible)
         {
-            var uiCamera = GameCamController.Instance.UICamera;
-            if (uiCamera != null)
-                uiCamera.enabled = visible;
-            else
-                UIView.Show(visible);
+            var cameras = Object.FindObjectsOfType<Camera>();
+            foreach (var cam in cameras)
+            {
+                if (cam.name == "UIView")
+                {
+                    cam.enabled = visible;
+                    break;
+                }
+            }
             Singleton<NotificationManager>.instance.NotificationsVisible = visible;
             Singleton<GameAreaManager>.instance.BordersVisible = visible;
             Singleton<DistrictManager>.instance.NamesVisible = visible;

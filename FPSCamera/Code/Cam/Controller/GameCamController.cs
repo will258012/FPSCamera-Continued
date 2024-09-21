@@ -1,6 +1,4 @@
-﻿using AlgernonCommons;
-using ColossalFramework.UI;
-using FPSCamera.Settings;
+﻿using FPSCamera.Settings;
 using FPSCamera.Utils;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
@@ -28,7 +26,6 @@ namespace FPSCamera.Cam.Controller
 
         public Camera MainCamera => Camera.main;
         public CameraController CameraController => ToolsModifierControl.cameraController;
-        public Camera UICamera { get; private set; }
         private bool IsDoFEnabled => !CameraController.isDepthOfFieldDisabled;
         private bool IsTiltEffectEnabled => !CameraController.isTiltShiftDisabled;
 
@@ -85,27 +82,6 @@ namespace FPSCamera.Cam.Controller
         private GameCamController()
         {
             if (CameraController == null) return;
-            var view = UIView.GetAView();
-            UICamera = view.uiCamera ?? view.GetComponent<Camera>();
-
-            if (UICamera == null)
-            {
-                Logging.Error("Failed to find UICamera. Retry with all cameras..");
-                var cameras = Object.FindObjectsOfType<Camera>();
-                foreach (var cam in cameras)
-                {
-                    if (cam.name == "UIView")
-                    {
-                        UICamera = cam;
-                        break;
-                    }
-                }
-            }
-
-            if (UICamera == null)
-            {
-                Logging.Error("Failed to find UICamera. UI toggling may slower or wrong.");
-            }
             _camDoF = GetComponent<DepthOfField>();
             _camTiltEffect = GetComponent<TiltShiftEffect>();
         }
