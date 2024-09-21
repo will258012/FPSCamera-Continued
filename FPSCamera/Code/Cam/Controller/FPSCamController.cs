@@ -90,7 +90,7 @@ namespace FPSCamera.Cam.Controller
                 case InstanceType.Citizen: { FPSCam = new CitizenCam(instanceID); break; }
             }
             EnableCam();
-            FPSCam.SyncCamOffset();
+            (FPSCam as IFollowCam).SyncCamOffset();
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace FPSCamera.Cam.Controller
             if (InputManager.MouseTriggered(InputManager.MouseButton.Middle) ||
                 InputManager.KeyTriggered(ModSettings.KeyCamReset))
             {
-                FPSCam.SyncCamOffset();
+                (FPSCam as IFollowCam)?.SyncCamOffset();
                 if (ModSettings.SmoothTransition)
                     _targetFoV = ModSettings.CamFieldOfView;
                 else
@@ -228,7 +228,7 @@ namespace FPSCamera.Cam.Controller
             if (InputManager.KeyTriggered(ModSettings.KeyAutoMove))
                 (FPSCam as FreeCam)?.ToggleAutoMove();
             if (InputManager.KeyTriggered(ModSettings.KeySaveOffset))
-                FPSCam.SaveCamOffset();
+                (FPSCam as IFollowCam)?.SaveCamOffset();
 
             { // key movement
                 var movementFactor = (InputManager.KeyPressed(ModSettings.KeySpeedUp) ? ModSettings.SpeedUpFactor : 1f)
@@ -316,7 +316,6 @@ namespace FPSCamera.Cam.Controller
         /// <param name="followCam">Given camera.</param>
         internal void SaveCamOffset(IFollowCam followCam)
         {
-            if (followCam == null) followCam = FPSCam as IFollowCam;
             var name = followCam?.GetPrefabName();
             if (name != null)
             {
@@ -331,7 +330,6 @@ namespace FPSCamera.Cam.Controller
         /// <param name="followCam">Given camera.</param>
         internal void SyncCamOffset(IFollowCam followCam)
         {
-            if (followCam == null) followCam = FPSCam as IFollowCam;
             OffsetsSettings.Load();
 
             var name = followCam?.GetPrefabName();

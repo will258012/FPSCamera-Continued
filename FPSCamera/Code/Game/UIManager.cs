@@ -1,6 +1,4 @@
 ﻿using AlgernonCommons;
-using ColossalFramework.UI;
-using FPSCamera.Cam.Controller;
 using FPSCamera.Utils;
 using System.Collections;
 using UnityEngine;
@@ -93,12 +91,15 @@ namespace FPSCamera.Game
             PropManager.instance.MarkersVisible = visibility;
             GuideManager.instance.TutorialDisabled = !visibility;
             DisasterManager.instance.MarkersVisible = visibility;
-            var uiCamera = GameCamController.Instance.UICamera;
-            if (uiCamera != null)
-                uiCamera.enabled = visibility;
-            else
-                UIView.Show(visibility);
-
+            var cameras = Object.FindObjectsOfType<Camera>();
+            foreach (var cam in cameras)
+            {
+                if (cam.name == "UIView")
+                {
+                    cam.enabled = visibility;
+                    break;
+                }
+            }
         }
 
         private static void SetUIVisibilityDirectly(bool visibility)
@@ -110,11 +111,15 @@ namespace FPSCamera.Game
             GuideManager.instance.TutorialDisabled = !visibility;
             DisasterManager.instance.MarkersVisible = visibility;
             NetManager.instance.RoadNamesVisible = visibility;
-            var uiCamera = GameCamController.Instance.UICamera;
-            if (uiCamera != null)
-                uiCamera.enabled = visibility;
-            else
-                UIView.Show(visibility);
+            var cameras = Object.FindObjectsOfType<Camera>();
+            foreach (var cam in cameras)
+            {
+                if (cam.name == "UIView")
+                {
+                    cam.enabled = visibility;
+                    break;
+                }
+            }
             if (!visibility)
                 Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
         }
