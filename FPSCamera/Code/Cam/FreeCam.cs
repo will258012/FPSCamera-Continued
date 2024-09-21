@@ -24,8 +24,6 @@ namespace FPSCamera.Cam
         public void ToggleAutoMove() => AutoMove = !AutoMove;
         public float GetSpeed() => _lastPositioning.pos.DistanceTo(_positioning.pos) / Time.deltaTime;
         public bool IsVaild() => true;
-        public void SyncCamOffset() { }
-        public void SaveCamOffset() { }
         public void StopCam() { IsActivated = false; _positioning = _lastPositioning = default; }
 
         internal Positioning _positioning = new Positioning(Vector3.zero);
