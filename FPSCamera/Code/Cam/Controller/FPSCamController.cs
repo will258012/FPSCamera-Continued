@@ -146,7 +146,12 @@ namespace FPSCamera.Cam.Controller
                 if (Status == CamStatus.Enabled)
                 {
                     if (!FPSCam.IsVaild())
+                    {
                         DisableCam();
+                        return;
+                    }
+                    if (FPSCam is WalkThruCam walkThruCam)
+                        walkThruCam.ElapseTime(Time.deltaTime);
                 }
             }
             catch (Exception e)

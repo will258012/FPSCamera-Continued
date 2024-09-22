@@ -26,13 +26,13 @@ namespace FPSCamera.Cam
         public string GetStatus() => CurrentCam?.GetStatus();
         public Positioning GetPositioning() => CurrentCam.GetPositioning();
         public void SwitchTarget() => SetRandomCam();
+        public void ElapseTime(float seconds) => _elapsedTime += seconds;
         public float GetElapsedTime() => _elapsedTime;
         public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
         public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
         public bool IsVaild()
         {
             if (!IsActivated) return false;
-            _elapsedTime += Time.deltaTime;
             var status = CurrentCam?.IsVaild() ?? false;
             if (!ModSettings.ManualSwitchWalk &&
                 _elapsedTime > ModSettings.PeriodWalk) status = false;

@@ -1,4 +1,5 @@
-﻿using FPSCamera.Settings;
+﻿using AlgernonCommons;
+using FPSCamera.Settings;
 using FPSCamera.Utils;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
@@ -24,13 +25,10 @@ namespace FPSCamera.Cam.Controller
         }
         private static GameCamController _instance = null;
 
-        public Camera MainCamera => Camera.main;
+        public Camera MainCamera { get; private set; }
         public CameraController CameraController => ToolsModifierControl.cameraController;
         private bool IsDoFEnabled => !CameraController.isDepthOfFieldDisabled;
         private bool IsTiltEffectEnabled => !CameraController.isTiltShiftDisabled;
-
-        public TComp AddComponent<TComp>() where TComp : MonoBehaviour
-            => CameraController.gameObject.AddComponent<TComp>();
         public TComp GetComponent<TComp>() where TComp : MonoBehaviour
             => CameraController.gameObject.GetComponent<TComp>();
         public void Initialize()
@@ -68,20 +66,22 @@ namespace FPSCamera.Cam.Controller
             MainCamera.fieldOfView = _cachedfieldOfView;
             MainCamera.nearClipPlane = _cachednearClipPlane;
             if (!ModSettings.SetBackCamera)
-            {
                 CameraController.m_targetPosition = MainCamera.transform.position;
-            }
             else
-            {
                 CameraController.m_targetPosition = _cachedTargetPos;
-            }
             CameraController.m_targetHeight = MainCamera.transform.position.y - MapUtils.GetMinHeightAt(MainCamera.transform.position);
             CameraController.m_targetAngle = new Vector2(MainCamera.transform.eulerAngles.y, MainCamera.transform.eulerAngles.x).ClampEulerAngles();
             CameraController.enabled = true;
         }
         private GameCamController()
         {
-            if (CameraController == null) return;
+            if (CameraController == null)
+            {
+                Logging.Error("CameraController is not found");
+                return;
+            }
+            MainCamera = AccessUtils.GetFieldValue<Camera>(CameraController, "m_camera");
+
             _camDoF = GetComponent<DepthOfField>();
             _camTiltEffect = GetComponent<TiltShiftEffect>();
         }
@@ -92,6 +92,5 @@ namespace FPSCamera.Cam.Controller
         internal Vector3 _cachedTargetPos;
         private float _cachedfieldOfView;
         private float _cachednearClipPlane;
-
     }
 }
