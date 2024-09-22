@@ -69,14 +69,14 @@ namespace FPSCamera.Cam.Controller
             MainCamera.nearClipPlane = _cachednearClipPlane;
             if (!ModSettings.SetBackCamera)
             {
-                CameraController.m_currentPosition = CameraController.m_targetPosition = MainCamera.transform.position;
-                CameraController.m_currentAngle = CameraController.m_targetAngle = new Vector2(MainCamera.transform.eulerAngles.y, MainCamera.transform.eulerAngles.x).ClampEulerAngles();
-                CameraController.m_currentHeight = CameraController.m_targetHeight = MainCamera.transform.position.y - MapUtils.GetMinHeightAt(MainCamera.transform.position);
+                CameraController.m_targetPosition = MainCamera.transform.position;
             }
             else
             {
                 CameraController.m_targetPosition = _cachedTargetPos;
             }
+            CameraController.m_targetHeight = MainCamera.transform.position.y - MapUtils.GetMinHeightAt(MainCamera.transform.position);
+            CameraController.m_targetAngle = new Vector2(MainCamera.transform.eulerAngles.y, MainCamera.transform.eulerAngles.x).ClampEulerAngles();
             CameraController.enabled = true;
         }
         private GameCamController()

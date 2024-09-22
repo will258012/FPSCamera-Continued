@@ -39,11 +39,11 @@ namespace FPSCamera
         protected override void LoadedActions(LoadMode mode)
         {
             base.LoadedActions(mode);
+            ModSupport.Initialize();
             gameObject = new GameObject();
             controller = GameCamController.Instance?.AddComponent<FPSCamController>();
             gameObject.AddComponent<CamInfoPanel>();
             gameObject.AddComponent<MainPanel>();
-            ModSupport.Initialize();
             if (ToolsModifierControl.isGame)
                 gameObject.AddComponent<FollowButtons>();
         }

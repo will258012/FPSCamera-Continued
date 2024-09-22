@@ -26,14 +26,13 @@ namespace FPSCamera.Cam
         public string GetStatus() => CurrentCam?.GetStatus();
         public Positioning GetPositioning() => CurrentCam.GetPositioning();
         public void SwitchTarget() => SetRandomCam();
-        public void ElapseTime(float seconds) => _elapsedTime += seconds;
         public float GetElapsedTime() => _elapsedTime;
         public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
         public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
         public bool IsVaild()
         {
             if (!IsActivated) return false;
-
+            _elapsedTime += Time.deltaTime;
             var status = CurrentCam?.IsVaild() ?? false;
             if (!ModSettings.ManualSwitchWalk &&
                 _elapsedTime > ModSettings.PeriodWalk) status = false;
@@ -60,7 +59,7 @@ namespace FPSCamera.Cam
                     return ModSettings.SelectDriving;
                 if (v.IsFlagSet(VehicleInfo.VehicleCategory.PublicTransport))
                     return ModSettings.SelectPublicTransit;
-                if (v.IsFlagSet(VehicleInfo.VehicleCategory.CityServices) || v.IsFlagSet(CityServiceCopters))
+                if (v.IsFlagSet(VehicleInfo.VehicleCategory.CityServices) || v.IsFlagSet(CityServiceCopters) || v.IsFlagSet(VehicleInfo.VehicleCategory.FishingBoat))
                     return ModSettings.SelectService;
                 if (v.IsFlagSet(VehicleInfo.VehicleCategory.Cargo))
                     return ModSettings.SelectCargo;
