@@ -7,7 +7,7 @@ namespace FPSCamera.Cam
         bool IsActivated { get; }
         float GetSpeed();
         Positioning GetPositioning();
-        bool IsVaild();
+        bool IsValid();
         void StopCam();
 
     }

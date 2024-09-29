@@ -1,5 +1,7 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
+using FPSCamera.Cam.Controller;
+using FPSCamera.Game;
 using FPSCamera.Utils;
 using HarmonyLib;
 using UnityEngine;
@@ -7,6 +9,7 @@ using UnityEngine;
 /// so here we replace it with UIView.GetAView().uiCamera.enabled. Same effect but much faster.
 namespace FPSCamera.Patches.GameUIPatches
 {
+    //This will be triggered before the game was loaded
     [HarmonyPatch(typeof(CameraController), "UpdateFreeCamera")]
     internal class UpdateFreeCameraPatch
     {
@@ -15,16 +18,8 @@ namespace FPSCamera.Patches.GameUIPatches
             if (__instance.m_freeCamera != AccessUtils.GetFieldValue<bool>(__instance, "m_cachedFreeCamera"))
             {
                 AccessUtils.SetFieldValue(__instance, "m_cachedFreeCamera", __instance.m_freeCamera);
-                var visibility = UIView.HasModalInput() || !__instance.m_freeCamera; //UIView.Show(UIView.HasModalInput() || !m_freeCamera);
-                var cameras = Object.FindObjectsOfType<Camera>();
-                foreach (var cam in cameras)
-                {
-                    if (cam.name == "UIView")
-                    {
-                        cam.enabled = visibility;
-                        break;
-                    }
-                }
+                var visibility = UIView.HasModalInput() || !__instance.m_freeCamera;
+                UIManager.UICamera.enabled = visibility;
                 Singleton<NotificationManager>.instance.NotificationsVisible = !__instance.m_freeCamera;
                 Singleton<GameAreaManager>.instance.BordersVisible = !__instance.m_freeCamera;
                 Singleton<DistrictManager>.instance.NamesVisible = !__instance.m_freeCamera;
@@ -34,27 +29,27 @@ namespace FPSCamera.Patches.GameUIPatches
                 Singleton<NetManager>.instance.RoadNamesVisible = !__instance.m_freeCamera;
             }
 
-            Camera.main.rect = AccessUtils.GetFieldValue<bool>(__instance, "m_cachedFreeCamera")
-                ? CameraController.kFullScreenRect
-                : CameraController.kFullScreenWithoutMenuBarRect;
+            if (AccessUtils.GetFieldValue<bool>(__instance, "m_cachedFreeCamera"))
+            {
+                GameCamController.Instance._cachedRect = Camera.main.rect;
+                Camera.main.rect = CameraController.kFullScreenRect;
+            }
+            else
+            {
+                if (GameCamController.Instance._cachedRect != default)// If we didn't record a rect, skip adjustment.
+                    Camera.main.rect = GameCamController.Instance._cachedRect;
+            }
             return false;
         }
     }
+
 
     [HarmonyPatch(typeof(CinematicCameraController), nameof(CinematicCameraController.SetUIVisible))]
     internal class SetUIVisiblePatch
     {
         internal static bool Prefix(bool visible)
         {
-            var cameras = Object.FindObjectsOfType<Camera>();
-            foreach (var cam in cameras)
-            {
-                if (cam.name == "UIView")
-                {
-                    cam.enabled = visible;
-                    break;
-                }
-            }
+            UIManager.UICamera.enabled = visible;
             Singleton<NotificationManager>.instance.NotificationsVisible = visible;
             Singleton<GameAreaManager>.instance.BordersVisible = visible;
             Singleton<DistrictManager>.instance.NamesVisible = visible;
@@ -62,8 +57,17 @@ namespace FPSCamera.Patches.GameUIPatches
             Singleton<GuideManager>.instance.TutorialDisabled = !visible;
             Singleton<DisasterManager>.instance.MarkersVisible = visible;
             Singleton<NetManager>.instance.RoadNamesVisible = visible;
-            Camera.main.rect = visible ? CameraController.kFullScreenWithoutMenuBarRect : CameraController.kFullScreenRect;
+            if (visible)
+            {
+                Camera.main.rect = GameCamController.Instance._cachedRect;
+            }
+            else
+            {
+                GameCamController.Instance._cachedRect = Camera.main.rect;
+                Camera.main.rect = CameraController.kFullScreenRect;
+            }
             return false;
         }
     }
+
 }

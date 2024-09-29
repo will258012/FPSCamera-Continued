@@ -28,7 +28,11 @@ namespace FPSCamera
         /// </summary>
         public override void OnLevelUnloading()
         {
-            Object.Destroy(gameObject);
+            if (gameObject != null)
+            {
+                Object.Destroy(gameObject);
+                gameObject = null;
+            }
             base.OnLevelUnloading();
         }
         /// <summary>
@@ -39,14 +43,18 @@ namespace FPSCamera
         {
             base.LoadedActions(mode);
             ModSupport.Initialize();
+            if (gameObject != null)
+            {
+                Object.Destroy(gameObject);
+            }
             gameObject = new GameObject();
             gameObject.AddComponent<FPSCamController>();
             gameObject.AddComponent<CamInfoPanel>();
             gameObject.AddComponent<MainPanel>();
             if (ToolsModifierControl.isGame)
                 gameObject.AddComponent<FollowButtons>();
-        }
 
-        private GameObject gameObject = new GameObject();
+        }
+        private GameObject gameObject = null;
     }
 }

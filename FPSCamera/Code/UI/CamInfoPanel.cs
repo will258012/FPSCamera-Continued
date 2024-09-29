@@ -44,7 +44,7 @@
 
         private void Update()
         {
-            if (Cam != null && Cam.IsVaild())
+            if (Cam != null && Cam.IsValid())
             {
                 _elapsedTime += Time.deltaTime;
                 if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval)

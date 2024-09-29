@@ -1,4 +1,5 @@
-﻿using AlgernonCommons.Translation;
+﻿using AlgernonCommons;
+using AlgernonCommons.Translation;
 using ColossalFramework;
 using ColossalFramework.Math;
 using FPSCamera.Cam.Controller;
@@ -28,6 +29,7 @@ namespace FPSCamera.Cam
                 FollowID = citizenId;
                 IsActivated = true;
             }
+            Logging.KeyMessage("Citizen cam started");
         }
         public uint FollowID { get; private set; }
         public bool IsActivated { get; private set; }
@@ -37,11 +39,12 @@ namespace FPSCamera.Cam
         {
             if (IsinVehicle)
             {
-                if (GetCitizen().m_vehicle == default && AnotherCam.IsVaild())
+                if (GetCitizen().m_vehicle == default && AnotherCam.IsValid())
                 {
                     IsinVehicle = false;
                     AnotherCam.StopCam();
                     AnotherCam = null;
+                    Logging.KeyMessage("Citizen cam: Stopped another cam");
                 }
             }
             else if (GetCitizen().m_vehicle != default)
@@ -50,6 +53,7 @@ namespace FPSCamera.Cam
                 IsinVehicle = true;
                 AnotherCam = new VehicleCam(new InstanceID() { Vehicle = vehicleId });
                 SyncCamOffset();
+                Logging.KeyMessage("Citizen cam: Started another cam");
             }
         }
         public Dictionary<string, string> GetInfos()
@@ -100,7 +104,7 @@ namespace FPSCamera.Cam
         }
         public float GetSpeed() => GetCitizenInstance().GetLastFrameData().m_velocity.magnitude;
 
-        public bool IsVaild()
+        public bool IsValid()
         {
             CheckAnotherCam();
             var flags = GetCitizenInstance().m_flags;

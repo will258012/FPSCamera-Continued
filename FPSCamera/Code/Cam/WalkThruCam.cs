@@ -11,10 +11,7 @@ namespace FPSCamera.Cam
 {
     public class WalkThruCam : IFollowCam, IFPSCam
     {
-        public WalkThruCam()
-        {
-            IsActivated = true;
-        }
+        public WalkThruCam() => IsActivated = true;
         public IFollowCam CurrentCam { get; private set; } = null;
         public uint FollowID => CurrentCam.FollowID;
         public InstanceID FollowInstance => CurrentCam.FollowInstance;
@@ -30,19 +27,19 @@ namespace FPSCamera.Cam
         public float GetElapsedTime() => _elapsedTime;
         public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
         public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
-        public bool IsVaild()
+        public bool IsValid()
         {
             if (!IsActivated) return false;
-            var status = CurrentCam?.IsVaild() ?? false;
+            var status = CurrentCam?.IsValid() ?? false;
             if (!ModSettings.ManualSwitchWalk &&
                 _elapsedTime > ModSettings.PeriodWalk) status = false;
             if (!status)
             {
                 SetRandomCam();
-                status = CurrentCam?.IsVaild() ?? false;
+                status = CurrentCam?.IsValid() ?? false;
                 if (!status)
                 {
-                    Logging.Error("no target for Walk-Thru mode");
+                    Logging.Error("No target for Walk-Thru mode");
                     AudioManager.instance.PlaySound(disabledClickSound);
                 }
             }
@@ -51,7 +48,7 @@ namespace FPSCamera.Cam
         private void SetRandomCam()
         {
             CurrentCam = null;
-            Logging.Message(" -- switching target");
+            Logging.KeyMessage("WalkThru cam: Switching target");
 
             items = GetVehicles((v) =>
             {
@@ -87,14 +84,13 @@ namespace FPSCamera.Cam
                     }));
 
             if (!items.Any()) return;
-            Logging.Message("Total: " + items.Count().ToString());
             int attempt = 3;
             do
             {
                 var followInstance = items.GetRandomOne();
                 CurrentCam = followInstance.Type == InstanceType.CitizenInstance ? new CitizenCam(followInstance) : new VehicleCam(followInstance) as IFollowCam;
             }
-            while (!(CurrentCam?.IsVaild() ?? false) && --attempt >= 0);
+            while (!(CurrentCam?.IsValid() ?? false) && --attempt >= 0);
 
             _elapsedTime = 0f;
             SyncCamOffset();
@@ -113,16 +109,17 @@ namespace FPSCamera.Cam
         private readonly AudioClip disabledClickSound = UIView.GetAView().defaultDisabledClickSound;
 
         /// <summary>
-        /// Get a <see cref="IEnumerable{InstanceID}"/> list of vaild vehicles.
+        /// Get a <see cref="IEnumerable{InstanceID}"/> list of valid vehicles.
         /// </summary>
         private IEnumerable<InstanceID> GetVehicles(System.Func<VehicleInfo.VehicleCategory, bool> filter) => Enumerable.Range(1, VehicleManager.instance.m_vehicles.m_buffer.Length - 1)
                     .Select(i => new InstanceID() { Vehicle = (ushort)i })
                     .Where(v =>
+                    VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].Info != null &&
                     VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].Info.vehicleCategory != VehicleInfo.VehicleCategory.None &&
                     VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].m_flags.IsFlagSet(Vehicle.Flags.Created) &&
                     filter(VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].Info.vehicleCategory));
         /// <summary>
-        /// Get a <see cref="IEnumerable{InstanceID}"/> list of vaild citizen instances.
+        /// Get a <see cref="IEnumerable{InstanceID}"/> list of valid citizen instances.
         /// </summary>
         private IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance, bool> filter) => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
                 .Select(i => new InstanceID() { CitizenInstance = (ushort)i })

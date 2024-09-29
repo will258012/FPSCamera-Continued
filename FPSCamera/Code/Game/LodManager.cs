@@ -80,16 +80,15 @@ namespace FPSCamera.Game
             switch (manager)
             {
                 case BuildingManager buildingManager:
-                    return buildingManager.m_buildings.m_buffer[buildingManager.m_infoCount].Info.m_minLodDistance;
+                    return buildingManager.m_buildings.m_buffer[0].Info.m_minLodDistance;
                 case PropManager propManager when !IsPropManager_MaxRenderDistance:
-                    return propManager.m_props.m_buffer[propManager.m_infoCount].Info.m_lodRenderDistance;
+                    return propManager.m_props.m_buffer[0].Info.m_lodRenderDistance;
                 case PropManager propManager when IsPropManager_MaxRenderDistance:
-                    return propManager.m_props.m_buffer[propManager.m_infoCount].Info.m_maxRenderDistance;
+                    return propManager.m_props.m_buffer[0].Info.m_maxRenderDistance;
                 case NetManager netManager:
-                    var count = PrefabCollection<NetInfo>.GetPrefab((uint)netManager.m_infoCount - 1);
-                    return count.m_segments[count.m_segments.Length - 1].m_lodRenderDistance;
+                    return netManager.m_segments.m_buffer[0].Info.m_segments[0].m_lodRenderDistance;
                 case VehicleManager vehicleManager:
-                    return PrefabCollection<VehicleInfo>.GetPrefab((uint)vehicleManager.m_infoCount - 1).m_lodRenderDistance;
+                    return vehicleManager.m_vehicles.m_buffer[0].Info.m_lodRenderDistance;
                 default:
                     throw new InvalidOperationException($"Unsupported SimulationManager type: {typeof(T)}");
             }

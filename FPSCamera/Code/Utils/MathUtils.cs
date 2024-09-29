@@ -47,7 +47,7 @@ namespace FPSCamera.Utils
         public static Vector2 ClampEulerAngles(this Vector2 eulerAngles)
         {
             for (int i = 0; i < 2; i++)
-                eulerAngles[i] = (eulerAngles[i] > 180) ? eulerAngles[i] - 360 : eulerAngles[i];
+                eulerAngles[i] = (eulerAngles[i] > 180f) ? eulerAngles[i] - 360f : eulerAngles[i];
             return eulerAngles;
         }
         public static float DistanceTo(this Vector3 pos, Vector3 target) => Vector3.Distance(pos, target);
