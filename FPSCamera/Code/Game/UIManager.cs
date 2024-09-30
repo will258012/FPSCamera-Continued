@@ -1,12 +1,27 @@
 ﻿using AlgernonCommons;
+using ColossalFramework.UI;
 using FPSCamera.Utils;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using ToggleItManager = ToggleIt.Managers.ToggleManager;
 namespace FPSCamera.Game
 {
     public class UIManager
     {
+        /// <summary>
+        /// Gets the game's UI camera instance.
+        /// </summary>
+        public static Camera UICamera
+        {
+            get
+            {
+                if (_uiCamera == null)
+                    _uiCamera = UIView.GetAView().uiCamera ?? Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
+                return _uiCamera;
+            }
+        }
+        private static Camera _uiCamera = null;
         private class UIState
         {
             internal bool NotificationsVisible { get; set; }
@@ -91,15 +106,7 @@ namespace FPSCamera.Game
             PropManager.instance.MarkersVisible = visibility;
             GuideManager.instance.TutorialDisabled = !visibility;
             DisasterManager.instance.MarkersVisible = visibility;
-            var cameras = Object.FindObjectsOfType<Camera>();
-            foreach (var cam in cameras)
-            {
-                if (cam.name == "UIView")
-                {
-                    cam.enabled = visibility;
-                    break;
-                }
-            }
+            UICamera.enabled = visibility;
         }
 
         private static void SetUIVisibilityDirectly(bool visibility)
@@ -111,15 +118,7 @@ namespace FPSCamera.Game
             GuideManager.instance.TutorialDisabled = !visibility;
             DisasterManager.instance.MarkersVisible = visibility;
             NetManager.instance.RoadNamesVisible = visibility;
-            var cameras = Object.FindObjectsOfType<Camera>();
-            foreach (var cam in cameras)
-            {
-                if (cam.name == "UIView")
-                {
-                    cam.enabled = visibility;
-                    break;
-                }
-            }
+            UICamera.enabled = visibility;
             if (!visibility)
                 Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
         }

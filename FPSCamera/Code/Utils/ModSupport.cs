@@ -9,12 +9,15 @@ namespace FPSCamera.Utils
         public static bool FoundToggleIt { get; private set; }
         public static bool FoundUUI { get; private set; }
         public static bool FoundTLM { get; private set; }
+        public static bool FoundTrainDisplay { get; private set; }
+        public static ushort FollowVehicleID { get; internal set; }
+
         internal static List<string> CheckModConflicts()
         {
             var list = new List<string>();
             if (AccessTools.TypeByName("FPSCamera.FPSCamera") != null) list.Add("First Person Camera: Updated");
             if (AccessTools.TypeByName("FPSCamera.Controller") != null) list.Add("First Person Camera v2.x");
-            if (AccessTools.TypeByName("EnhancedZoomContinued.EnhancedZoomMod") != null) list.Add("Enhanced Zoom Continued");
+            if (AssemblyUtils.IsAssemblyPresent("EnhancedZoom")) list.Add("Enhanced Zoom Continued");
             return list;
         }
         internal static void Initialize()
@@ -26,6 +29,9 @@ namespace FPSCamera.Utils
 
                 if (AssemblyUtils.IsAssemblyPresent("UnifiedUILib"))
                     FoundUUI = true;
+
+                if (AssemblyUtils.IsAssemblyPresent("TrainDisplay"))
+                    FoundTrainDisplay = true;
 
                 var assembly = AssemblyUtils.GetEnabledAssembly("TransportLinesManager");
 

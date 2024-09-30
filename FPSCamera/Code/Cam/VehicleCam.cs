@@ -22,12 +22,14 @@ namespace FPSCamera.Cam
             IsActivated = true;
             if (ModSettings.StickToFrontVehicle && !SwitchTarget(GetFrontVehicleID())) return;
             hasReversed = GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed);
+            if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = (ushort)FollowID;
+            Logging.KeyMessage("Vehicle cam started");
         }
         private bool SwitchTarget(ushort id)
         {
             FollowID = id;
             FollowInstance = new InstanceID() { Vehicle = id };
-            if (!IsVaild()) return false;
+            if (!IsValid()) return false;
             SyncCamOffset();
             return true;
         }
@@ -77,13 +79,13 @@ namespace FPSCamera.Cam
             }
             return status;
         }
-        public bool IsVaild()
+        public bool IsValid()
         {
             if (!IsActivated) return false;
             var flags = GetVehicle().m_flags;
             if (flags.IsFlagSet(Vehicle.Flags.Reversed) != hasReversed)
             {
-                Logging.Message($" -- vehicle(ID:{FollowID}) changes direction");
+                Logging.KeyMessage("Vehicle cam: Vehicle changes direction");
                 hasReversed = !hasReversed;
                 if (ModSettings.StickToFrontVehicle && !SwitchTarget(GetFrontVehicleID()))
                 {
@@ -108,6 +110,7 @@ namespace FPSCamera.Cam
         {
             FollowID = default;
             FollowInstance = default;
+            ModSupport.FollowVehicleID = default;
             IsActivated = false;
         }
         public ushort GetHeadVehicleID() => GetVehicle().GetFirstVehicle((ushort)FollowID);

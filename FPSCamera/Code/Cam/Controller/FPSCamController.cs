@@ -14,8 +14,21 @@ namespace FPSCamera.Cam.Controller
     /// </summary>
     public class FPSCamController : MonoBehaviour
     {
+        /// <summary>
+        /// Gets the singleton instance of the <see cref="FPSCamController"/>.
+        /// </summary>
         public static FPSCamController Instance { get; private set; }
+
+        /// <summary>
+        /// Gets the current FPS camera instance.
+        /// </summary>
         public IFPSCam FPSCam { get; private set; }
+
+        /// <summary>
+        /// Gets the current status of the camera.
+        /// Useful for status determination.
+        /// </summary>
+        public CamStatus Status { get; private set; } = CamStatus.Disabled;
         /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
@@ -72,17 +85,14 @@ namespace FPSCamera.Cam.Controller
         private void AfterTransition()
         {
             if (ModSettings.HideGameUI)
-            {
-                GameCamController.Instance.MainCamera.rect = CameraController.kFullScreenWithoutMenuBarRect;
                 StartCoroutine(UIManager.ToggleUI(true));
-            }
             Status = CamStatus.Disabled;
             GameCamController.Instance.Restore();
         }
         /// <summary>
-        /// Starts following the specified instance with the camera.
+        /// Starts Follow mode.
         /// </summary>
-        /// <param name="instanceID">The instance ID to follow.</param>
+        /// <param name="instanceID">The <see cref="InstanceID"/> to follow.</param>
         public void StartFollowing(InstanceID instanceID)
         {
             Logging.KeyMessage("Starting Follow mode");
@@ -98,7 +108,7 @@ namespace FPSCamera.Cam.Controller
         }
 
         /// <summary>
-        /// Starts the free camera mode.
+        /// Starts Free-camera mode.
         /// </summary>
         public void StartFreeCam()
         {
@@ -109,7 +119,7 @@ namespace FPSCamera.Cam.Controller
         }
 
         /// <summary>
-        /// Starts the walk-through camera mode.
+        /// Starts Walk-through mode.
         /// </summary>
         public void StartWalkThruCam()
         {
@@ -145,8 +155,13 @@ namespace FPSCamera.Cam.Controller
             {
                 if (Status == CamStatus.Enabled)
                 {
-                    if (!FPSCam.IsVaild())
+                    if (!FPSCam.IsValid())
+                    {
                         DisableCam();
+                        return;
+                    }
+                    if (FPSCam is WalkThruCam walkThruCam)
+                        walkThruCam.ElapseTime(Time.deltaTime);
                 }
             }
             catch (Exception e)
@@ -168,7 +183,7 @@ namespace FPSCamera.Cam.Controller
                 HandleInput();
                 if (Status == CamStatus.Transitioning)
                 {
-                    UpdatTransitionPos();
+                    UpdateTransitionPos();
                 }
                 else if (Status == CamStatus.Enabled)
                 {
@@ -180,9 +195,13 @@ namespace FPSCamera.Cam.Controller
             }
             catch (Exception e)
             {
-                Logging.LogException(e);
                 if (Status == CamStatus.Enabled)
+                {
+                    Logging.Error("FPS Camera is about to exit due to some issues");
                     DisableCam();
+                }
+                Logging.Error("at FPSCamController.LateUpdate()");
+                Logging.LogException(e);
             }
         }
 
@@ -205,7 +224,9 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void HandleInput()
         {
-            if (InputManager.KeyTriggered(ModSettings.KeyCamToggle) && !SimulationManager.instance.ForcedSimulationPaused)
+            if (InputManager.KeyTriggered(ModSettings.KeyCamToggle) &&
+                !SimulationManager.instance.ForcedSimulationPaused && // when the game isn't in the pause menu
+                !GameCamController.Instance.CameraController.m_freeCamera) // when isn't in the game's free mode
             {
                 if (Status == CamStatus.Enabled) DisableCam();
                 else StartFreeCam();
@@ -363,7 +384,6 @@ namespace FPSCamera.Cam.Controller
             var instancePos = FPSCam.GetPositioning().pos + (FPSCam.GetPositioning().rotation * _offset.pos);
             var instanceRotation = FPSCam.GetPositioning().rotation * _offset.rotation;
 
-
             // Adjust the y-axis to ensure the camera is above the road.
             var roadHeight = MapUtils.GetClosestSegmentLevel(instancePos) ?? default; // Get the height of the closest road segment, if available.
             instancePos.y = Math.Max(instancePos.y, roadHeight); // Ensure the camera is at least at the height of the road.
@@ -468,7 +488,7 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Updates the camera's position and rotation in transition.
         /// </summary>
-        private void UpdatTransitionPos()
+        private void UpdateTransitionPos()
         {
             var cameraTransform = GameCamController.Instance.MainCamera.transform;
             _transitionTimer += Time.deltaTime;
@@ -495,7 +515,8 @@ namespace FPSCamera.Cam.Controller
             Enabled,
             Transitioning
         }
-        public CamStatus Status = CamStatus.Disabled;
+
+
         private bool _isScrollTransitioning = false;
         private Positioning _endPos = new Positioning(Vector3.zero);
         private Positioning _offset = new Positioning(Vector3.zero);
