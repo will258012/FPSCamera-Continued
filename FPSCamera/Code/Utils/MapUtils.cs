@@ -1,7 +1,6 @@
 ﻿namespace FPSCamera.Utils
 {
     using UnityEngine;
-    using static FPSCamera.Utils.MathUtils;
 
     public static class MapUtils
     {
@@ -21,7 +20,7 @@
         public static float? GetClosestSegmentLevel(Vector3 pos)
         {
 
-            var input = Tool.GetRaycastInput(pos, new Range(-100f, 2f));
+            var input = Tool.GetRaycastInput(pos, -100f, 2f);
             input.m_netService.m_service = ItemClass.Service.Road;
             input.m_netService.m_itemLayers = ItemClass.Layer.Default |
                                               ItemClass.Layer.PublicTransport |
@@ -90,13 +89,13 @@
             }
 
             internal static RaycastInput GetRaycastInput(Vector3 position)
-                => GetRaycastInput(position, new Range(-100f, 100f));
+                => GetRaycastInput(position, -100f, 100f);
             internal static RaycastInput GetRaycastInput(Vector3 position,
-                                                          Range verticalRange)
+                                                          float min, float max)
             {
                 var input = new RaycastInput(
-                                new Ray(position + Vector3.up * verticalRange.max, Vector3.down),
-                                        verticalRange.Size)
+                                new Ray(position + Vector3.up * max, Vector3.down),
+                                        max - min)
                 { m_ignoreTerrain = true };
                 return input;
             }

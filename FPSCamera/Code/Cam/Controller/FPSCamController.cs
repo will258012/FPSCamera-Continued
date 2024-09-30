@@ -224,7 +224,9 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void HandleInput()
         {
-            if (InputManager.KeyTriggered(ModSettings.KeyCamToggle) && !SimulationManager.instance.ForcedSimulationPaused)
+            if (InputManager.KeyTriggered(ModSettings.KeyCamToggle) &&
+                !SimulationManager.instance.ForcedSimulationPaused && // when the game isn't in the pause menu
+                !GameCamController.Instance.CameraController.m_freeCamera) // when isn't in the game's free mode
             {
                 if (Status == CamStatus.Enabled) DisableCam();
                 else StartFreeCam();

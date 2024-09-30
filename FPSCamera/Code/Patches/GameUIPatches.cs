@@ -1,6 +1,5 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
-using FPSCamera.Cam.Controller;
 using FPSCamera.Game;
 using FPSCamera.Utils;
 using HarmonyLib;
@@ -29,16 +28,9 @@ namespace FPSCamera.Patches.GameUIPatches
                 Singleton<NetManager>.instance.RoadNamesVisible = !__instance.m_freeCamera;
             }
 
-            if (AccessUtils.GetFieldValue<bool>(__instance, "m_cachedFreeCamera"))
-            {
-                GameCamController.Instance._cachedRect = Camera.main.rect;
-                Camera.main.rect = CameraController.kFullScreenRect;
-            }
-            else
-            {
-                if (GameCamController.Instance._cachedRect != default)// If we didn't record a rect, skip adjustment.
-                    Camera.main.rect = GameCamController.Instance._cachedRect;
-            }
+            Camera.main.rect = AccessUtils.GetFieldValue<bool>(__instance, "m_cachedFreeCamera")
+                ? CameraController.kFullScreenRect
+                : CameraController.kFullScreenWithoutMenuBarRect;
             return false;
         }
     }
@@ -57,15 +49,7 @@ namespace FPSCamera.Patches.GameUIPatches
             Singleton<GuideManager>.instance.TutorialDisabled = !visible;
             Singleton<DisasterManager>.instance.MarkersVisible = visible;
             Singleton<NetManager>.instance.RoadNamesVisible = visible;
-            if (visible)
-            {
-                Camera.main.rect = GameCamController.Instance._cachedRect;
-            }
-            else
-            {
-                GameCamController.Instance._cachedRect = Camera.main.rect;
-                Camera.main.rect = CameraController.kFullScreenRect;
-            }
+            Camera.main.rect = visible ? CameraController.kFullScreenWithoutMenuBarRect : CameraController.kFullScreenRect;
             return false;
         }
     }

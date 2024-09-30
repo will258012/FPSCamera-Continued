@@ -140,7 +140,7 @@ namespace FPSCamera.Cam.Controller
 
         internal Positioning _cachedPositioning;
         internal Vector3 _cachedTargetPos;
-        internal Rect _cachedRect;
+        internal Rect _cachedRect = CameraController.kFullScreenWithoutMenuBarRect;
 
         private float _cachedfieldOfView;
         private float _cachednearClipPlane;

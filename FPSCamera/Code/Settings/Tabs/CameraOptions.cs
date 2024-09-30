@@ -106,11 +106,11 @@ namespace FPSCamera.Settings.Tabs
             currentY += invertRotateVertical_CheckBox.height + Margin;
 
 
-            movementSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 0f, 60f, .5f, ModSettings.MovementSpeed);
+            movementSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.MovementSpeed);
             movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
             currentY += movementSpeed_Slider.height + SliderMargin;
 
-            speedUpFactor_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SPEEDUPFACTOR"), 1.25f, 10f, .5f, ModSettings.SpeedUpFactor);
+            speedUpFactor_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SPEEDUPFACTOR"), 1.25f, 10f, .25f, ModSettings.SpeedUpFactor);
             speedUpFactor_Slider.eventValueChanged += (_, value) => ModSettings.SpeedUpFactor = value;
             currentY += speedUpFactor_Slider.height + SliderMargin;
 

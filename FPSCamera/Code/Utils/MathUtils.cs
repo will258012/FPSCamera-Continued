@@ -8,19 +8,6 @@ namespace FPSCamera.Utils
 {
     public static class MathUtils
     {
-        public struct Range
-        {
-
-            public Range(float min = float.MinValue, float max = float.MaxValue)
-            {
-                this.min = float.IsNaN(min) ? float.MinValue : min;
-                this.max = float.IsNaN(max) ? float.MaxValue :
-                                              max < min ? min : max;
-            }
-
-            public float min, max;
-            public float Size => max - min;
-        }
         public static bool AlmostEquals(this float a, float b, float error = 1 / 32f)
             => Math.Abs(b - a) < error;
         public struct Positioning
