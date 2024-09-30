@@ -1,5 +1,4 @@
 ﻿using AlgernonCommons;
-using ColossalFramework.UI;
 using FPSCamera.Utils;
 using System.Collections;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace FPSCamera.Game
             get
             {
                 if (_uiCamera == null)
-                    _uiCamera = UIView.GetAView().uiCamera ?? Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
+                    _uiCamera = Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
                 return _uiCamera;
             }
         }
