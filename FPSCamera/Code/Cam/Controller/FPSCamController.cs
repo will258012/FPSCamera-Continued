@@ -30,6 +30,14 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public CamStatus Status { get; private set; } = CamStatus.Disabled;
         /// <summary>
+        /// Invoked after FPS Camera is enabled.
+        /// </summary>
+        public Action OnCameraEnabled { get; set; }
+        /// <summary>
+        /// Invoked after FPS Camera is disabled.
+        /// </summary>
+        public Action OnCameraDisabled { get; set; }
+        /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
         private void Awake() => Instance = this;
@@ -43,14 +51,13 @@ namespace FPSCamera.Cam.Controller
                 CamInfoPanel.Instance.EnableCamInfoPanel();
             if (ModSettings.HideGameUI)
                 StartCoroutine(UIManager.ToggleUI(false));
-            if (ModSettings.LodOpt)
+            if (ModSettings.LodOpt != 0)
                 StartCoroutine(LodManager.ToggleLODOpt(true));
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(true));
-            if (FollowButtons.Instance != null)
-                FollowButtons.Instance.enabled = false;
             GameCamController.Instance.Initialize();
             Status = CamStatus.Enabled;
+            OnCameraEnabled?.Invoke();
         }
 
         /// <summary>
@@ -61,11 +68,9 @@ namespace FPSCamera.Cam.Controller
             Logging.KeyMessage("Disabling FPS Camera");
             FPSCam?.StopCam();
             FPSCam = null;
-            if (FollowButtons.Instance != null)
-                FollowButtons.Instance.enabled = true;
             if (ModSettings.ShowInfoPanel)
                 CamInfoPanel.Instance.DisableCamInfoPanel();
-            if (ModSettings.LodOpt)
+            if (ModSettings.LodOpt != 0)
                 StartCoroutine(LodManager.ToggleLODOpt(false));
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(false));
@@ -75,12 +80,16 @@ namespace FPSCamera.Cam.Controller
                 if (ModSettings.SetBackCamera)
                     StartTransitioningOnDisabled(GameCamController.Instance._cachedPositioning);
                 else
-                    StartTransitioningOnDisabled(new Positioning(GameCamController.Instance.MainCamera.transform.position + new Vector3(0f, 50f, 0f), GameCamController.Instance.MainCamera.transform.rotation));
+                    StartTransitioningOnDisabled(
+                        new Positioning(GameCamController.Instance.MainCamera.transform.position +
+                        new Vector3(0f, 50f, 0f), 
+                        GameCamController.Instance.MainCamera.transform.rotation));
             }
             else
             {
                 AfterTransition();
             }
+            OnCameraDisabled?.Invoke();
         }
         private void AfterTransition()
         {
@@ -385,8 +394,8 @@ namespace FPSCamera.Cam.Controller
             var instanceRotation = FPSCam.GetPositioning().rotation * _offset.rotation;
 
             // Adjust the y-axis to ensure the camera is above the road.
-            var roadHeight = MapUtils.GetClosestSegmentLevel(instancePos) ?? default; // Get the height of the closest road segment, if available.
-            instancePos.y = Math.Max(instancePos.y, roadHeight); // Ensure the camera is at least at the height of the road.
+            if (MapUtils.GetClosestSegmentLevel(instancePos, out var height)) // Get the height of the closest road segment, if available.
+                instancePos.y = Math.Max(instancePos.y, height); // Ensure the camera is at least at the height of the road.
 
 
             // Limit the camera's position to the allowed area.
@@ -444,10 +453,8 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.GroundClipping != 0)
             {
                 var minHeight = MapUtils.GetMinHeightAt(instancePos) + ModSettings.GroundLevelOffset; // Get minimum height including ground level offset.
-                if ((ModSettings.GroundClipping == 3 || ModSettings.GroundClipping == 4 ?
-                        MapUtils.GetClosestSegmentLevel(instancePos) : null)
-                        is float roadHeight)
-                    minHeight = roadHeight + ModSettings.RoadLevelOffset; // Adjust minHeight if road height is applicable.
+                if ((ModSettings.GroundClipping == 3 || ModSettings.GroundClipping == 4) && MapUtils.GetClosestSegmentLevel(instancePos, out var height))
+                    minHeight = height + ModSettings.RoadLevelOffset; // Adjust minHeight if road height is applicable.
 
                 if (ModSettings.GroundClipping == 2 || ModSettings.GroundClipping == 4 || instancePos.y < minHeight)
                     instancePos.y = minHeight; // Apply the minimum height to the camera's y-axis.
