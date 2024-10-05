@@ -23,7 +23,7 @@ namespace FPSCamera.Settings.Tabs
         private readonly UICheckBox showInfoPanel_CheckBox;
         private readonly UISlider heightScale_Slider;
         private readonly UIButton defaults_Button;
-        private readonly UICheckBox LodOpt_CheckBox;
+        private readonly UIDropDown LodOpt_DropDown;
         private readonly UICheckBox ShadowsOpt_CheckBox;
 
         /// <summary>
@@ -80,11 +80,19 @@ namespace FPSCamera.Settings.Tabs
             UISpacers.AddTitleSpacer(panel, LeftMargin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_OPT"));
             currentY += TitleMargin;
 
-            LodOpt_CheckBox = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("SETTINGS_LODOPT"));
-            LodOpt_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_LODOPT_DETAIL"),"\n");
-            LodOpt_CheckBox.isChecked = ModSettings.LodOpt;
-            LodOpt_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.LodOpt = isChecked;
-            currentY += LodOpt_CheckBox.height + LeftMargin;
+            string[] LodOpt_Items = new[]
+            {
+                Translations.Translate("DISABLED"),
+                Translations.Translate("LOW"),
+                Translations.Translate("MID"),
+                Translations.Translate("HIGH")
+            };
+
+            LodOpt_DropDown = UIDropDowns.AddPlainDropDown(panel, LeftMargin, currentY, Translations.Translate("SETTINGS_LODOPT"), LodOpt_Items, ModSettings.LodOpt, 300);
+            LodOpt_DropDown.tooltip = string.Format(Translations.Translate("SETTINGS_LODOPT_DETAIL"), "\n");
+            LodOpt_DropDown.eventSelectedIndexChanged += (_, value) => ModSettings.LodOpt = value;
+            LodOpt_DropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
+            currentY += LodOpt_DropDown.parent.height + Margin;
 
             ShadowsOpt_CheckBox = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHADOWSOPT"));
             ShadowsOpt_CheckBox.tooltip = Translations.Translate("SETTINGS_SHADOWSOPT_DETAIL");
@@ -106,7 +114,8 @@ namespace FPSCamera.Settings.Tabs
             hideUI_CheckBox.isChecked = setBackCamera_CheckBox.isChecked =
                 metricUnit_CheckBox.isChecked = showInfoPanel_CheckBox.isChecked = true;
             heightScale_Slider.value = 1f;
-            LodOpt_CheckBox.isChecked = ShadowsOpt_CheckBox.isChecked = false;
+            LodOpt_DropDown.selectedIndex = 0;
+            ShadowsOpt_CheckBox.isChecked = false;
             CameraOptions.Reset();
             HotKeyOptions.Reset();
             //Put language updates last
