@@ -82,7 +82,7 @@ namespace FPSCamera.Cam.Controller
                 else
                     StartTransitioningOnDisabled(
                         new Positioning(GameCamController.Instance.MainCamera.transform.position +
-                        new Vector3(0f, 50f, 0f), 
+                        new Vector3(0f, 50f, 0f),
                         GameCamController.Instance.MainCamera.transform.rotation));
             }
             else
@@ -303,10 +303,11 @@ namespace FPSCamera.Cam.Controller
             var pitchRotation = Quaternion.Euler(pitchDegree, 0f, 0f);
             _offset.rotation = yawRotation * _offset.rotation * pitchRotation;
 
-            //Limit pitch
+            // Limit pitch
             var eulerAngles = _offset.rotation.eulerAngles;
             if (eulerAngles.x > 180f) eulerAngles.x -= 360f;
             eulerAngles.x = eulerAngles.x.Clamp(-ModSettings.MaxPitchDeg, ModSettings.MaxPitchDeg);
+            eulerAngles.z = 0f;
             _offset.rotation = Quaternion.Euler(eulerAngles);
 
             // scroll zooming
