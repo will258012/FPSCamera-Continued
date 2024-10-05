@@ -18,6 +18,7 @@ namespace FPSCamera.Utils
             if (AccessTools.TypeByName("FPSCamera.FPSCamera") != null) list.Add("First Person Camera: Updated");
             if (AccessTools.TypeByName("FPSCamera.Controller") != null) list.Add("First Person Camera v2.x");
             if (AssemblyUtils.IsAssemblyPresent("EnhancedZoom")) list.Add("Enhanced Zoom Continued");
+            if (AssemblyUtils.IsAssemblyPresent("IINS.AutoWalking")) list.Add("First-person Auto-walking");
             return list;
         }
         internal static void Initialize()
@@ -52,7 +53,7 @@ namespace FPSCamera.Utils
 
             catch (Exception e)
             {
-                Logging.Error($"ModSupport: Falled to finding the mod");
+                Logging.Error($"ModSupport: Failed to finding the mod");
                 Logging.LogException(e);
             }
         }
