@@ -312,7 +312,7 @@ namespace FPSCamera.Settings.Tabs
             maxPitchDeg_Slider.value = 70f;
             fov_Slider.value = 45f;
             nearClipPlane_Slider.value = 1f;
-            foViewScrollfactor_Slider.value = 1.05f;
+            foViewScrollfactor_Slider.value = 1.2f;
 
             showCursorFree_CheckBox.isChecked = false;
             groundCliping_dropDown.selectedIndex = 0;

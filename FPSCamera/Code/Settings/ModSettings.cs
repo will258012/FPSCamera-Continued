@@ -101,10 +101,11 @@ namespace FPSCamera.Settings
         public float XMLCamNearClipPlane { get => CamNearClipPlane; set => CamNearClipPlane = value; }
         [XmlIgnore]
         internal static float CamNearClipPlane = 1f;
+
         [XmlElement("FoViewScrollfactor")]
         public float XMLFoViewScrollfactor { get => FoViewScrollfactor; set => FoViewScrollfactor = value; }
         [XmlIgnore]
-        internal static float FoViewScrollfactor = 1.05f;
+        internal static float FoViewScrollfactor = 1.2f;
 
         #endregion
         #region Free-Camera Mode Options
@@ -231,9 +232,9 @@ namespace FPSCamera.Settings
         #endregion
         #region Optimization Options
         [XmlElement("LodOpt")]
-        public bool XMLLodOpt { get => LodOpt; set => LodOpt = value; }
+        public int XMLLodOpt { get => LodOpt; set => LodOpt = value; }
         [XmlIgnore]
-        internal static bool LodOpt = false;
+        internal static int LodOpt = 0;
 
         [XmlElement("ShadowsOpt")]
         public bool XMLShadowsOpt { get => ShadowsOpt; set => ShadowsOpt = value; }
@@ -333,7 +334,5 @@ namespace FPSCamera.Settings
         public Vector3 XMLMainButtonPos { get => MainButtonPos; set => MainButtonPos = value; }
         [XmlIgnore]
         internal static Vector3 MainButtonPos = new Vector3(0f, 0f);
-        [XmlIgnore]
-        public new string WhatsNewVersion { get; set; }
     }
 }
