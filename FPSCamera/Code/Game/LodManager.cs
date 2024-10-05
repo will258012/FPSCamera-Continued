@@ -1,4 +1,5 @@
 ﻿using AlgernonCommons;
+using FPSCamera.Settings;
 using System;
 using System.Collections;
 namespace FPSCamera.Game
@@ -12,7 +13,12 @@ namespace FPSCamera.Game
                 if (status)
                 {
                     LodConfig.SaveLodConfig();
-                    LodConfig.ActiveConfig = LodConfig.Optimized;
+                    if (ModSettings.LodOpt == 1)
+                        LodConfig.ActiveConfig = LodConfig.Low;
+                    else if (ModSettings.LodOpt == 2)
+                        LodConfig.ActiveConfig = LodConfig.Mid;
+                    else if (ModSettings.LodOpt == 3)
+                        LodConfig.ActiveConfig = LodConfig.High;
                 }
                 else
                 {
@@ -120,26 +126,42 @@ namespace FPSCamera.Game
             internal float NetworkLodDistance { get; set; }
             internal float VehicleLodDistance { get; set; }
 
-            internal static LodConfig Saved => savedconfig;
+            internal static LodConfig Saved { get; private set; }
 
-            internal static LodConfig Optimized =>
+            internal static LodConfig Low =>
+                new LodConfig(256f,
+                    256f,
+                    10000f,
+                    10000f,
+                    10000f,
+                    512f,
+                    256f
+                    );
+            internal static LodConfig Mid =>
+                new LodConfig(256f,
+                    256f,
+                    128f,
+                    256f,
+                    512f,
+                    512f,
+                    256f
+                    );
+            internal static LodConfig High =>
                 new LodConfig(64f,
                     128f,
-                    32f,
+                    64f,
                     128f,
                     256f,
                     256f,
                     128f
                     );
-
             internal static LodConfig ActiveConfig = null;
-            private static LodConfig savedconfig;
 
             internal static void SaveLodConfig()
             {
                 try
                 {
-                    savedconfig = new LodConfig(
+                    Saved = new LodConfig(
                         citizenLodDistance: GetLodDistance<CitizenInfo>(),
                         treeLodDistance: GetLodDistance<TreeInfo>(),
                         propLodDistance: GetLodDistance(PropManager.instance),
@@ -148,13 +170,13 @@ namespace FPSCamera.Game
                         networkLodDistance: GetLodDistance(NetManager.instance),
                         vehicleLodDistance: GetLodDistance(VehicleManager.instance));
                     Logging.Message($"Saved LOD Config:\n" +
-                        $"  CitizenLodDistance = {savedconfig.CitizenLodDistance}\n" +
-                        $"  TreeLodDistance = {savedconfig.TreeLodDistance}\n" +
-                        $"  PropLodDistance = {savedconfig.PropLodDistance}\n" +
-                        $"  DecalPropFadeDistance = {savedconfig.DecalPropFadeDistance}\n" +
-                        $"  BuildingLodDistance = {savedconfig.BuildingLodDistance}\n" +
-                        $"  NetworkLodDistance = {savedconfig.NetworkLodDistance}\n" +
-                        $"  VehicleLodDistance = {savedconfig.VehicleLodDistance}\n");
+                        $"  CitizenLodDistance = {Saved.CitizenLodDistance}\n" +
+                        $"  TreeLodDistance = {Saved.TreeLodDistance}\n" +
+                        $"  PropLodDistance = {Saved.PropLodDistance}\n" +
+                        $"  DecalPropFadeDistance = {Saved.DecalPropFadeDistance}\n" +
+                        $"  BuildingLodDistance = {Saved.BuildingLodDistance}\n" +
+                        $"  NetworkLodDistance = {Saved.NetworkLodDistance}\n" +
+                        $"  VehicleLodDistance = {Saved.VehicleLodDistance}\n");
 
                 }
                 catch (Exception e)
@@ -165,7 +187,6 @@ namespace FPSCamera.Game
             }
 
         }
-
     }
 }
 

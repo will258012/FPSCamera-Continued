@@ -9,15 +9,15 @@ namespace FPSCamera.UI
 {
     public class FollowButtons : MonoBehaviour
     {
-        public static FollowButtons Instance { get; private set; }
         private void Awake()
         {
-            Instance = this;
             citizenVehicleInfo_Button = Initialize(ref citizenVehicleInfo_Panel);
             cityServiceVehicleInfo_Button = Initialize(ref cityServiceVehicleInfo_Panel);
             publicTransportVehicleInfo_Button = Initialize(ref publicTransportVehicleInfo_Panel);
             citizenInfo_Button = Initialize(ref citizenInfo_Panel);
             touristInfo_Button = Initialize(ref touristInfo_Panel);
+            FPSCamController.Instance.OnCameraEnabled += SetDisable;
+            FPSCamController.Instance.OnCameraDisabled += SetEnable;
         }
         private void Update()
         {
@@ -35,14 +35,34 @@ namespace FPSCamera.UI
             Destroy(publicTransportVehicleInfo_Button);
             Destroy(citizenInfo_Button);
             Destroy(touristInfo_Button);
+            FPSCamController.Instance.OnCameraEnabled -= SetDisable;
+            FPSCamController.Instance.OnCameraDisabled -= SetEnable;
         }
-
+        /// <summary>
+        /// For action.
+        /// </summary>
+        private void SetEnable() => enabled = true;
+        /// <summary>
+        /// For action.
+        /// </summary>
+        private void SetDisable() => enabled = false;
+        /// <summary>
+        /// Initialize follow button for the given panel.
+        /// </summary>
+        /// <typeparam name="T">The type of the panel.</typeparam>
+        /// <param name="panel">Given panel.</param>
+        /// <returns>The given panel after add the button.</returns>
         private UIButton Initialize<T>(ref T panel) where T : WorldInfoPanel
         {
             panel = UIView.library.Get<T>(typeof(T).Name);
             return CreateCameraButton(panel);
         }
-
+        /// <summary>
+        /// Create follow button for given panel.
+        /// </summary>
+        /// <typeparam name="T">The type of the panel.</typeparam>
+        /// <param name="panel">Given panel.</param>
+        /// <returns>The follow button.</returns>
         private UIButton CreateCameraButton<T>(T panel) where T : WorldInfoPanel
         {
             var button = panel.component.AddUIComponent<UIButton>();
@@ -69,7 +89,14 @@ namespace FPSCamera.UI
             button.relativePosition = new Vector3(button.relativePosition.x - 4f, button.relativePosition.y - 20f);
 
             return button;
-        }
+        }/// <summary>
+         /// Update the given follow button's visibility for the given panel.
+         /// The button will be hidden if the <see cref="InstanceID"/> of the panel is invalid or the conditions for additional filters are met (If have).
+         /// </summary>
+         /// <typeparam name="T">The type of the panel.</typeparam>
+         /// <param name="panel">Given panel.</param>
+         /// <param name="button">Given follow button.</param>
+         /// <param name="filter">Additional filters.</param>
         private void UpdateButtonVisibility<T>(T panel, UIButton button, Func<InstanceID, bool> filter = null) where T : WorldInfoPanel
         {
             if (panel.component.isVisible)
@@ -78,7 +105,12 @@ namespace FPSCamera.UI
                 button.isVisible = instanceID != default && (filter?.Invoke(instanceID) ?? true);
             }
         }
-
+        /// <summary>
+        /// Get the given panel's <see cref="InstanceID"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the panel.</typeparam>
+        /// <param name="panel">Given panel.</param>
+        /// <returns>The <see cref="InstanceID"/> of the given panel.</returns>
         private InstanceID GetPanelInstanceID<T>(T panel) where T : WorldInfoPanel => AccessUtils.GetFieldValue<InstanceID>(panel, "m_InstanceID");
 
         private CitizenVehicleWorldInfoPanel citizenVehicleInfo_Panel;

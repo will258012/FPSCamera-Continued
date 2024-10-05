@@ -1,12 +1,11 @@
-﻿using FPSCamera.Game;
-using HarmonyLib;
+﻿using HarmonyLib;
 using System;
 using UnityEngine;
-
+using static FPSCamera.Game.LodManager.LodConfig;
 namespace FPSCamera.Patches
 {
     [HarmonyPatch]
-    [HarmonyAfter("com.github.algernon-A.csl.visibilitycontrol", "boformer.TrueLodToggler")]
+    [HarmonyAfter("com.github.algernon-A.csl.visibilitycontrol", "boformer.TrueLodToggler")]// Ensure that this patch runs after these mods have adjusted their settings.
     internal static class LodPatches
     {
 
@@ -14,12 +13,18 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void BuildingInfoBaseRefreshLOD(BuildingInfoBase __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
-            // Only applies to instances with LODs.
+            // If there's no active LOD configuration, return (this adjustment isn't related to FPSCamera).
+            if (ActiveConfig == null) return;
+
+            // Applies only to instances with LODs.
             if (__instance.m_lodMesh != null)
             {
-                __instance.m_minLodDistance = LodManager.LodConfig.ActiveConfig.BuildingLodDistance;
-
+                // If we're applying the saved LOD configuration:
+                __instance.m_minLodDistance = ActiveConfig == Saved ?
+                    // Apply the greater LOD distance.
+                    Math.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
+                    // Otherwise, apply the smaller LOD distance.
+                    Math.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
             }
         }
 
@@ -27,11 +32,13 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void BuildingRefreshLOD(BuildingInfo __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
+            if (ActiveConfig == null) return;
             // Only applies to instances with LODs.
             if (__instance.m_lodMesh != null)
             {
-                __instance.m_minLodDistance = LodManager.LodConfig.ActiveConfig.BuildingLodDistance;
+                __instance.m_minLodDistance = ActiveConfig == Saved ?
+                    Math.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
+                    Math.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
 
             }
         }
@@ -40,11 +47,13 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void BuildingSubRefreshLOD(BuildingInfoSub __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
+            if (ActiveConfig == null) return;
             // Only applies to instances with LODs.
             if (__instance.m_lodMesh != null)
             {
-                __instance.m_minLodDistance = LodManager.LodConfig.ActiveConfig.BuildingLodDistance;
+                __instance.m_minLodDistance = ActiveConfig == Saved ?
+                    Math.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
+                    Math.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
 
             }
         }
@@ -53,11 +62,13 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void CitizenRefreshLOD(CitizenInfo __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
+            if (ActiveConfig == null) return;
             // Only applies to instances with LODs.
             if (__instance.m_lodMesh != null)
             {
-                __instance.m_lodRenderDistance = LodManager.LodConfig.ActiveConfig.CitizenLodDistance;
+                __instance.m_lodRenderDistance = ActiveConfig == Saved ?
+                    Math.Max(__instance.m_lodRenderDistance, ActiveConfig.CitizenLodDistance) :
+                    Math.Min(__instance.m_lodRenderDistance, ActiveConfig.CitizenLodDistance);
             }
         }
 
@@ -65,7 +76,7 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void NetRefreshLOD(NetInfo __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
+            if (ActiveConfig == null) return;
             // Iterate through all segments in net.
             NetInfo.Segment[] segments = __instance.m_segments;
             if (segments != null)
@@ -75,7 +86,9 @@ namespace FPSCamera.Patches
                     // Only applies to segments with LODs.
                     if (segments[i].m_lodMesh != null)
                     {
-                        segments[i].m_lodRenderDistance = LodManager.LodConfig.ActiveConfig.NetworkLodDistance;
+                        segments[i].m_lodRenderDistance = ActiveConfig == Saved ?
+                            Math.Max(segments[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance) :
+                            Math.Min(segments[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance);
                     }
                 }
             }
@@ -89,7 +102,9 @@ namespace FPSCamera.Patches
                     // Only applies to segments with LODs.
                     if (nodes[i].m_lodMesh != null)
                     {
-                        nodes[i].m_lodRenderDistance = LodManager.LodConfig.ActiveConfig.NetworkLodDistance;
+                        nodes[i].m_lodRenderDistance = ActiveConfig == Saved ?
+                            Math.Max(nodes[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance) :
+                            Math.Min(nodes[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance);
                     }
                 }
             }
@@ -99,11 +114,13 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void PropRefreshLOD(PropInfo __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
+            if (ActiveConfig == null) return;
             // Decal or prop?
             if (__instance.m_isDecal && __instance.m_material && __instance.m_material.shader.name.Equals("Custom/Props/Decal/Blend"))
             {
-                var distence = LodManager.LodConfig.ActiveConfig.DecalPropFadeDistance;
+                var distence = ActiveConfig == Saved ?
+                    Math.Max(__instance.m_lodRenderDistance, ActiveConfig.DecalPropFadeDistance) :
+                    Math.Min(__instance.m_lodRenderDistance, ActiveConfig.DecalPropFadeDistance);
                 // Apply visibility.
                 __instance.m_lodRenderDistance = distence;
                 __instance.m_material.SetFloat("_FadeDistanceFactor", 1f / (distence * distence));
@@ -111,7 +128,9 @@ namespace FPSCamera.Patches
             else
             {
                 // Non-decal prop.
-                __instance.m_lodRenderDistance = LodManager.LodConfig.ActiveConfig.PropLodDistance;
+                __instance.m_lodRenderDistance = ActiveConfig == Saved ?
+                    Math.Max(__instance.m_lodRenderDistance, ActiveConfig.PropLodDistance) :
+                    Math.Min(__instance.m_lodRenderDistance, ActiveConfig.PropLodDistance);
             }
         }
 
@@ -119,32 +138,40 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void TreeRefreshLOD(TreeInfo __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
-            __instance.m_lodRenderDistance = LodManager.LodConfig.ActiveConfig.TreeLodDistance;
+            if (ActiveConfig == null) return;
+            __instance.m_lodRenderDistance = ActiveConfig == Saved ?
+                Math.Max(__instance.m_lodRenderDistance, ActiveConfig.TreeLodDistance) :
+                Math.Min(__instance.m_lodRenderDistance, ActiveConfig.TreeLodDistance);
         }
 
         [HarmonyPatch(typeof(VehicleInfo), nameof(VehicleInfo.RefreshLevelOfDetail))]
         [HarmonyPostfix]
         private static void VehicleRefreshLOD(VehicleInfo __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
-            __instance.m_lodRenderDistance = LodManager.LodConfig.ActiveConfig.VehicleLodDistance;
+            if (ActiveConfig == null) return;
+            __instance.m_lodRenderDistance = ActiveConfig == Saved ?
+                Math.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
+                Math.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
         }
 
         [HarmonyPatch(typeof(VehicleInfoBase), nameof(VehicleInfoBase.RefreshLevelOfDetail))]
         [HarmonyPostfix]
         private static void VehicleSubRefreshLOD(VehicleInfoBase __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
-            __instance.m_lodRenderDistance = LodManager.LodConfig.ActiveConfig.VehicleLodDistance;
+            if (ActiveConfig == null) return;
+            __instance.m_lodRenderDistance = ActiveConfig == Saved ?
+                Math.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
+                Math.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
         }
 
         [HarmonyPatch(typeof(VehicleInfoSub), nameof(VehicleInfoSub.RefreshLevelOfDetail))]
         [HarmonyPostfix]
         private static void VehicleSubRefreshLOD(VehicleInfoSub __instance)
         {
-            if (LodManager.LodConfig.ActiveConfig == null) return;
-            __instance.m_lodRenderDistance = LodManager.LodConfig.ActiveConfig.VehicleLodDistance;
+            if (ActiveConfig == null) return;
+            __instance.m_lodRenderDistance = ActiveConfig == Saved ?
+                Math.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
+                Math.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
         }
     }
 }
