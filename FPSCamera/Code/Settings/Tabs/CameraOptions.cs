@@ -26,7 +26,8 @@ namespace FPSCamera.Settings.Tabs
         private static UISlider fov_Slider;
         private static UISlider nearClipPlane_Slider;
         private static UISlider foViewScrollfactor_Slider;
-
+        private static UICheckBox pathsDetection_CheckBox;
+        private static UICheckBox tracksDetection_CheckBox;
 
         private static UICheckBox showCursorFree_CheckBox;
         private static UIDropDown groundCliping_dropDown;
@@ -53,10 +54,6 @@ namespace FPSCamera.Settings.Tabs
         private static UISlider transSpeed_Slider;
         private static UISlider minTransDistance_Slider;
         private static UISlider maxTransDistance_Slider;
-
-
-
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CameraOptions"/> class.
@@ -140,6 +137,18 @@ namespace FPSCamera.Settings.Tabs
             foViewScrollfactor_Slider.tooltip = Translations.Translate("SETTINGS_FOVIEWSCROLLFACTOR_DETAIL");
             foViewScrollfactor_Slider.eventValueChanged += (_, value) => ModSettings.FoViewScrollfactor = value;
             currentY += foViewScrollfactor_Slider.height + SliderMargin;
+
+            pathsDetection_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_PATHS_DETECTION"));
+            pathsDetection_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_DETECTIONS_DETAIL"), "\n");
+            pathsDetection_CheckBox.isChecked = ModSettings.PathsDetection;
+            pathsDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.PathsDetection = isChecked;
+            currentY += pathsDetection_CheckBox.height + Margin;
+
+            tracksDetection_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_TRACKS_DETECTION"));
+            tracksDetection_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_DETECTIONS_DETAIL"), "\n");
+            tracksDetection_CheckBox.isChecked = ModSettings.TracksDetection;
+            tracksDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.TracksDetection = isChecked;
+            currentY += tracksDetection_CheckBox.height + Margin;
             #endregion
             #region Free-Camera Mode Options
 
@@ -175,8 +184,6 @@ namespace FPSCamera.Settings.Tabs
             roadLevelOffset_Slider.tooltip = Translations.Translate("SETTINGS_ROADLEVELOFFSET_DETAIL");
             roadLevelOffset_Slider.eventValueChanged += (_, value) => ModSettings.RoadLevelOffset = value;
             currentY += roadLevelOffset_Slider.height + SliderMargin;
-
-
             #endregion
             #region Follow Mode Options
             UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_FOLLOW"));
@@ -313,6 +320,7 @@ namespace FPSCamera.Settings.Tabs
             fov_Slider.value = 45f;
             nearClipPlane_Slider.value = 1f;
             foViewScrollfactor_Slider.value = 1.2f;
+            pathsDetection_CheckBox.isChecked = tracksDetection_CheckBox.isChecked = true;
 
             showCursorFree_CheckBox.isChecked = false;
             groundCliping_dropDown.selectedIndex = 0;

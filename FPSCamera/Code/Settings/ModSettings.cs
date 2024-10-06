@@ -49,6 +49,23 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static bool UseMetricUnit = true;
 
+        [XmlElement("Fade")]
+        public bool XMLFade { get => Fade; set => Fade = value; }
+        [XmlIgnore]
+        internal static bool Fade = true;
+
+        #region Optimization Options
+        [XmlElement("LodOpt")]
+        public int XMLLodOpt { get => LodOpt; set => LodOpt = value; }
+        [XmlIgnore]
+        internal static int LodOpt = 0;
+
+        [XmlElement("ShadowsOpt")]
+        public bool XMLShadowsOpt { get => ShadowsOpt; set => ShadowsOpt = value; }
+        [XmlIgnore]
+        internal static bool ShadowsOpt = false;
+        #endregion
+
         #endregion
 
         #region Camera Options
@@ -128,6 +145,18 @@ namespace FPSCamera.Settings
         public float XMLRoadLevelOffset { get => RoadLevelOffset; set => RoadLevelOffset = value; }
         [XmlIgnore]
         internal static float RoadLevelOffset = 0f;
+
+        [XmlElement("PathsDetection")]
+        public bool XMLPathsInRoads { get => PathsDetection; set => PathsDetection = value; }
+        [XmlIgnore]
+        internal static bool PathsDetection = true;
+
+        [XmlElement("TracksDetection")]
+        public bool XMLRailsInRoads { get => TracksDetection; set => TracksDetection = value; }
+        [XmlIgnore]
+        internal static bool TracksDetection = true;
+
+
         #endregion
         #region Follow Mode Options
         [XmlElement("ShowCursorFollow")]
@@ -229,17 +258,6 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static float MaxTransDistance = 500f;
 
-        #endregion
-        #region Optimization Options
-        [XmlElement("LodOpt")]
-        public int XMLLodOpt { get => LodOpt; set => LodOpt = value; }
-        [XmlIgnore]
-        internal static int LodOpt = 0;
-
-        [XmlElement("ShadowsOpt")]
-        public bool XMLShadowsOpt { get => ShadowsOpt; set => ShadowsOpt = value; }
-        [XmlIgnore]
-        internal static bool ShadowsOpt = false;
         #endregion
         #endregion
 

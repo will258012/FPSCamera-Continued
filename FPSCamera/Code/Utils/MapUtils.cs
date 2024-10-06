@@ -1,5 +1,6 @@
 ﻿namespace FPSCamera.Utils
 {
+    using FPSCamera.Settings;
     using UnityEngine;
 
     public static class MapUtils
@@ -28,11 +29,10 @@
             height = default;
             var input = RayCastTool.GetRaycastInput(position, -3f, 3f); // Configure raycast input parameters
             input.m_netService.m_service = ItemClass.Service.Road;
-            input.m_netService.m_itemLayers = ItemClass.Layer.Default |
-                                              ItemClass.Layer.PublicTransport |
+            input.m_netService.m_itemLayers = ItemClass.Layer.Default |// ItemClass.Layer.PublicTransport is sonly for TransportLine, not for Road.
                                               ItemClass.Layer.MetroTunnels;
-
-            input.m_netService2.m_service = ItemClass.Service.Beautification; // For paths
+            if (ModSettings.PathsDetection)
+                input.m_netService2.m_service = ItemClass.Service.Beautification; // For paths
 
             input.m_ignoreSegmentFlags = NetSegment.Flags.Deleted |
                                          NetSegment.Flags.Collapsed |
@@ -46,16 +46,18 @@
                 return true;
             }
 
-            // If no result, change the service to ItemClass.Service.PublicTransport (for rails).
-            input.m_netService.m_service = ItemClass.Service.PublicTransport;
-
-            // Perform the raycast again:
-            if (RayCastTool.RayCast(input, out var result2, 3f))
+            if (ModSettings.TracksDetection)
             {
-                height = result2.m_hitPos.y + defaultHeightOffset;
-                return true;
-            }
+                // If no result, change the service to ItemClass.Service.PublicTransport (for tracks).
+                input.m_netService.m_service = ItemClass.Service.PublicTransport;
 
+                // Perform the raycast again:
+                if (RayCastTool.RayCast(input, out var result2, 3f))
+                {
+                    height = result2.m_hitPos.y + defaultHeightOffset;
+                    return true;
+                }
+            }
             // Return false if no valid result was found.
             return false;
         }
@@ -65,12 +67,11 @@
         {
             var input = RayCastTool.GetRaycastInput(position);
             input.m_netService.m_service = ItemClass.Service.Road;
-            input.m_netService.m_itemLayers = ItemClass.Layer.Default |
-                                              ItemClass.Layer.PublicTransport;
-
             input.m_netService2.m_service = ItemClass.Service.Beautification;
 
+            input.m_netService.m_itemLayers = ItemClass.Layer.Default;
             input.m_ignoreSegmentFlags = NetSegment.Flags.None;
+
             return RayCastTool.RayCast(input, out var result, 5f) ?
                    new InstanceID() { NetSegment = result.m_netSegment } : default;
         }

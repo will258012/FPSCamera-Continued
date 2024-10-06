@@ -2,10 +2,12 @@
 {
     using AlgernonCommons.Translation;
     using AlgernonCommons.UI;
+    using ColossalFramework;
     using ColossalFramework.UI;
     using FPSCamera.Cam.Controller;
     using FPSCamera.Settings;
     using FPSCamera.Utils;
+    using System;
     using UnityEngine;
 
     public class MainPanel : MonoBehaviour
@@ -26,18 +28,8 @@
             Panel.width = 400f;
             Panel.height = 1000f;
             AddSettings();
-            Panel.eventVisibilityChanged += (_, isVisible) =>
-            {
-                if (!isVisible)
-                {
-                    ModSettings.Save();
-                    Close();
-                }
-                else
-                {
-                    AddSettings();
-                }
-            };
+
+            Panel.eventVisibilityChanged += OnChangedVisibility;
             Panel.isVisible = false;
 
             if (ModSupport.FoundUUI)
@@ -176,6 +168,13 @@
                 Panel.height = currentY;
             }
         }
+        private void OnDestory()
+        {
+            Panel.eventVisibilityChanged -= OnChangedVisibility;
+            Destroy(Panel);
+            Destroy(GetMainButton());
+
+        }
         private void Close()
         {
             foreach (var component in Panel.components)
@@ -192,6 +191,53 @@
             }
             return false;
         }
+        private void OnChangedVisibility(UIComponent component, bool value)
+        {
+            if (isAnimating) return;
+            if (!value)
+            {
+                if (ModSettings.Fade)
+                {
+                    isAnimating = true;
+                    RunFadeInOrOutAnimation(value, () =>
+                    {
+                        Panel.isVisible = false;
+                        isAnimating = false;
+                        ModSettings.Save();
+                        Close();
+                    });
+                }
+                else
+                {
+                    ModSettings.Save();
+                    Close();
+                    Panel.opacity = 0f;
+                }
+            }
+            else
+            {
+                AddSettings();
+                Panel.opacity = 1f;
+                if (ModSettings.Fade)
+                {
+                    isAnimating = true;
+                    RunFadeInOrOutAnimation(value, () => isAnimating = false);
+                }
+            }
+        }
+        private void RunFadeInOrOutAnimation(bool status, Action action = null)
+        {
+            if (!Panel.isVisible)
+            {
+                Panel.isVisible = true;
+            }
+
+            ValueAnimator.Animate("fade_in_out",
+                f => Panel.opacity = f,
+                new AnimatedFloat(status ? 0f : 1f, status ? 1f : 0.0f, 0.2f, EasingType.SineEaseOut),
+                () => action?.Invoke());
+        }
         private UIButton _mainBtn = null;
+        private bool isAnimating = false;
     }
 }

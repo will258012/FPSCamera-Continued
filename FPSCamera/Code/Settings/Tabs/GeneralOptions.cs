@@ -25,6 +25,7 @@ namespace FPSCamera.Settings.Tabs
         private readonly UIButton defaults_Button;
         private readonly UIDropDown LodOpt_DropDown;
         private readonly UICheckBox ShadowsOpt_CheckBox;
+        private readonly UICheckBox fade_CheckBox;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GeneralOptions"/> class.
@@ -77,6 +78,11 @@ namespace FPSCamera.Settings.Tabs
             metricUnit_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.UseMetricUnit = isChecked;
             currentY += metricUnit_CheckBox.height + LeftMargin;
 
+            fade_CheckBox = UICheckBoxes.AddPlainCheckBox(panel, LeftMargin, currentY, Translations.Translate("SETTINGS_FADE"));
+            fade_CheckBox.isChecked = ModSettings.Fade;
+            fade_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.Fade = isChecked;
+            currentY += fade_CheckBox.height + LeftMargin;
+
             UISpacers.AddTitleSpacer(panel, LeftMargin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_OPT"));
             currentY += TitleMargin;
 
@@ -114,6 +120,7 @@ namespace FPSCamera.Settings.Tabs
             hideUI_CheckBox.isChecked = setBackCamera_CheckBox.isChecked =
                 metricUnit_CheckBox.isChecked = showInfoPanel_CheckBox.isChecked = true;
             heightScale_Slider.value = 1f;
+            fade_CheckBox.isChecked = true;
             LodOpt_DropDown.selectedIndex = 0;
             ShadowsOpt_CheckBox.isChecked = false;
             CameraOptions.Reset();
