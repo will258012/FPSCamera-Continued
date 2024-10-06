@@ -396,7 +396,7 @@ namespace FPSCamera.Cam.Controller
 
             // Adjust the y-axis to ensure the camera is above the road.
             if (MapUtils.GetClosestSegmentLevel(instancePos, out var height)) // Get the height of the closest road segment, if available.
-                instancePos.y = Math.Max(instancePos.y, height); // Ensure the camera is at least at the height of the road.
+                instancePos.y = Mathf.Max(instancePos.y, height); // Ensure the camera is at least at the height of the road.
 
 
             // Limit the camera's position to the allowed area.

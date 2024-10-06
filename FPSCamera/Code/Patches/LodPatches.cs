@@ -22,9 +22,9 @@ namespace FPSCamera.Patches
                 // If we're applying the saved LOD configuration:
                 __instance.m_minLodDistance = ActiveConfig == Saved ?
                     // Apply the greater LOD distance.
-                    Math.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
+                    Mathf.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
                     // Otherwise, apply the smaller LOD distance.
-                    Math.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
+                    Mathf.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
             }
         }
 
@@ -37,8 +37,8 @@ namespace FPSCamera.Patches
             if (__instance.m_lodMesh != null)
             {
                 __instance.m_minLodDistance = ActiveConfig == Saved ?
-                    Math.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
-                    Math.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
+                    Mathf.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
+                    Mathf.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
 
             }
         }
@@ -52,8 +52,8 @@ namespace FPSCamera.Patches
             if (__instance.m_lodMesh != null)
             {
                 __instance.m_minLodDistance = ActiveConfig == Saved ?
-                    Math.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
-                    Math.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
+                    Mathf.Max(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance) :
+                    Mathf.Min(__instance.m_minLodDistance, ActiveConfig.BuildingLodDistance);
 
             }
         }
@@ -67,8 +67,8 @@ namespace FPSCamera.Patches
             if (__instance.m_lodMesh != null)
             {
                 __instance.m_lodRenderDistance = ActiveConfig == Saved ?
-                    Math.Max(__instance.m_lodRenderDistance, ActiveConfig.CitizenLodDistance) :
-                    Math.Min(__instance.m_lodRenderDistance, ActiveConfig.CitizenLodDistance);
+                    Mathf.Max(__instance.m_lodRenderDistance, ActiveConfig.CitizenLodDistance) :
+                    Mathf.Min(__instance.m_lodRenderDistance, ActiveConfig.CitizenLodDistance);
             }
         }
 
@@ -87,8 +87,8 @@ namespace FPSCamera.Patches
                     if (segments[i].m_lodMesh != null)
                     {
                         segments[i].m_lodRenderDistance = ActiveConfig == Saved ?
-                            Math.Max(segments[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance) :
-                            Math.Min(segments[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance);
+                            Mathf.Max(segments[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance) :
+                            Mathf.Min(segments[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance);
                     }
                 }
             }
@@ -103,8 +103,8 @@ namespace FPSCamera.Patches
                     if (nodes[i].m_lodMesh != null)
                     {
                         nodes[i].m_lodRenderDistance = ActiveConfig == Saved ?
-                            Math.Max(nodes[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance) :
-                            Math.Min(nodes[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance);
+                            Mathf.Max(nodes[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance) :
+                            Mathf.Min(nodes[i].m_lodRenderDistance, ActiveConfig.NetworkLodDistance);
                     }
                 }
             }
@@ -119,8 +119,8 @@ namespace FPSCamera.Patches
             if (__instance.m_isDecal && __instance.m_material && __instance.m_material.shader.name.Equals("Custom/Props/Decal/Blend"))
             {
                 var distence = ActiveConfig == Saved ?
-                    Math.Max(__instance.m_lodRenderDistance, ActiveConfig.DecalPropFadeDistance) :
-                    Math.Min(__instance.m_lodRenderDistance, ActiveConfig.DecalPropFadeDistance);
+                    Mathf.Max(__instance.m_lodRenderDistance, ActiveConfig.DecalPropFadeDistance) :
+                    Mathf.Min(__instance.m_lodRenderDistance, ActiveConfig.DecalPropFadeDistance);
                 // Apply visibility.
                 __instance.m_lodRenderDistance = distence;
                 __instance.m_material.SetFloat("_FadeDistanceFactor", 1f / (distence * distence));
@@ -129,8 +129,8 @@ namespace FPSCamera.Patches
             {
                 // Non-decal prop.
                 __instance.m_lodRenderDistance = ActiveConfig == Saved ?
-                    Math.Max(__instance.m_lodRenderDistance, ActiveConfig.PropLodDistance) :
-                    Math.Min(__instance.m_lodRenderDistance, ActiveConfig.PropLodDistance);
+                    Mathf.Max(__instance.m_lodRenderDistance, ActiveConfig.PropLodDistance) :
+                    Mathf.Min(__instance.m_lodRenderDistance, ActiveConfig.PropLodDistance);
             }
         }
 
@@ -140,8 +140,8 @@ namespace FPSCamera.Patches
         {
             if (ActiveConfig == null) return;
             __instance.m_lodRenderDistance = ActiveConfig == Saved ?
-                Math.Max(__instance.m_lodRenderDistance, ActiveConfig.TreeLodDistance) :
-                Math.Min(__instance.m_lodRenderDistance, ActiveConfig.TreeLodDistance);
+                Mathf.Max(__instance.m_lodRenderDistance, ActiveConfig.TreeLodDistance) :
+                Mathf.Min(__instance.m_lodRenderDistance, ActiveConfig.TreeLodDistance);
         }
 
         [HarmonyPatch(typeof(VehicleInfo), nameof(VehicleInfo.RefreshLevelOfDetail))]
@@ -150,8 +150,8 @@ namespace FPSCamera.Patches
         {
             if (ActiveConfig == null) return;
             __instance.m_lodRenderDistance = ActiveConfig == Saved ?
-                Math.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
-                Math.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
+                Mathf.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
+                Mathf.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
         }
 
         [HarmonyPatch(typeof(VehicleInfoBase), nameof(VehicleInfoBase.RefreshLevelOfDetail))]
@@ -160,8 +160,8 @@ namespace FPSCamera.Patches
         {
             if (ActiveConfig == null) return;
             __instance.m_lodRenderDistance = ActiveConfig == Saved ?
-                Math.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
-                Math.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
+                Mathf.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
+                Mathf.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
         }
 
         [HarmonyPatch(typeof(VehicleInfoSub), nameof(VehicleInfoSub.RefreshLevelOfDetail))]
@@ -170,8 +170,8 @@ namespace FPSCamera.Patches
         {
             if (ActiveConfig == null) return;
             __instance.m_lodRenderDistance = ActiveConfig == Saved ?
-                Math.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
-                Math.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
+                Mathf.Max(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance) :
+                Mathf.Min(__instance.m_lodRenderDistance, ActiveConfig.VehicleLodDistance);
         }
     }
 }
