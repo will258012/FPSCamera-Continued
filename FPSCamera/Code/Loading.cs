@@ -47,7 +47,7 @@ namespace FPSCamera
             {
                 Object.Destroy(gameObject);
             }
-            gameObject = new GameObject();
+            gameObject = new GameObject("FPSCamera");
             gameObject.AddComponent<FPSCamController>();
             gameObject.AddComponent<CamInfoPanel>();
             gameObject.AddComponent<MainPanel>();

@@ -88,7 +88,6 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.SetBackCamera)
             {
                 _cachedPositioning = new Positioning(MainCamera.transform.position, MainCamera.transform.rotation);
-                _cachedTargetPos = CameraController.m_targetPosition;
             }
 
             _cachedfieldOfView = MainCamera.fieldOfView;
@@ -111,14 +110,13 @@ namespace FPSCamera.Cam.Controller
             {
                 CameraController.m_targetPosition = MainCamera.transform.position;
                 CameraController.m_targetHeight = MainCamera.transform.position.y - MapUtils.GetMinHeightAt(MainCamera.transform.position);
+                CameraController.m_targetAngle = new Vector2(MainCamera.transform.eulerAngles.y, MainCamera.transform.eulerAngles.x).ClampEulerAngles();
             }
             else
             {
                 MainCamera.transform.position = _cachedPositioning.pos;
                 MainCamera.transform.rotation = _cachedPositioning.rotation;
-                CameraController.m_targetPosition = _cachedTargetPos;
             }
-            CameraController.m_targetAngle = new Vector2(MainCamera.transform.eulerAngles.y, MainCamera.transform.eulerAngles.x).ClampEulerAngles();
             CameraController.enabled = true;
         }
         /// <summary>
@@ -139,7 +137,6 @@ namespace FPSCamera.Cam.Controller
         private readonly TiltShiftEffect _camTiltEffect;
 
         internal Positioning _cachedPositioning;
-        internal Vector3 _cachedTargetPos;
         internal Rect _cachedRect = CameraController.kFullScreenWithoutMenuBarRect;
 
         private float _cachedfieldOfView;

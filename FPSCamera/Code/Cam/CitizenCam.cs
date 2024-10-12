@@ -106,9 +106,16 @@ namespace FPSCamera.Cam
 
         public bool IsValid()
         {
-            CheckAnotherCam();
             var flags = GetCitizenInstance().m_flags;
-            return IsActivated && ((flags & (CitizenInstance.Flags.Created | CitizenInstance.Flags.Deleted)) == CitizenInstance.Flags.Created);
+            if (IsActivated &&
+                !flags.IsFlagSet(CitizenInstance.Flags.None) &&
+                !flags.IsFlagSet(CitizenInstance.Flags.Deleted) &&
+                flags.IsFlagSet(CitizenInstance.Flags.Created))
+            {
+                CheckAnotherCam();
+                return true;
+            }
+            else return false;
         }
         public void SyncCamOffset()
         {
