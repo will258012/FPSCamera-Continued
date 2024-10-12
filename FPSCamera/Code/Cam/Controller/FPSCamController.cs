@@ -404,22 +404,18 @@ namespace FPSCamera.Cam.Controller
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-
-                GameCamController.Instance.CameraController.m_targetPosition =
-                    cameraTransform.position =
-                    cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
-                    cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
-                    ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
-                    : instancePos;
+                cameraTransform.position =
+                cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+                cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
+                ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
+                : instancePos;
                 cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
             {
-                GameCamController.Instance.CameraController.m_targetPosition =
-                    cameraTransform.position = instancePos;
+                cameraTransform.position = instancePos;
                 cameraTransform.rotation = instanceRotation;
             }
-            GameCamController.Instance.CameraController.m_targetAngle = new Vector2(cameraTransform.eulerAngles.y, cameraTransform.eulerAngles.x).ClampEulerAngles();
         }
 
         /// <summary>
@@ -467,28 +463,24 @@ namespace FPSCamera.Cam.Controller
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-                GameCamController.Instance.CameraController.m_targetPosition =
-                    cameraTransform.position =
-                    freeCam._positioning.pos =
-                    cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
-                     cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
-                    ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
-                    : instancePos;
+                cameraTransform.position =
+                freeCam._positioning.pos =
+                cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+                 cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
+                ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
+                : instancePos;
                 cameraTransform.rotation =
                     freeCam._positioning.rotation =
                     Quaternion.Slerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
             {
-                GameCamController.Instance.CameraController.m_targetPosition =
-                    cameraTransform.position =
-                    freeCam._positioning.pos =
-                    instancePos;
+                cameraTransform.position =
+                freeCam._positioning.pos =
+                instancePos;
                 cameraTransform.rotation = freeCam._positioning.rotation = instanceRotation;
 
             }
-            GameCamController.Instance.CameraController.m_targetAngle =
-                new Vector2(cameraTransform.eulerAngles.y, cameraTransform.eulerAngles.x).ClampEulerAngles();
             // Reset the position offset after applying.
             _offset.pos = Vector3.zero;
         }
@@ -509,13 +501,10 @@ namespace FPSCamera.Cam.Controller
                 return;
             }
             // Apply the calculated position and rotation to the camera.
-            GameCamController.Instance.CameraController.m_targetPosition =
-                cameraTransform.position =
+            cameraTransform.position =
                 Vector3.Lerp(cameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
             cameraTransform.rotation =
                 Quaternion.Slerp(cameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
-            GameCamController.Instance.CameraController.m_targetAngle =
-                new Vector2(cameraTransform.eulerAngles.y, cameraTransform.eulerAngles.x).ClampEulerAngles();
         }
         public enum CamStatus
         {
