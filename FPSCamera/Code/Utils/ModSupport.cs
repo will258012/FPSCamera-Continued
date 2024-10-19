@@ -28,7 +28,7 @@ namespace FPSCamera.Utils
                 if (AssemblyUtils.IsAssemblyPresent("ToggleIt"))
                     FoundToggleIt = true;
 
-                if (AssemblyUtils.IsAssemblyPresent("UnifiedUILib"))
+                if (AssemblyUtils.IsAssemblyPresent("UnifiedUIMod"))
                     FoundUUI = true;
 
                 if (AssemblyUtils.IsAssemblyPresent("TrainDisplay"))
