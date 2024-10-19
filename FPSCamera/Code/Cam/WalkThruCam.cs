@@ -13,15 +13,15 @@ namespace FPSCamera.Cam
     {
         public WalkThruCam() => IsActivated = true;
         public IFollowCam CurrentCam { get; private set; } = null;
-        public uint FollowID => CurrentCam.FollowID;
-        public InstanceID FollowInstance => CurrentCam.FollowInstance;
+        public uint FollowID => CurrentCam?.FollowID ?? default;
+        public InstanceID FollowInstance => CurrentCam?.FollowInstance ?? default;
         public bool IsActivated { get; private set; }
-        public float GetSpeed() => CurrentCam.GetSpeed();
+        public float GetSpeed() => CurrentCam?.GetSpeed() ?? default;
         public string GetFollowName() => CurrentCam?.GetFollowName();
         public string GetPrefabName() => CurrentCam?.GetPrefabName();
         public Dictionary<string, string> GetInfos() => CurrentCam?.GetInfos();
         public string GetStatus() => CurrentCam?.GetStatus();
-        public Positioning GetPositioning() => CurrentCam.GetPositioning();
+        public Positioning GetPositioning() => CurrentCam?.GetPositioning() ?? default;
         public void SwitchTarget() => SetRandomCam();
         public void ElapseTime(float seconds) => _elapsedTime += seconds;
         public float GetElapsedTime() => _elapsedTime;
@@ -47,6 +47,7 @@ namespace FPSCamera.Cam
         }
         private void SetRandomCam()
         {
+            CurrentCam?.DisableCam();
             CurrentCam = null;
             Logging.KeyMessage("WalkThru cam: Switching target");
 
@@ -97,9 +98,9 @@ namespace FPSCamera.Cam
         }
 
 
-        public void StopCam()
+        public void DisableCam()
         {
-            CurrentCam?.StopCam();
+            CurrentCam?.DisableCam();
             CurrentCam = null;
             IsActivated = false;
         }

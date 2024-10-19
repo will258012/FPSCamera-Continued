@@ -106,19 +106,33 @@ namespace FPSCamera.Cam.Controller
             MainCamera.nearClipPlane = _cachednearClipPlane;
             if (ModSettings.HideGameUI)
                 Camera.main.rect = _cachedRect;
-            if (!ModSettings.SetBackCamera)
-            {
-                CameraController.m_targetPosition = MainCamera.transform.position;
-                CameraController.m_targetHeight = MainCamera.transform.position.y - MapUtils.GetMinHeightAt(MainCamera.transform.position);
-                CameraController.m_targetAngle = new Vector2(MainCamera.transform.eulerAngles.y, MainCamera.transform.eulerAngles.x).ClampEulerAngles();
-            }
-            else
-            {
-                MainCamera.transform.position = _cachedPositioning.pos;
-                MainCamera.transform.rotation = _cachedPositioning.rotation;
-            }
+            SyncCameraControllerFromTransform();
             CameraController.enabled = true;
         }
+        // Edited from ACME.FPSMode by algernon. Many Thanks!
+        /// <summary>
+        /// Synchronizes the camera controller's position and angle with the <see cref="MainCamera"/> transform.
+        /// This function adjusts the <see cref="CameraController"/> to match the camera's position and orientation in the scene.
+        /// </summary>
+        public void SyncCameraControllerFromTransform()
+        {
+            // Set CameraController position and angle to match current position and angle.
+            float verticalOffset = CameraController.m_currentSize * Mathf.Max(0f, 1f - (CameraController.m_currentHeight / CameraController.m_maxDistance))
+                                   / Mathf.Tan(Mathf.PI / 180f * MainCamera.fieldOfView);
+            var quaternion = MainCamera.transform.rotation;
+            var diff = CameraController.m_currentPosition + (quaternion * new Vector3(0f, 0f, 0f - verticalOffset));
+            diff.y += CameraController.CalculateCameraHeightOffset(diff, verticalOffset);
+            diff = CameraController.ClampCameraPosition(diff);
+            diff += CameraController.m_cameraShake * Mathf.Sqrt(verticalOffset);
+
+            // Adjust controller position and angle to account for the above.
+            var adjustedPos = CameraController.m_targetPosition + MainCamera.transform.position - diff;
+            CameraController.m_targetPosition = CameraController.m_currentPosition = adjustedPos;
+            CameraController.m_targetHeight = CameraController.m_currentHeight = adjustedPos.y;
+            CameraController.m_targetAngle = CameraController.m_currentAngle =
+                new Vector2(quaternion.eulerAngles.y, quaternion.eulerAngles.x).ClampEulerAngles();
+        }
+
         /// <summary>
         /// Private constructor for the <see cref="GameCamController"/>.
         /// Initializes components if <see cref="global::CameraController"/> is found.
