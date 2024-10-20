@@ -81,8 +81,7 @@ namespace FPSCamera.Cam.Controller
                     StartTransitioningOnDisabled(GameCamController.Instance._cachedPositioning);
                 else
                     StartTransitioningOnDisabled(
-                        new Positioning(GameCamController.Instance.MainCamera.transform.position +
-                        new Vector3(0f, 50f, 0f),
+                        new Positioning(GameCamController.Instance.CameraController.transform.position,
                         GameCamController.Instance.MainCamera.transform.rotation));
             }
             else
@@ -91,8 +90,7 @@ namespace FPSCamera.Cam.Controller
                     AfterTransition(GameCamController.Instance._cachedPositioning);
                 else
                     AfterTransition(
-                        new Positioning(GameCamController.Instance.MainCamera.transform.position +
-                        new Vector3(0f, 50f, 0f),
+                        new Positioning(GameCamController.Instance.CameraController.transform.position,
                         GameCamController.Instance.MainCamera.transform.rotation));
             }
             OnCameraDisabled?.Invoke();

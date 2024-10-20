@@ -88,6 +88,7 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.SetBackCamera)
             {
                 _cachedPositioning = new Positioning(MainCamera.transform.position, MainCamera.transform.rotation);
+                _savedCameraView = new CameraController.SavedCameraView(CameraController);
             }
 
             _cachedfieldOfView = MainCamera.fieldOfView;
@@ -106,9 +107,29 @@ namespace FPSCamera.Cam.Controller
             MainCamera.nearClipPlane = _cachednearClipPlane;
             if (ModSettings.HideGameUI)
                 Camera.main.rect = _cachedRect;
-            SyncCameraControllerFromTransform();
+
+            if (ModSettings.SetBackCamera)
+            {
+                ResetFromSavedCameraView(_savedCameraView);
+                _cachedPositioning = new Positioning(Vector3.zero);
+                _savedCameraView = default;
+            }
+            else
+                SyncCameraControllerFromTransform();
             CameraController.enabled = true;
         }
+        /// <summary>
+        /// Resets the <see cref="CameraController"/>'s properties (position, angle, size, etc.) from a saved camera view.
+        /// </summary>
+        /// <param name="view">The <see cref="CameraController.SavedCameraView"/> to restore the camera to.</param>
+        public void ResetFromSavedCameraView(CameraController.SavedCameraView view)
+        {
+            CameraController.m_targetSize = CameraController.m_currentSize = view.m_size;
+            CameraController.m_targetAngle = CameraController.m_currentAngle = view.m_angle;
+            CameraController.m_targetHeight = CameraController.m_currentHeight = view.m_height;
+            CameraController.m_targetPosition = CameraController.m_currentPosition = view.m_position;
+        }
+
         // Edited from ACME.FPSMode by algernon. Many Thanks!
         /// <summary>
         /// Synchronizes the camera controller's position and angle with the <see cref="MainCamera"/> transform.
@@ -151,6 +172,7 @@ namespace FPSCamera.Cam.Controller
         private readonly TiltShiftEffect _camTiltEffect;
 
         internal Positioning _cachedPositioning;
+        private CameraController.SavedCameraView _savedCameraView;
         internal Rect _cachedRect = CameraController.kFullScreenWithoutMenuBarRect;
 
         private float _cachedfieldOfView;
