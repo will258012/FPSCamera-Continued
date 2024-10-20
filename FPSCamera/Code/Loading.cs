@@ -42,7 +42,6 @@ namespace FPSCamera
         protected override void LoadedActions(LoadMode mode)
         {
             base.LoadedActions(mode);
-            ModSupport.Initialize();
             if (gameObject != null)
             {
                 Object.Destroy(gameObject);
@@ -54,6 +53,11 @@ namespace FPSCamera
             if (ToolsModifierControl.isGame)
                 gameObject.AddComponent<FollowButtons>();
 
+        }
+        public override void OnCreated(ILoading loading)
+        {
+            base.OnCreated(loading);
+            ModSupport.Initialize();
         }
         private GameObject gameObject = null;
     }

@@ -225,6 +225,7 @@
                 }
             }
         }
+        //Edited from BrokenNodeDetector.UI.RunFadeInOrOutAnimation() by krzychu1245. Many Thanks!
         private void RunFadeInOrOutAnimation(bool status, Action action = null)
         {
             if (!Panel.isVisible)

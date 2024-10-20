@@ -30,6 +30,7 @@ namespace FPSCamera.Cam
             FollowID = id;
             FollowInstance = new InstanceID() { Vehicle = id };
             if (!IsValid()) return false;
+            if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = id;
             SyncCamOffset();
             return true;
         }
@@ -106,11 +107,12 @@ namespace FPSCamera.Cam
         }
         public void SyncCamOffset() => FPSCamController.Instance.SyncCamOffset(this);
         public void SaveCamOffset() => FPSCamController.Instance.SaveCamOffset(this);
-        public void StopCam()
+        public void DisableCam()
         {
             FollowID = default;
             FollowInstance = default;
-            ModSupport.FollowVehicleID = default;
+            if (ModSupport.FoundTrainDisplay)
+                ModSupport.FollowVehicleID = default;
             IsActivated = false;
         }
         public ushort GetHeadVehicleID() => GetVehicle().GetFirstVehicle((ushort)FollowID);

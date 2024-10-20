@@ -34,16 +34,20 @@ namespace FPSCamera.Cam
         public uint FollowID { get; private set; }
         public bool IsActivated { get; private set; }
         public InstanceID FollowInstance { get; private set; }
+        /// <summary>
+        /// Will be used if the citizen enters a vehicle. Use caution!
+        /// </summary>
         public VehicleCam AnotherCam { get; private set; } = null;
         private void CheckAnotherCam()
         {
             if (IsinVehicle)
             {
-                if (GetCitizen().m_vehicle == default && AnotherCam.IsValid())
+                if (GetCitizen().m_vehicle == default || !(AnotherCam?.IsValid() ?? false))
                 {
                     IsinVehicle = false;
-                    AnotherCam.StopCam();
+                    AnotherCam?.DisableCam();
                     AnotherCam = null;
+                    SyncCamOffset();
                     Logging.KeyMessage("Citizen cam: Stopped another cam");
                 }
             }
@@ -74,9 +78,6 @@ namespace FPSCamera.Cam
                 details = details.Concat(anotherDetails).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             return details;
         }
-
-
-
         public Positioning GetPositioning()
         {
             if (IsinVehicle)
@@ -102,7 +103,7 @@ namespace FPSCamera.Cam
             return status;
 
         }
-        public float GetSpeed() => GetCitizenInstance().GetLastFrameData().m_velocity.magnitude;
+        public float GetSpeed() => IsinVehicle ? AnotherCam.GetSpeed() : GetCitizenInstance().GetLastFrameData().m_velocity.magnitude;
 
         public bool IsValid()
         {
@@ -129,20 +130,18 @@ namespace FPSCamera.Cam
                 FPSCamController.Instance.SaveCamOffset(AnotherCam);
             else FPSCamController.Instance.SaveCamOffset(this);
         }
-        public void StopCam()
+        public void DisableCam()
         {
             FollowID = default;
             FollowInstance = default;
             IsActivated = false;
             if (IsinVehicle)
             {
-                AnotherCam.StopCam();
+                AnotherCam.DisableCam();
+                IsinVehicle = false;
             }
             AnotherCam = null;
         }
-
-
-
 
         private bool IsinVehicle = false;
 

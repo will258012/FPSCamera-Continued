@@ -66,7 +66,7 @@ namespace FPSCamera.Cam.Controller
         private void DisableCam()
         {
             Logging.KeyMessage("Disabling FPS Camera");
-            FPSCam?.StopCam();
+            FPSCam?.DisableCam();
             FPSCam = null;
             if (ModSettings.ShowInfoPanel)
                 CamInfoPanel.Instance.DisableCamInfoPanel();
@@ -81,21 +81,27 @@ namespace FPSCamera.Cam.Controller
                     StartTransitioningOnDisabled(GameCamController.Instance._cachedPositioning);
                 else
                     StartTransitioningOnDisabled(
-                        new Positioning(GameCamController.Instance.MainCamera.transform.position +
-                        new Vector3(0f, 50f, 0f),
+                        new Positioning(GameCamController.Instance.CameraController.transform.position,
                         GameCamController.Instance.MainCamera.transform.rotation));
             }
             else
             {
-                AfterTransition();
+                if (ModSettings.SetBackCamera)
+                    AfterTransition(GameCamController.Instance._cachedPositioning);
+                else
+                    AfterTransition(
+                        new Positioning(GameCamController.Instance.CameraController.transform.position,
+                        GameCamController.Instance.MainCamera.transform.rotation));
             }
             OnCameraDisabled?.Invoke();
         }
-        private void AfterTransition()
+        private void AfterTransition(Positioning positioning)
         {
             if (ModSettings.HideGameUI)
                 StartCoroutine(UIManager.ToggleUI(true));
             Status = CamStatus.Disabled;
+            GameCamController.Instance.MainCamera.transform.position = positioning.pos;
+            GameCamController.Instance.MainCamera.transform.rotation = positioning.rotation;
             GameCamController.Instance.Restore();
         }
         /// <summary>
@@ -149,7 +155,7 @@ namespace FPSCamera.Cam.Controller
             if (cameraTransform.position.DistanceTo(endPos.pos) <= ModSettings.MinTransDistance ||
                     cameraTransform.position.DistanceTo(endPos.pos) > ModSettings.MaxTransDistance)
             {
-                AfterTransition();
+                AfterTransition(endPos);
                 return;
             }
             Status = CamStatus.Transitioning;
@@ -496,8 +502,8 @@ namespace FPSCamera.Cam.Controller
                 _transitionTimer >= MaxTransitioningTime)
             {
                 _transitionTimer = 0f;
+                AfterTransition(_endPos);
                 _endPos = new Positioning(Vector3.zero);
-                AfterTransition();
                 return;
             }
             // Apply the calculated position and rotation to the camera.
