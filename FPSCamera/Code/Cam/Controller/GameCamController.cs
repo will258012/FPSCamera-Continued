@@ -125,33 +125,32 @@ namespace FPSCamera.Cam.Controller
         public void ResetFromSavedCameraView(CameraController.SavedCameraView view)
         {
             CameraController.m_targetSize = CameraController.m_currentSize = view.m_size;
-            CameraController.m_targetAngle = CameraController.m_currentAngle = view.m_angle;
+            //CameraController.m_targetAngle = CameraController.m_currentAngle = view.m_angle;
             CameraController.m_targetHeight = CameraController.m_currentHeight = view.m_height;
             CameraController.m_targetPosition = CameraController.m_currentPosition = view.m_position;
         }
 
-        // Edited from ACME.FPSMode by algernon. Many Thanks!
         /// <summary>
         /// Synchronizes the camera controller's position and angle with the <see cref="MainCamera"/> transform.
         /// This function adjusts the <see cref="CameraController"/> to match the camera's position and orientation in the scene.
         /// </summary>
         public void SyncCameraControllerFromTransform()
         {
-            // Set CameraController position and angle to match current position and angle.
-            float verticalOffset = CameraController.m_currentSize * Mathf.Max(0f, 1f - (CameraController.m_currentHeight / CameraController.m_maxDistance))
-                                   / Mathf.Tan(Mathf.PI / 180f * MainCamera.fieldOfView);
-            var quaternion = MainCamera.transform.rotation;
-            var diff = CameraController.m_currentPosition + (quaternion * new Vector3(0f, 0f, 0f - verticalOffset));
-            diff.y += CameraController.CalculateCameraHeightOffset(diff, verticalOffset);
-            diff = CameraController.ClampCameraPosition(diff);
-            diff += CameraController.m_cameraShake * Mathf.Sqrt(verticalOffset);
+            // Set the size (Z offset) to the minimum value (40f) for the game.
+            CameraController.m_targetSize = CameraController.m_currentSize = 40f;
 
-            // Adjust controller position and angle to account for the above.
-            var adjustedPos = CameraController.m_targetPosition + MainCamera.transform.position - diff;
-            CameraController.m_targetPosition = CameraController.m_currentPosition = adjustedPos;
-            CameraController.m_targetHeight = CameraController.m_currentHeight = adjustedPos.y;
+            // Calculate the new position based on the Z offset, moving forward from the camera's transform.
+            var newPos = MainCamera.transform.position + (MainCamera.transform.rotation * Vector3.forward * 40f);
+
+            // Update the CameraController's position based on the adjusted new position.
+            CameraController.m_targetPosition = CameraController.m_currentPosition = newPos;
+
+            // Calculate the height based on the new position and the minimum height of the terrain.
+            CameraController.m_targetHeight = CameraController.m_currentHeight = newPos.y - MapUtils.GetMinHeightAt(newPos);
+
+            // Set the target angle based on the camera's transform, clamping the angles to valid ranges.
             CameraController.m_targetAngle = CameraController.m_currentAngle =
-                new Vector2(quaternion.eulerAngles.y, quaternion.eulerAngles.x).ClampEulerAngles();
+                new Vector2(MainCamera.transform.rotation.eulerAngles.y, MainCamera.transform.rotation.eulerAngles.x).ClampEulerAngles();
         }
 
         /// <summary>

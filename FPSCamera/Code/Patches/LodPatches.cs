@@ -4,6 +4,7 @@ using UnityEngine;
 using static FPSCamera.Game.LodManager.LodConfig;
 namespace FPSCamera.Patches
 {
+    //Edited from the code of algernon's Visibility Control. Many Thanks!
     [HarmonyPatch]
     [HarmonyAfter("com.github.algernon-A.csl.visibilitycontrol", "boformer.TrueLodToggler")]// Ensure that this patch runs after these mods have adjusted their settings.
     internal static class LodPatches

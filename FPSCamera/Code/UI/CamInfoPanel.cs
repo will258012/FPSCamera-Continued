@@ -1,5 +1,6 @@
 ﻿namespace FPSCamera.UI
 {
+    using AlgernonCommons;
     using AlgernonCommons.Translation;
     using FPSCamera.Cam;
     using FPSCamera.Cam.Controller;
@@ -44,28 +45,37 @@
 
         private void Update()
         {
-            if (Cam != null && Cam.IsValid())
+            try
             {
-                _elapsedTime += Time.deltaTime;
-                if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval)
+                if (Cam != null && Cam.IsValid())
                 {
-                    UpdateStatus(); UpdateTargetInfos(); UpdateSpeed();
-
-                    _footer = Translations.Translate("INFO_TIME");
-                    if (Cam is WalkThruCam walkThruCam)
+                    _elapsedTime += Time.deltaTime;
+                    if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval)
                     {
-                        var time = walkThruCam.GetElapsedTime();
-                        _footer += $"{(uint)time / 60:00}:{(uint)time % 60:00} / ";
-                    }
+                        UpdateStatus(); UpdateTargetInfos(); UpdateSpeed();
 
-                    _footer += $"{(uint)_elapsedTime / 60:00}:{(uint)_elapsedTime % 60:00}";
-                    _lastBufferStrUpdateTime = _elapsedTime;
+                        _footer = Translations.Translate("INFO_TIME");
+                        if (Cam is WalkThruCam walkThruCam)
+                        {
+                            var time = walkThruCam.GetElapsedTime();
+                            _footer += $"{(uint)time / 60:00}:{(uint)time % 60:00} / ";
+                        }
+
+                        _footer += $"{(uint)_elapsedTime / 60:00}:{(uint)_elapsedTime % 60:00}";
+                        _lastBufferStrUpdateTime = _elapsedTime;
+                    }
+                }
+                else
+                {
+                    _leftInfos.Clear(); _rightInfos.Clear();
+                    _footer = ""; _mid = Translations.Translate("INVALID");
                 }
             }
-            else
+            catch (System.Exception e)
             {
-                _leftInfos.Clear(); _rightInfos.Clear();
-                _footer = ""; _mid = Translations.Translate("INVALID");
+                Logging.Error("CamInfoPanel is disabled due to some issues");
+                Logging.LogException(e);
+                enabled = false;
             }
         }
 

@@ -81,7 +81,7 @@ namespace FPSCamera.Cam.Controller
                     StartTransitioningOnDisabled(GameCamController.Instance._cachedPositioning);
                 else
                     StartTransitioningOnDisabled(
-                        new Positioning(GameCamController.Instance.CameraController.transform.position,
+                        new Positioning(GameCamController.Instance.MainCamera.transform.position,
                         GameCamController.Instance.MainCamera.transform.rotation));
             }
             else
@@ -90,7 +90,7 @@ namespace FPSCamera.Cam.Controller
                     AfterTransition(GameCamController.Instance._cachedPositioning);
                 else
                     AfterTransition(
-                        new Positioning(GameCamController.Instance.CameraController.transform.position,
+                        new Positioning(GameCamController.Instance.MainCamera.transform.position,
                         GameCamController.Instance.MainCamera.transform.rotation));
             }
             OnCameraDisabled?.Invoke();
@@ -181,8 +181,7 @@ namespace FPSCamera.Cam.Controller
             }
             catch (Exception e)
             {
-                Logging.Error("FPS Camera is about to exit due to some issues");
-                Logging.Error("at FPSCamController.Update()");
+                Logging.Error("FPS Camera is about to exit due to some issues (Update)");
                 Logging.LogException(e);
                 DisableCam();
             }
@@ -212,10 +211,9 @@ namespace FPSCamera.Cam.Controller
             {
                 if (Status == CamStatus.Enabled)
                 {
-                    Logging.Error("FPS Camera is about to exit due to some issues");
+                    Logging.Error("FPS Camera is about to exit due to some issues (LateUpdate)");
                     DisableCam();
                 }
-                Logging.Error("at FPSCamController.LateUpdate()");
                 Logging.LogException(e);
             }
         }

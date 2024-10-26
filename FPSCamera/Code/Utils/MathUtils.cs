@@ -31,12 +31,26 @@ namespace FPSCamera.Utils
         }
         public static float Clamp(this float value, float min, float max) => Mathf.Clamp(value, min, max);
 
+        // Usage:
+        // eulerAngles.x => Yaw
+        // eulerAngles.y => Pitch (as defined by CameraController).
+        //
+        // Note: 
+        // In Unity's Quaternion.eulerAngles:
+        // - x => Pitch
+        // - y => Yaw
+        // - z => Roll
         public static Vector2 ClampEulerAngles(this Vector2 eulerAngles)
         {
+            // Clamp yaw and pitch from 0~360 degrees to -180~180 degrees.
             for (int i = 0; i < 2; i++)
-                eulerAngles[i] = (eulerAngles[i] > 180f) ? eulerAngles[i] - 360f : eulerAngles[i];
+                eulerAngles[i] = Mathf.Repeat(eulerAngles[i] + 180f, 360f) - 180f;
+
+            // Clamp pitch to the range of 0~90 degrees.
+            eulerAngles.y = Mathf.Clamp(eulerAngles.y, 0f, 90f);
             return eulerAngles;
         }
+
         public static float DistanceTo(this Vector3 pos, Vector3 target) => Vector3.Distance(pos, target);
 
         private static readonly System.Random _random = new System.Random();
