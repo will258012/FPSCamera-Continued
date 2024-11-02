@@ -202,6 +202,6 @@
         private string _mid, _footer;
         private Dictionary<string, string> _leftInfos, _rightInfos;
         private Texture2D _panelTexture, _infoFieldTexture;
-        private IFPSCam Cam => FPSCamController.Instance.FPSCam;
+        private static IFPSCam Cam => FPSCamController.Instance.FPSCam;
     }
 }

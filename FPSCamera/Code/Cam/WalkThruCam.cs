@@ -112,7 +112,7 @@ namespace FPSCamera.Cam
         /// <summary>
         /// Get a <see cref="IEnumerable{InstanceID}"/> list of valid vehicles.
         /// </summary>
-        private IEnumerable<InstanceID> GetVehicles(System.Func<VehicleInfo.VehicleCategory, bool> filter) => Enumerable.Range(1, VehicleManager.instance.m_vehicles.m_buffer.Length - 1)
+        private static IEnumerable<InstanceID> GetVehicles(System.Func<VehicleInfo.VehicleCategory, bool> filter) => Enumerable.Range(1, VehicleManager.instance.m_vehicles.m_buffer.Length - 1)
                     .Select(i => new InstanceID() { Vehicle = (ushort)i })
                     .Where(v =>
                     VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].Info != null &&
@@ -122,12 +122,11 @@ namespace FPSCamera.Cam
         /// <summary>
         /// Get a <see cref="IEnumerable{InstanceID}"/> list of valid citizen instances.
         /// </summary>
-        private IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance, bool> filter) => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
+        private static IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance, bool> filter) => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
                 .Select(i => new InstanceID() { CitizenInstance = (ushort)i })
                 .Where(c =>
                 CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance].m_flags.IsFlagSet(CitizenInstance.Flags.Created) &&
                 filter(CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance]));
-
     }
 
 }
