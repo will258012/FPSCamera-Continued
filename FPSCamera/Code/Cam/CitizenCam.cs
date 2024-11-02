@@ -6,6 +6,7 @@ using FPSCamera.Cam.Controller;
 using System.Collections.Generic;
 using System.Linq;
 using static FPSCamera.Utils.MathUtils;
+using static RenderManager;
 
 namespace FPSCamera.Cam
 {
@@ -82,6 +83,8 @@ namespace FPSCamera.Cam
         {
             if (IsinVehicle)
                 return AnotherCam.GetPositioning();
+            // We should check if CitizenInstance is valid. If not do so the game will crash!!
+            if (GetCitizen().m_instance == default) return default;
             GetCitizenInstance().GetSmoothPosition(GetCitizen().m_instance, out var pos, out var rotation);
             return new Positioning(pos, rotation);
         }
@@ -107,8 +110,10 @@ namespace FPSCamera.Cam
 
         public bool IsValid()
         {
+            // We should check if CitizenInstance is valid. If not do so the game will crash!!
+            if (!IsActivated || GetCitizen().m_instance == default) return false;
             var flags = GetCitizenInstance().m_flags;
-            if (IsActivated &&
+            if (
                 !flags.IsFlagSet(CitizenInstance.Flags.None) &&
                 !flags.IsFlagSet(CitizenInstance.Flags.Deleted) &&
                 flags.IsFlagSet(CitizenInstance.Flags.Created))

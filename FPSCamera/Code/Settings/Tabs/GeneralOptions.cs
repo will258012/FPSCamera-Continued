@@ -1,7 +1,9 @@
 ﻿using AlgernonCommons;
 using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
+using AlgernonCommons.XML;
 using ColossalFramework.UI;
+using FPSCamera.UI;
 using UnityEngine;
 
 namespace FPSCamera.Settings.Tabs
@@ -44,6 +46,7 @@ namespace FPSCamera.Settings.Tabs
             {
                 Translations.Index = index;
                 OptionsPanelManager<OptionsPanel>.LocaleChanged();
+                MainPanel.Instance?.LocaleChanged();
             };
             language_DropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += language_DropDown.parent.height + LeftMargin;
@@ -116,17 +119,9 @@ namespace FPSCamera.Settings.Tabs
         /// </summary>
         internal void Reset()
         {
-            logging_CheckBox.isChecked = false;
-            hideUI_CheckBox.isChecked = setBackCamera_CheckBox.isChecked =
-                metricUnit_CheckBox.isChecked = showInfoPanel_CheckBox.isChecked = true;
-            heightScale_Slider.value = 1f;
-            fade_CheckBox.isChecked = true;
-            LodOpt_DropDown.selectedIndex = 0;
-            ShadowsOpt_CheckBox.isChecked = false;
-            CameraOptions.Reset();
-            HotKeyOptions.Reset();
-            //Put language updates last
-            language_DropDown.selectedIndex = 0;
+            ModSettings.ResetToDefaults();
+            ModSettings.Save();
+            OptionsPanelManager<OptionsPanel>.LocaleChanged();
         }
     }
 }

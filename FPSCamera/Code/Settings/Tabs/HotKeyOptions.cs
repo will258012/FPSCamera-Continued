@@ -106,30 +106,5 @@ namespace FPSCamera.Settings.Tabs
 
             KeyUUIToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYUUITOGGLE"), ModSettings.KeyUUIToggle);
         }
-        /// <summary>
-        /// <see cref="Reset()"/> for default button in <see cref="GeneralOptions"/>.
-        /// default values are in <seealso cref="ModSettings"/>.
-        /// </summary>
-        internal static void Reset()
-        {
-            KeyCamToggle.Binding = new KeyOnlyBinding(KeyCode.BackQuote);
-            KeySpeedUp.Binding = new KeyOnlyBinding(KeyCode.CapsLock);
-            KeyCamReset.Binding = new KeyOnlyBinding(KeyCode.Minus);
-            KeyCursorToggle.Binding = new KeyOnlyBinding(KeyCode.Tab);
-            KeyAutoMove.Binding = new KeyOnlyBinding(KeyCode.E);
-            KeySaveOffset.Binding = new KeyOnlyBinding(KeyCode.Backslash);
-            KeyMoveForward.Binding = new KeyOnlyBinding(KeyCode.W);
-            KeyMoveBackward.Binding = new KeyOnlyBinding(KeyCode.S);
-            KeyMoveLeft.Binding = new KeyOnlyBinding(KeyCode.A);
-            KeyMoveRight.Binding = new KeyOnlyBinding(KeyCode.D);
-            KeyMoveUp.Binding = new KeyOnlyBinding(KeyCode.PageUp);
-            KeyMoveDown.Binding = new KeyOnlyBinding(KeyCode.PageDown);
-            KeyRotateLeft.Binding = new KeyOnlyBinding(KeyCode.LeftArrow);
-            KeyRotateRight.Binding = new KeyOnlyBinding(KeyCode.RightArrow);
-            KeyRotateUp.Binding = new KeyOnlyBinding(KeyCode.UpArrow);
-            KeyRotateDown.Binding = new KeyOnlyBinding(KeyCode.DownArrow);
-            KeyUUIToggle.Binding = new Keybinding(KeyCode.F, false, true, false);
-        }
-
     }
 }

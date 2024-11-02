@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "FPSCamera": {
+      "commandName": "Project"
+    },
+    "Start Cities: Skylines": {
+      "commandName": "Executable",
+      "executablePath": "D:\\SteamLibrary\\steamapps\\common\\Cities_Skylines\\Cities.exe"
+    }
+  }
+}

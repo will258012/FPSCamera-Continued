@@ -171,6 +171,7 @@
         private void OnDestory()
         {
             Panel.eventVisibilityChanged -= OnChangedVisibility;
+            
             Destroy(Panel);
             Destroy(GetMainButton());
 
@@ -191,6 +192,11 @@
             }
             return false;
         }
+        public void LocaleChanged()
+        {
+            Close();
+            AddSettings();
+        }
         private void OnChangedVisibility(UIComponent component, bool value)
         {
             if (isAnimating) return;
@@ -204,19 +210,16 @@
                         Panel.isVisible = false;
                         isAnimating = false;
                         ModSettings.Save();
-                        Close();
                     });
                 }
                 else
                 {
                     ModSettings.Save();
-                    Close();
                     Panel.opacity = 0f;
                 }
             }
             else
             {
-                AddSettings();
                 Panel.opacity = 1f;
                 if (ModSettings.Fade)
                 {

@@ -379,7 +379,7 @@ namespace FPSCamera.Cam.Controller
                 newOffset.pos += ModSettings.PedestrianFixedOffset;
             else if (followCam is VehicleCam cam)
             {
-                if (cam.GetVehicle().m_leadingVehicle != default && cam.GetPrefabName() != cam.GetVehicle(cam.GetFrontVehicleID()).Info.name)
+                if (cam.GetVehicle().m_leadingVehicle != default && cam.GetPrefabName() != VehicleCam.GetVehicle(cam.GetFrontVehicleID()).Info.name)
                     newOffset.pos += ModSettings.MidVehFixedOffset;
                 else
                     newOffset.pos += ModSettings.VehicleFixedOffset;
