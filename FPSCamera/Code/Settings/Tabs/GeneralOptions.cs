@@ -2,6 +2,7 @@
 using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
 using ColossalFramework.UI;
+using FPSCamera.UI;
 using UnityEngine;
 
 namespace FPSCamera.Settings.Tabs
@@ -44,6 +45,7 @@ namespace FPSCamera.Settings.Tabs
             {
                 Translations.Index = index;
                 OptionsPanelManager<OptionsPanel>.LocaleChanged();
+                MainPanel.Instance?.LocaleChanged();
             };
             language_DropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += language_DropDown.parent.height + LeftMargin;
