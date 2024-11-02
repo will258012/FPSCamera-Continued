@@ -1,4 +1,7 @@
-﻿using AlgernonCommons.Keybinding;
+﻿using AlgernonCommons;
+using AlgernonCommons.Keybinding;
+using AlgernonCommons.Notifications;
+using AlgernonCommons.Translation;
 using AlgernonCommons.XML;
 using ColossalFramework.IO;
 using System.IO;
@@ -12,16 +15,91 @@ namespace FPSCamera.Settings
     {
         // Settings file name
         [XmlIgnore]
-        private static readonly string SettingsFileName = Path.Combine(DataLocation.localApplicationData, "FPSCamera_Continued.xml");
+        internal static readonly string SettingsFileName = Path.Combine(DataLocation.localApplicationData, "FPSCamera_Continued.xml");
 
         internal static void Load() => XMLFileUtils.Load<ModSettings>(SettingsFileName);
 
         internal static void Save() => XMLFileUtils.Save<ModSettings>(SettingsFileName);
 
-        /// After modifying the default values of the internal fields,
-        /// be sure to adjust the values of <see cref="Tabs.GeneralOptions.Reset()"/>, 
-        /// <seealso cref="Tabs.CameraOptions.Reset()"/> or
-        /// <seealso cref="Tabs.HotKeyOptions.Reset()"/>
+        // Remember edit values here if the settings have edited!
+        internal static void ResetToDefaults()
+        {
+            Translations.CurrentLanguage = "default";
+            Logging.DetailLogging = false;
+            WhatsNew.LastNotifiedVersionString = "0.0";
+
+            HideGameUI = true;
+            SetBackCamera = true;
+            ShowInfoPanel = true;
+            InfoPanelHeightScale = 1f;
+            UseMetricUnit = true;
+            Fade = true;
+
+            LodOpt = 0;
+            ShadowsOpt = false;
+
+            Dof = false;
+            InvertRotateHorizontal = false;
+            InvertRotateVertical = false;
+            MovementSpeed = 30f;
+            SpeedUpFactor = 4f;
+            RotateSensitivity = 5f;
+            RotateKeyFactor = 8f;
+            MaxPitchDeg = 70f;
+            CamFieldOfView = 45f;
+            CamNearClipPlane = 1f;
+            FoViewScrollfactor = 1.2f;
+
+            ShowCursorFree = false;
+            GroundClipping = 0;
+            GroundLevelOffset = 0f;
+            RoadLevelOffset = 0f;
+            PathsDetection = true;
+            TracksDetection = true;
+
+            ShowCursorFollow = false;
+            StickToFrontVehicle = true;
+            FollowCamOffset = Vector3.zero;
+            VehicleFixedOffset = new Vector3(0f, 2f, 3f);
+            MidVehFixedOffset = new Vector3(0f, 3f, 2f);
+            PedestrianFixedOffset = new Vector3(0f, 2f, 0f);
+
+            PeriodWalk = 20f;
+            ManualSwitchWalk = false;
+            SelectPedestrian = true;
+            SelectPassenger = true;
+            SelectWaiting = true;
+            SelectDriving = true;
+            SelectPublicTransit = true;
+            SelectService = true;
+            SelectCargo = true;
+
+            SmoothTransition = true;
+            TransSpeed = 10f;
+            MinTransDistance = 15f;
+            MaxTransDistance = 500f;
+
+            KeyCamToggle = new KeyOnlyBinding(KeyCode.BackQuote);
+            KeySpeedUp = new KeyOnlyBinding(KeyCode.CapsLock);
+            KeyCamReset = new KeyOnlyBinding(KeyCode.Minus);
+            KeyCursorToggle = new KeyOnlyBinding(KeyCode.Tab);
+            KeyAutoMove = new KeyOnlyBinding(KeyCode.E);
+            KeySaveOffset = new KeyOnlyBinding(KeyCode.Backslash);
+            KeyMoveForward = new KeyOnlyBinding(KeyCode.W);
+            KeyMoveBackward = new KeyOnlyBinding(KeyCode.S);
+            KeyMoveLeft = new KeyOnlyBinding(KeyCode.A);
+            KeyMoveRight = new KeyOnlyBinding(KeyCode.D);
+            KeyMoveUp = new KeyOnlyBinding(KeyCode.PageUp);
+            KeyMoveDown = new KeyOnlyBinding(KeyCode.PageDown);
+            KeyRotateLeft = new KeyOnlyBinding(KeyCode.LeftArrow);
+            KeyRotateRight = new KeyOnlyBinding(KeyCode.RightArrow);
+            KeyRotateUp = new KeyOnlyBinding(KeyCode.UpArrow);
+            KeyRotateDown = new KeyOnlyBinding(KeyCode.DownArrow);
+            KeyUUIToggle = new Keybinding(KeyCode.F, false, true, false);
+            MainButtonPos = new Vector3(0f, 0f);
+        }
+
+
 
         #region General Options
         [XmlElement("HideGameUI")]

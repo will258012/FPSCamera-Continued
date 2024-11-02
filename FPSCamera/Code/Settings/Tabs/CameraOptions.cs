@@ -302,59 +302,5 @@ namespace FPSCamera.Settings.Tabs
 
             #endregion
         }
-
-
-
-        /// <summary>
-        /// <see cref="Reset()"/> for default button in <see cref="GeneralOptions"/>.
-        /// default values are in <seealso cref="ModSettings"/>.
-        /// </summary>
-        internal static void Reset()
-        {
-            dof_CheckBox.isChecked = invertRotateHorizontal_CheckBox.isChecked = invertRotateVertical_CheckBox.isChecked = false;
-            movementSpeed_Slider.value = 30f;
-            speedUpFactor_Slider.value = 4f;
-            rotateSensitivity_Slider.value = 5f;
-            rotateKeyFactor_Slider.value = 8f;
-            maxPitchDeg_Slider.value = 70f;
-            fov_Slider.value = 45f;
-            nearClipPlane_Slider.value = 1f;
-            foViewScrollfactor_Slider.value = 1.2f;
-            pathsDetection_CheckBox.isChecked = tracksDetection_CheckBox.isChecked = true;
-
-            showCursorFree_CheckBox.isChecked = false;
-            groundCliping_dropDown.selectedIndex = 0;
-            groundLevelOffset_Slider.value = roadLevelOffset_Slider.value = 0f;
-
-            showCursorFollow_CheckBox.isChecked = false;
-            stickToFrontVehicle_CheckBox.isChecked = true;
-
-            FollowCamOffset.x_Slider.value = FollowCamOffset.y_Slider.value = FollowCamOffset.z_Slider.value = 0f;
-
-            VehicleFixedOffset.x_Slider.value = 0f;
-            VehicleFixedOffset.y_Slider.value = 2f;
-            VehicleFixedOffset.z_Slider.value = 3f;
-
-            MidVehFixedOffset.x_Slider.value = 0f;
-            MidVehFixedOffset.y_Slider.value = 3f;
-            MidVehFixedOffset.z_Slider.value = -2f;
-
-            PedestrianFixedOffset.x_Slider.value = 0f;
-            PedestrianFixedOffset.y_Slider.value = 2f;
-            PedestrianFixedOffset.z_Slider.value = 0f;
-
-
-            periodWalk_Slider.value = 20f;
-            manualSwitchWalk_CheckBox.isChecked = false;
-            selectPedestrian_CheckBox.isChecked = selectPassenger_CheckBox.isChecked =
-                selectWaiting_CheckBox.isChecked = selectDriving_CheckBox.isChecked =
-                selectPublicTransit_CheckBox.isChecked = selectService_CheckBox.isChecked =
-                selectCargo_CheckBox.isChecked = true;
-
-            smoothTransition_CheckBox.isChecked = true;
-            transSpeed_Slider.value = 10f;
-            minTransDistance_Slider.value = 5f;
-            maxTransDistance_Slider.value = 500f;
-        }
     }
 }
