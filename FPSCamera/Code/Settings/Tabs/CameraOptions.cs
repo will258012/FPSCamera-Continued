@@ -111,7 +111,7 @@ namespace FPSCamera.Settings.Tabs
             speedUpFactor_Slider.eventValueChanged += (_, value) => ModSettings.SpeedUpFactor = value;
             currentY += speedUpFactor_Slider.height + SliderMargin;
 
-            rotateSensitivity_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_ROTATESENSITIVITY"), .25f, 10f, .5f, ModSettings.RotateSensitivity);
+            rotateSensitivity_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_ROTATESENSITIVITY"), .5f, 10f, .5f, ModSettings.RotateSensitivity);
             rotateSensitivity_Slider.eventValueChanged += (_, value) => ModSettings.RotateSensitivity = value;
             currentY += rotateSensitivity_Slider.height + SliderMargin;
 
@@ -129,7 +129,7 @@ namespace FPSCamera.Settings.Tabs
             fov_Slider.eventValueChanged += (_, value) => ModSettings.CamFieldOfView = value;
             currentY += fov_Slider.height + SliderMargin;
 
-            nearClipPlane_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_CAMNEARCLIPPLANE"), .125f, 32f, .5f, ModSettings.CamNearClipPlane);
+            nearClipPlane_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_CAMNEARCLIPPLANE"), .1f, 32f, .1f, ModSettings.CamNearClipPlane);
             nearClipPlane_Slider.eventValueChanged += (_, value) => ModSettings.CamNearClipPlane = value;
             currentY += nearClipPlane_Slider.height + SliderMargin;
 
