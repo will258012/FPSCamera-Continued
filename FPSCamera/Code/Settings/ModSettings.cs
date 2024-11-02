@@ -177,17 +177,17 @@ namespace FPSCamera.Settings
         [XmlElement("VehicleFixedOffset")]
         public Vector3 XMLVehicleFixedOffset { get => VehicleFixedOffset; set => VehicleFixedOffset = value; }
         [XmlIgnore]
-        internal static Vector3 VehicleFixedOffset = Vector3.zero;
+        internal static Vector3 VehicleFixedOffset = new Vector3(0f, 2f, 3f);
 
         [XmlElement("MidVehFixedOffset")]
         public Vector3 XMLMidVehFixedOffset { get => MidVehFixedOffset; set => MidVehFixedOffset = value; }
         [XmlIgnore]
-        internal static Vector3 MidVehFixedOffset = Vector3.zero;
+        internal static Vector3 MidVehFixedOffset = new Vector3(0f, 3f, 2f);
 
         [XmlElement("PedestrianFixedOffset")]
         public Vector3 XMLPedestrianFixedOffset { get => PedestrianFixedOffset; set => PedestrianFixedOffset = value; }
         [XmlIgnore]
-        internal static Vector3 PedestrianFixedOffset = Vector3.zero;
+        internal static Vector3 PedestrianFixedOffset = new Vector3(0f, 2f, 0f);
 
         #endregion
         #region Walk-Through Mode Options
@@ -250,7 +250,7 @@ namespace FPSCamera.Settings
         [XmlElement("MinTransDistance")]
         public float XMLMinTransDistance { get => MinTransDistance; set => MinTransDistance = value; }
         [XmlIgnore]
-        internal static float MinTransDistance = 5f;
+        internal static float MinTransDistance = 15f;
 
 
         [XmlElement("MaxTransDistance")]
