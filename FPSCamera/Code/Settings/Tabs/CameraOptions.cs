@@ -137,18 +137,6 @@ namespace FPSCamera.Settings.Tabs
             foViewScrollfactor_Slider.tooltip = Translations.Translate("SETTINGS_FOVIEWSCROLLFACTOR_DETAIL");
             foViewScrollfactor_Slider.eventValueChanged += (_, value) => ModSettings.FoViewScrollfactor = value;
             currentY += foViewScrollfactor_Slider.height + SliderMargin;
-
-            pathsDetection_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_PATHS_DETECTION"));
-            pathsDetection_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_DETECTIONS_DETAIL"), "\n");
-            pathsDetection_CheckBox.isChecked = ModSettings.PathsDetection;
-            pathsDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.PathsDetection = isChecked;
-            currentY += pathsDetection_CheckBox.height + Margin;
-
-            tracksDetection_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_TRACKS_DETECTION"));
-            tracksDetection_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_DETECTIONS_DETAIL"), "\n");
-            tracksDetection_CheckBox.isChecked = ModSettings.TracksDetection;
-            tracksDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.TracksDetection = isChecked;
-            currentY += tracksDetection_CheckBox.height + Margin;
             #endregion
             #region Free-Camera Mode Options
 
@@ -184,6 +172,18 @@ namespace FPSCamera.Settings.Tabs
             roadLevelOffset_Slider.tooltip = Translations.Translate("SETTINGS_ROADLEVELOFFSET_DETAIL");
             roadLevelOffset_Slider.eventValueChanged += (_, value) => ModSettings.RoadLevelOffset = value;
             currentY += roadLevelOffset_Slider.height + SliderMargin;
+
+            pathsDetection_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_PATHS_DETECTION"));
+            pathsDetection_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_DETECTIONS_DETAIL"), "\n");
+            pathsDetection_CheckBox.isChecked = ModSettings.PathsDetection;
+            pathsDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.PathsDetection = isChecked;
+            currentY += pathsDetection_CheckBox.height + Margin;
+
+            tracksDetection_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_TRACKS_DETECTION"));
+            tracksDetection_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_DETECTIONS_DETAIL"), "\n");
+            tracksDetection_CheckBox.isChecked = ModSettings.TracksDetection;
+            tracksDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.TracksDetection = isChecked;
+            currentY += tracksDetection_CheckBox.height + Margin;
             #endregion
             #region Follow Mode Options
             UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_FOLLOW"));

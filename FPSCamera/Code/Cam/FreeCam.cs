@@ -10,25 +10,19 @@ namespace FPSCamera.Cam
     /// </summary>
     public class FreeCam : IFPSCam
     {
-        public FreeCam()
-        {
-            var transform = GameCamController.Instance.MainCamera.transform;
-            _positioning.pos = transform.position;
-            _positioning.rotation = Quaternion.identity;
-            _lastPositioning = _positioning;
-            IsActivated = true;
-        }
+        public FreeCam() => IsActivated = true;
 
         public bool IsActivated { get; private set; }
-        public Positioning GetPositioning() => _positioning;
-        internal void RecordLastPositioning() => _lastPositioning = _positioning;
+        public Positioning GetPositioning() =>
+            new Positioning(GameCamController.Instance.MainCamera.transform.position,
+            GameCamController.Instance.MainCamera.transform.rotation);
+        internal void UpdateSpeed(Vector3 a, Vector3 b) => speed = a.DistanceTo(b) / Time.deltaTime;
         public bool AutoMove { get; set; }
         public void ToggleAutoMove() => AutoMove = !AutoMove;
-        public float GetSpeed() => _lastPositioning.pos.DistanceTo(_positioning.pos) / Time.deltaTime;
+        public float GetSpeed() => speed;
         public bool IsValid() => true;
-        public void DisableCam() { IsActivated = false; _positioning = _lastPositioning = default; AutoMove = false; }
+        public void DisableCam() { IsActivated = false; AutoMove = false; speed = 0f; }
 
-        internal Positioning _positioning = new Positioning(Vector3.zero);
-        private Positioning _lastPositioning = new Positioning(Vector3.zero);
+        private float speed = 0f;
     }
 }

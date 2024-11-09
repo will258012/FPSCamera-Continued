@@ -75,24 +75,20 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(false));
 
-            if (ModSettings.SmoothTransition)
+            if (ModSettings.SetBackCamera)
             {
-                if (ModSettings.SetBackCamera)
+                if (ModSettings.SmoothTransition)
                     StartTransitioningOnDisabled(GameCamController.Instance._cachedPositioning);
-                else
-                    StartTransitioningOnDisabled(
-                        new Positioning(GameCamController.Instance.MainCamera.transform.position,
-                        GameCamController.Instance.MainCamera.transform.rotation));
+                else AfterTransition(GameCamController.Instance._cachedPositioning);
             }
             else
             {
-                if (ModSettings.SetBackCamera)
-                    AfterTransition(GameCamController.Instance._cachedPositioning);
-                else
-                    AfterTransition(
-                        new Positioning(GameCamController.Instance.MainCamera.transform.position,
-                        GameCamController.Instance.MainCamera.transform.rotation));
+                if (ModSettings.HideGameUI)
+                    StartCoroutine(UIManager.ToggleUI(true));
+                Status = CamStatus.Disabled;
+                GameCamController.Instance.Restore();
             }
+
             OnCameraDisabled?.Invoke();
         }
         private void AfterTransition(Positioning positioning)
@@ -104,6 +100,7 @@ namespace FPSCamera.Cam.Controller
             GameCamController.Instance.MainCamera.transform.rotation = positioning.rotation;
             GameCamController.Instance.Restore();
         }
+
         /// <summary>
         /// Starts Follow mode.
         /// </summary>
@@ -151,9 +148,8 @@ namespace FPSCamera.Cam.Controller
         {
             _transitionTimer = 0f;
             _targetFoV = ModSettings.CamFieldOfView;
-            var cameraTransform = GameCamController.Instance.MainCamera.transform;
-            if (cameraTransform.position.DistanceTo(endPos.pos) <= ModSettings.MinTransDistance ||
-                    cameraTransform.position.DistanceTo(endPos.pos) > ModSettings.MaxTransDistance)
+            if (CameraTransform.position.DistanceTo(endPos.pos) <= 2f ||
+                CameraTransform.position.DistanceTo(endPos.pos) > ModSettings.MaxTransDistance)
             {
                 AfterTransition(endPos);
                 return;
@@ -392,33 +388,26 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void UpdateFollowCamPos()
         {
-            var cameraTransform = GameCamController.Instance.MainCamera.transform;
-
             // Calculate the desired position and rotation of the camera by applying the offset to the FPSCam's current position and rotation.
             var instancePos = FPSCam.GetPositioning().pos + (FPSCam.GetPositioning().rotation * _offset.pos);
             var instanceRotation = FPSCam.GetPositioning().rotation * _offset.rotation;
-
-            // Adjust the y-axis to ensure the camera is above the road.
-            if (MapUtils.GetClosestSegmentLevel(instancePos, out var height)) // Get the height of the closest road segment, if available.
-                instancePos.y = Mathf.Max(instancePos.y, height); // Ensure the camera is at least at the height of the road.
-
 
             // Limit the camera's position to the allowed area.
             instancePos = CameraController.ClampCameraPosition(instancePos);
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-                cameraTransform.position =
-                cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
-                cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
-                ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
+                CameraTransform.position =
+                CameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+                CameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
+                ? Vector3.Lerp(CameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                 : instancePos;
-                cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
+                CameraTransform.rotation = Quaternion.Slerp(CameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
             {
-                cameraTransform.position = instancePos;
-                cameraTransform.rotation = instanceRotation;
+                CameraTransform.position = instancePos;
+                CameraTransform.rotation = instanceRotation;
             }
         }
 
@@ -427,20 +416,15 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void UpdateFreeCamPos(FreeCam freeCam)
         {
-
             // Automatically move the camera forward if AutoMove is enabled and the secondary mouse button is not pressed.
             if (freeCam.AutoMove && !InputManager.MousePressed(InputManager.MouseButton.Secondary))
             {
                 var movement = Vector3.zero;
                 movement.z += Time.deltaTime * ModSettings.MovementSpeed / MapUtils.ToKilometer(1f);
                 _offset.pos += _offset.rotation * movement;
-
             }
-            var cameraTransform = GameCamController.Instance.MainCamera.transform;
-
-            freeCam.RecordLastPositioning();
-            // Calculate the desired position and rotation of the camera by applying the offset to the FPSCam's current position and rotation.
-            var instancePos = FPSCam.GetPositioning().pos + _offset.pos;
+            // Calculate the desired position and rotation of the camera by applying the offset to the camera's current position and rotation.
+            var instancePos = CameraTransform.position + _offset.pos;
             var instanceRotation = _offset.rotation;
 
             /*
@@ -454,6 +438,7 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.GroundClipping != 0)
             {
                 var minHeight = MapUtils.GetMinHeightAt(instancePos) + ModSettings.GroundLevelOffset; // Get minimum height including ground level offset.
+
                 if ((ModSettings.GroundClipping == 3 || ModSettings.GroundClipping == 4) && MapUtils.GetClosestSegmentLevel(instancePos, out var height))
                     minHeight = height + ModSettings.RoadLevelOffset; // Adjust minHeight if road height is applicable.
 
@@ -464,25 +449,25 @@ namespace FPSCamera.Cam.Controller
             // Limit the camera's position to the allowed area.
             instancePos = CameraController.ClampCameraPosition(instancePos);
 
+            //Update the speed for info panel to display.
+            if (ModSettings.ShowInfoPanel)
+                freeCam.UpdateSpeed(CameraTransform.position, instancePos);
+
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
-                cameraTransform.position =
-                freeCam._positioning.pos =
-                cameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
-                 cameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
-                ? Vector3.Lerp(cameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
+                CameraTransform.position =
+                CameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
+                 CameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
+                ? Vector3.Lerp(CameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                 : instancePos;
-                cameraTransform.rotation =
-                    freeCam._positioning.rotation =
-                    Quaternion.Slerp(cameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
+                CameraTransform.rotation =
+                    Quaternion.Slerp(CameraTransform.rotation, instanceRotation, Time.deltaTime * ModSettings.TransSpeed);
             }
             else
             {
-                cameraTransform.position =
-                freeCam._positioning.pos =
-                instancePos;
-                cameraTransform.rotation = freeCam._positioning.rotation = instanceRotation;
+                CameraTransform.position = instancePos;
+                CameraTransform.rotation = instanceRotation;
 
             }
             // Reset the position offset after applying.
@@ -494,9 +479,9 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void UpdateTransitionPos()
         {
-            var cameraTransform = GameCamController.Instance.MainCamera.transform;
             _transitionTimer += Time.deltaTime;
-            if (cameraTransform.position.DistanceTo(_endPos.pos) <= ModSettings.MinTransDistance ||
+            // If we've reached the distance of the end or time is out
+            if (CameraTransform.position.DistanceTo(_endPos.pos) <= 2f ||
                 _transitionTimer >= MaxTransitioningTime)
             {
                 _transitionTimer = 0f;
@@ -504,11 +489,11 @@ namespace FPSCamera.Cam.Controller
                 _endPos = new Positioning(Vector3.zero);
                 return;
             }
-            // Apply the calculated position and rotation to the camera.
-            cameraTransform.position =
-                Vector3.Lerp(cameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
-            cameraTransform.rotation =
-                Quaternion.Slerp(cameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
+            // Apply the transition position and rotation to the camera.
+            CameraTransform.position =
+                Vector3.Lerp(CameraTransform.position, _endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
+            CameraTransform.rotation =
+                Quaternion.Slerp(CameraTransform.rotation, _endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
         }
         public enum CamStatus
         {
@@ -516,8 +501,7 @@ namespace FPSCamera.Cam.Controller
             Enabled,
             Transitioning
         }
-
-
+        private static Transform CameraTransform => GameCamController.Instance.MainCamera.transform;
         private bool _isScrollTransitioning = false;
         private Positioning _endPos = new Positioning(Vector3.zero);
         private Positioning _offset = new Positioning(Vector3.zero);
