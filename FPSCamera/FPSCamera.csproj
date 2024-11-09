@@ -29,6 +29,10 @@
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\workshop\content\255710\1764637396\ToggleIt.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="TransportLinesManager">
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\workshop\content\255710\3007903394\TransportLinesManager.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnifiedUILib">
       <HintPath>..\..\..\..\..\SteamLibrary\steamapps\workshop\content\255710\2966990700\UnifiedUILib.dll</HintPath>
     </Reference>

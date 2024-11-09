@@ -1,5 +1,4 @@
 ﻿using ColossalFramework;
-using System;
 using UnityEngine;
 
 namespace FPSCamera.Utils
@@ -19,7 +18,15 @@ namespace FPSCamera.Utils
             TransportInfo.TransportType.Trolleybus,
             };
 
-
+        public static string GetStationName(ushort stopId, ushort lineid)
+        {
+            if (ModSupport.FoundTLM)
+            {
+                var subService = TransportManager.instance.m_lines.m_buffer[lineid].Info.m_netSubService;
+                return TransportLinesManager.ModShared.TLMFacade.GetFullStationName(stopId, lineid, false, subService);
+            }
+            return GetStopName(stopId);
+        }
         private static string GetStopName(ushort stopId)
         {
             var id = new InstanceID() { NetNode = stopId };
@@ -66,23 +73,6 @@ namespace FPSCamera.Utils
             bid.Building = buildingId;
             return Singleton<BuildingManager>.instance.GetBuildingName(buildingId, bid);
         }
-        public static string GetStationName(ushort stopId, ushort lineid)
-        {
-
-            if (ModSupport.FoundTLM)
-            {
-                var subService = TransportManager.instance.m_lines.m_buffer[lineid].Info.m_netSubService;
-                object result = AccessUtils.InvokeMethod(
-                    "TransportLinesManager.Utils.TLMStationUtils, TransportLinesManager",
-                    "GetStationName",
-                    new object[] { stopId, lineid, subService, false },
-                    new Type[] { typeof(ushort), typeof(ushort), typeof(ItemClass.SubService), typeof(bool) }
-                    );
-                return result?.ToString() ?? GetStopName(stopId);
-            }
-            return GetStopName(stopId);
-        }
-
 
         private static string GetStationRoadName(Vector3 pos)
         {
