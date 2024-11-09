@@ -6,12 +6,12 @@ using static AlgernonCommons.UI.UISliders;
 
 namespace FPSCamera.UI
 {
-    internal class OffsetSliders
+    public class OffsetSliders
     {
-        internal UISlider x_Slider;
-        internal UISlider y_Slider;
-        internal UISlider z_Slider;
-        internal UIPanel slidersPanel;
+        public UISlider x_Slider;
+        public UISlider y_Slider;
+        public UISlider z_Slider;
+        public UIPanel slidersPanel;
         private const float Margin = 5f;
         private const float SliderMargin = 60f;
 
