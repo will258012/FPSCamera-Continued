@@ -18,6 +18,7 @@
 "HARMONY_NOT_INSTALLED","The required Harmony 2 mod dependency was not installed","Possible cause of Harmony error - Harmony not installed."
 "HARMONY_MOD_ERROR","An old and/or broken mod is preventing Harmony 2 from operating properly","Possible cause of Harmony error - a broken mod (not this one) can cause things to stop working."
 "HARMONY_MOD_CONFLICT","Another mod may be trying to apply a conflicting Harmony patch","Possible cause of Harmony error - two mods trying to patch the same thing at once."
+"K45_TLM_DETECTED","An older version of Transport Lines Manager by Klyte45 is detected. Consider updating to t1a2l's version for full feature support.",""
 "DETAIL_LOGGING","Enable detailed debugging logging","Option to record more detail in game log"
 "WHATSNEW_L1","This message is just to let you know that the mod has been updated.",""
 "WHATSNEW_L2","For a detailed list of changes, please visit the Steam Workshop or GitHub.",""
