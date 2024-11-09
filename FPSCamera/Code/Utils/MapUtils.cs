@@ -27,7 +27,7 @@
         public static bool GetClosestSegmentLevel(Vector3 position, out float height)
         {
             height = default;
-            var input = RayCastTool.GetRaycastInput(position, -3f, 3f); // Configure raycast input parameters
+            var input = RayCastTool.GetRaycastInput(position, -5f, 5f); // Configure raycast input parameters
             input.m_netService.m_service = ItemClass.Service.Road;
             input.m_netService.m_itemLayers = ItemClass.Layer.Default |// ItemClass.Layer.PublicTransport is sonly for TransportLine, not for Road.
                                               ItemClass.Layer.MetroTunnels;
@@ -39,7 +39,7 @@
                                          NetSegment.Flags.Flooded;
 
             // Perform the raycast and check for a result:
-            if (RayCastTool.RayCast(input, out var result, 3f))
+            if (RayCastTool.RayCast(input, out var result, 5f))
             {
                 // Set the height to the hit position plus the default offset.
                 height = result.m_hitPos.y + defaultHeightOffset;
@@ -52,7 +52,7 @@
                 input.m_netService.m_service = ItemClass.Service.PublicTransport;
 
                 // Perform the raycast again:
-                if (RayCastTool.RayCast(input, out var result2, 3f))
+                if (RayCastTool.RayCast(input, out var result2, 5f))
                 {
                     height = result2.m_hitPos.y + defaultHeightOffset;
                     return true;
