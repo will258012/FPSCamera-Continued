@@ -18,14 +18,14 @@ namespace FPSCamera.Utils
             TransportInfo.TransportType.Trolleybus,
             };
 
-        public static string GetStationName(ushort stopId, ushort lineid)
+        public static string GetStationName(ushort stopId, ushort lineId)
         {
-            if (ModSupport.FoundTLM)
-            {
-                var subService = TransportManager.instance.m_lines.m_buffer[lineid].Info.m_netSubService;
-                return TransportLinesManager.ModShared.TLMFacade.GetFullStationName(stopId, lineid, false, subService);
-            }
-            return GetStopName(stopId);
+            return ModSupport.FoundTLM ? GetStopNameByTLM(stopId, lineId) : GetStopName(stopId);
+        }
+        private static string GetStopNameByTLM(ushort stopId, ushort lineId)
+        {
+            var subService = TransportManager.instance.m_lines.m_buffer[lineId].Info.m_netSubService;
+            return TransportLinesManager.ModShared.TLMFacade.GetFullStationName(stopId, lineId, false, subService);
         }
         private static string GetStopName(ushort stopId)
         {
