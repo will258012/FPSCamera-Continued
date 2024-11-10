@@ -443,7 +443,10 @@ namespace FPSCamera.Cam.Controller
                     minHeight = height + ModSettings.RoadLevelOffset; // Adjust minHeight if road height is applicable.
 
                 if (ModSettings.GroundClipping == 2 || ModSettings.GroundClipping == 4 || instancePos.y < minHeight)
-                    instancePos.y = minHeight; // Apply the minimum height to the camera's y-axis.
+                    instancePos.y = ModSettings.SmoothTransition &&
+                        Math.Abs(instancePos.y - minHeight) <= ModSettings.MinTransDistance ?
+                        Mathf.Lerp(instancePos.y, minHeight, Time.deltaTime * ModSettings.TransSpeed) :
+                        minHeight; // Apply the minimum height to the camera's y-axis.
             }
 
             // Limit the camera's position to the allowed area.
