@@ -18,6 +18,7 @@
 "HARMONY_NOT_INSTALLED","此模组所需的必需物品 Harmony 2 未订阅或未启用","Possible cause of Harmony error - Harmony not installed."
 "HARMONY_MOD_ERROR","存在一个过时/损坏的模组导致 Harmony 2 模组无法正常运行","Possible cause of Harmony error - a broken mod (not this one) can cause things to stop working."
 "HARMONY_MOD_CONFLICT","另一个模组可能在尝试调用冲突的 Harmony 库","Possible cause of Harmony error - two mods trying to patch the same thing at once."
+"K45_TLM_DETECTED","检测到由 Klyte45 制作的较旧版本 Transport Lines Manager。请考虑更新至由 t1a2l 制作的版本以获得完整功能支持。",""
 "DETAIL_LOGGING","启用详细的调试日志记录","Option to record more detail in game log"
 "WHATSNEW_L1","此消息只是为了让您知晓模组已经更新。",""
 "WHATSNEW_L2","请访问创意工坊或 GitHub 以获取详细更新日志。",""

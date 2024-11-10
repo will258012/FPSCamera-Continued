@@ -11,6 +11,7 @@ namespace FPSCamera.Utils
         public static bool FoundTLM { get; private set; }
         public static bool FoundTrainDisplay { get; private set; }
         public static ushort FollowVehicleID { get; internal set; }
+        internal static bool FoundK45TLM = false;
 
         internal static List<string> CheckModConflicts()
         {
@@ -42,7 +43,8 @@ namespace FPSCamera.Utils
 
                     if (n != null)
                     {
-                        Logging.Error("ModSupport: Found an older version of Transport Lines Manager by Klyte45. Please update to the version by t1a2l for full feature support");
+                        Logging.KeyMessage("ModSupport: Found an older version of Transport Lines Manager by Klyte45");
+                        FoundK45TLM = true;
                     }
                     else
                     {

@@ -1,6 +1,7 @@
-﻿using AlgernonCommons.Notifications;
-using AlgernonCommons;
+﻿using AlgernonCommons;
+using AlgernonCommons.Notifications;
 using AlgernonCommons.Patching;
+using AlgernonCommons.Translation;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
 using FPSCamera.UI;
@@ -55,15 +56,18 @@ namespace FPSCamera
             if (ToolsModifierControl.isGame)
                 gameObject.AddComponent<FollowButtons>();
 
-            /// TODO: Need to remove in the next version
-            var notification = NotificationBase.ShowNotification<DontShowAgainNotification>();
-            notification.AddParas("Since we changed the default values ​​of some settings, you may need to reset the settings for a better experience.");
-            notification.AddParas("由于我们修改了部分设置的默认值，您可能需要重置设置以获得更佳体验。");
-            notification.DSAButton.eventClicked += (component, clickEvent) =>
+            if (ModSupport.FoundK45TLM && WhatsNew.LastNotifiedVersion < AssemblyUtils.CurrentVersion)
             {
-                WhatsNew.LastNotifiedVersion = AssemblyUtils.CurrentVersion;
-                ModBase.Instance?.SaveSettings();
-            };
+                var notification = NotificationBase.ShowNotification<DontShowAgainNotification>();
+                //notification.AddParas("Since we changed the default values ​​of some settings, you may need to reset the settings for a better experience.");
+                //notification.AddParas("由于我们修改了部分设置的默认值，您可能需要重置设置以获得更佳体验。");
+                notification.AddParas(Translations.Translate("K45_TLM_DETECTED"));
+                notification.DSAButton.eventClicked += (component, clickEvent) =>
+                {
+                    WhatsNew.LastNotifiedVersion = AssemblyUtils.CurrentVersion;
+                    ModSettings.Save();
+                };
+            }
         }
         public override void OnCreated(ILoading loading)
         {

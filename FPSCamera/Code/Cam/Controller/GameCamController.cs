@@ -142,11 +142,14 @@ namespace FPSCamera.Cam.Controller
             // Calculate the new position based on the Z offset, moving forward from the camera's transform.
             var newPos = MainCamera.transform.position + (MainCamera.transform.rotation * Vector3.forward * 40f);
 
+            // Limit the camera's position to the allowed area.
+            newPos = CameraController.ClampCameraPosition(newPos);
+
             // Update the CameraController's position based on the adjusted new position.
             CameraController.m_targetPosition = CameraController.m_currentPosition = newPos;
 
             // Calculate the height based on the new position and the minimum height of the terrain.
-            CameraController.m_targetHeight = CameraController.m_currentHeight = newPos.y - MapUtils.GetMinHeightAt(newPos);
+            CameraController.m_targetHeight = CameraController.m_currentHeight = newPos.y + CameraController.CalculateCameraHeightOffset(newPos, 40f);
 
             // Set the target angle based on the camera's transform, clamping the angles to valid ranges.
             CameraController.m_targetAngle = CameraController.m_currentAngle =

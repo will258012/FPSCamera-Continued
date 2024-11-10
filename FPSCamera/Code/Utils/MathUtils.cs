@@ -8,7 +8,7 @@ namespace FPSCamera.Utils
 {
     public static class MathUtils
     {
-        public static bool AlmostEquals(this float a, float b, float error = 1 / 32f)
+        public static bool AlmostEquals(this float a, float b, float error = 0.03125f)
             => Math.Abs(b - a) < error;
         public struct Positioning
         {
@@ -55,6 +55,5 @@ namespace FPSCamera.Utils
 
         private static readonly System.Random _random = new System.Random();
         public static T GetRandomOne<T>(this IEnumerable<T> list) => list.Any() ? list.ElementAt(_random.Next(list.Count())) : default;
-
     }
 }
