@@ -1,4 +1,5 @@
 ﻿using AlgernonCommons;
+using ColossalFramework;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
 using UnityEngine;
@@ -136,24 +137,36 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void SyncCameraControllerFromTransform()
         {
-            // Set the size (Z offset) to the minimum value (40f) for the game.
-            CameraController.m_targetSize = CameraController.m_currentSize = 40f;
+            //Calculate ground height.
+            var groundHeight = MapUtils.GetMinHeightAt(MainCamera.transform.position);
+
+            // Set the target angle based on the camera's transform, clamping the angles to valid ranges.
+            CameraController.m_targetAngle = CameraController.m_currentAngle =
+                new Vector2(MainCamera.transform.rotation.eulerAngles.y, MainCamera.transform.rotation.eulerAngles.x).ClampEulerAngles();
+
+            // Set the size (height difference between the camera height and the ground).
+            CameraController.m_targetSize = CameraController.m_currentSize =
+                (Mathf.Max(0f, MainCamera.transform.position.y - groundHeight)
+                ).Clamp(40f, 4000f);
+
+            //Set the height (ground height).
+            CameraController.m_targetHeight = CameraController.m_currentHeight = groundHeight;
+
+            //Calculate distance (Z offset).
+            var dist = CameraController.m_targetSize
+                      * Mathf.Max(0f, 1f - groundHeight / CameraController.m_maxDistance)
+                      / Mathf.Tan(MainCamera.fieldOfView * Mathf.Deg2Rad);
 
             // Calculate the new position based on the Z offset, moving forward from the camera's transform.
-            var newPos = MainCamera.transform.position + (MainCamera.transform.rotation * Vector3.forward * 40f);
+            var newPos = MainCamera.transform.position + (MainCamera.transform.rotation * Vector3.forward * dist);
+
+            newPos.y += CameraController.CalculateCameraHeightOffset(newPos, dist);
 
             // Limit the camera's position to the allowed area.
             newPos = CameraController.ClampCameraPosition(newPos);
 
             // Update the CameraController's position based on the adjusted new position.
             CameraController.m_targetPosition = CameraController.m_currentPosition = newPos;
-
-            // Calculate the height based on the new position and the minimum height of the terrain.
-            CameraController.m_targetHeight = CameraController.m_currentHeight = newPos.y + CameraController.CalculateCameraHeightOffset(newPos, 40f);
-
-            // Set the target angle based on the camera's transform, clamping the angles to valid ranges.
-            CameraController.m_targetAngle = CameraController.m_currentAngle =
-                new Vector2(MainCamera.transform.rotation.eulerAngles.y, MainCamera.transform.rotation.eulerAngles.x).ClampEulerAngles();
         }
 
         /// <summary>
