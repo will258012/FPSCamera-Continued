@@ -1,4 +1,5 @@
 ﻿using AlgernonCommons;
+using ColossalFramework;
 using FPSCamera.Game;
 using FPSCamera.Settings;
 using FPSCamera.UI;
@@ -22,7 +23,7 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Gets the current FPS camera instance.
         /// </summary>
-        public IFPSCam FPSCam { get; private set; }
+        public IFPSCam FPSCam { get; set; } = null;
 
         /// <summary>
         /// Gets the current status of the camera.
@@ -45,7 +46,7 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Enables the camera and associated UI elements or settings.
         /// </summary>
-        private void EnableCam()
+        public void EnableCam(bool IsPlugin = false)
         {
             if (ModSettings.ShowInfoPanel)
                 CamInfoPanel.Instance.EnableCamInfoPanel();
@@ -56,7 +57,7 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(true));
             GameCamController.Instance.Initialize();
-            Status = CamStatus.Enabled;
+            Status = IsPlugin ? CamStatus.PluginEnabled : CamStatus.Enabled;
             OnCameraEnabled?.Invoke();
         }
 
@@ -85,20 +86,19 @@ namespace FPSCamera.Cam.Controller
             {
                 if (ModSettings.HideGameUI)
                     StartCoroutine(UIManager.ToggleUI(true));
-                Status = CamStatus.Disabled;
                 GameCamController.Instance.Restore();
+                Status = CamStatus.Disabled;
             }
-
             OnCameraDisabled?.Invoke();
         }
         private void AfterTransition(Positioning positioning)
         {
             if (ModSettings.HideGameUI)
                 StartCoroutine(UIManager.ToggleUI(true));
-            Status = CamStatus.Disabled;
             GameCamController.Instance.MainCamera.transform.position = positioning.pos;
             GameCamController.Instance.MainCamera.transform.rotation = positioning.rotation;
             GameCamController.Instance.Restore();
+            Status = CamStatus.Disabled;
         }
 
         /// <summary>
@@ -164,9 +164,9 @@ namespace FPSCamera.Cam.Controller
         {
             try
             {
-                if (Status == CamStatus.Enabled)
+                if (Status == CamStatus.Enabled || Status == CamStatus.PluginEnabled)
                 {
-                    if (!FPSCam.IsValid())
+                    if (!(FPSCam?.IsValid() ?? false))
                     {
                         DisableCam();
                         return;
@@ -205,7 +205,7 @@ namespace FPSCamera.Cam.Controller
             }
             catch (Exception e)
             {
-                if (Status == CamStatus.Enabled)
+                if (Status == CamStatus.Enabled || Status == CamStatus.PluginEnabled)
                 {
                     Logging.Error("FPS Camera is about to exit due to some issues (LateUpdate)");
                     DisableCam();
@@ -220,7 +220,7 @@ namespace FPSCamera.Cam.Controller
         /// <returns>True if the camera was disabled, false otherwise.</returns>
         public bool OnEsc()
         {
-            if (Status == CamStatus.Enabled)
+            if (Status == CamStatus.Enabled || Status == CamStatus.PluginEnabled)
             {
                 DisableCam();
                 return true;
@@ -237,10 +237,10 @@ namespace FPSCamera.Cam.Controller
                 !SimulationManager.instance.ForcedSimulationPaused && // when the game isn't in the pause menu
                 !GameCamController.Instance.CameraController.m_freeCamera) // when isn't in the game's free mode
             {
-                if (Status == CamStatus.Enabled) DisableCam();
-                else StartFreeCam();
+                if (Status == CamStatus.Enabled || Status == CamStatus.PluginEnabled) DisableCam();
+                else if (Status == CamStatus.Disabled) StartFreeCam();
             }
-            if (Status == CamStatus.Disabled) return;
+            if (Status != CamStatus.Enabled) return;
 
             if (InputManager.MouseTriggered(InputManager.MouseButton.Middle) ||
                 InputManager.KeyTriggered(ModSettings.KeyCamReset))
@@ -502,6 +502,7 @@ namespace FPSCamera.Cam.Controller
         {
             Disabled,
             Enabled,
+            PluginEnabled,
             Transitioning
         }
         private static Transform CameraTransform => GameCamController.Instance.MainCamera.transform;

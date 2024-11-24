@@ -8,6 +8,7 @@
     using FPSCamera.Settings;
     using FPSCamera.Utils;
     using System;
+    using UnifiedUI.GUI;
     using UnityEngine;
 
     public class MainPanel : MonoBehaviour
@@ -24,9 +25,13 @@
             #region Main Panel
 
             Panel = UIView.GetAView().AddUIComponent(typeof(UIPanel)) as UIPanel;
-            Panel.backgroundSprite = "ScrollbarTrack";
+            Panel.autoLayout = false;
+            Panel.canFocus = true;
+            Panel.isInteractive = true;
+            Panel.atlas = UITextures.InGameAtlas;
+            Panel.backgroundSprite = "UnlockingPanel2";
             Panel.width = 400f;
-            Panel.height = 1000f;
+
             AddSettings();
 
             Panel.eventVisibilityChanged += OnChangedVisibility;
@@ -154,7 +159,7 @@
                 manualSwitchWalk_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ManualSwitchWalk = isChecked;
                 currentY += manualSwitchWalk_CheckBox.height + Margin;
 
-                var walkThruBtn = UIButtons.AddButton(Panel, Margin, currentY, Translations.Translate("WALKTHRUBTN_TEXT"), 200f, 40f);
+                var walkThruBtn = UIButtons.AddButton(Panel, (Panel.width - 200f) / 2f, currentY, Translations.Translate("WALKTHRUBTN_TEXT"), 200f, 40f);
 
                 walkThruBtn.eventClick += (_, m) =>
                 {
@@ -171,7 +176,7 @@
         private void OnDestory()
         {
             Panel.eventVisibilityChanged -= OnChangedVisibility;
-            
+
             Destroy(Panel);
             Destroy(GetMainButton());
 
@@ -188,6 +193,10 @@
             if (Panel.isVisible)
             {
                 Panel.isVisible = false;
+                if (ModSupport.FoundUUI)
+                {
+                    (GetMainButton() as ButtonBase).IsActive = false;
+                }
                 return true;
             }
             return false;

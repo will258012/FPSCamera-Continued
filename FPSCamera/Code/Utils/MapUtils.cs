@@ -27,7 +27,7 @@
         public static bool GetClosestSegmentLevel(Vector3 position, out float height)
         {
             height = default;
-            var input = RayCastTool.GetRaycastInput(position, -5f, 5f); // Configure raycast input parameters
+            var input = RayCastTool.GetRaycastInput(position, -100f, 5f); // Configure raycast input parameters
             input.m_netService.m_service = ItemClass.Service.Road;
             input.m_netService.m_itemLayers = ItemClass.Layer.Default |// ItemClass.Layer.PublicTransport is sonly for TransportLine, not for Road.
                                               ItemClass.Layer.MetroTunnels;

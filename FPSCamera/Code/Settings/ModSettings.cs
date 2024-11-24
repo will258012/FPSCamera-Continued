@@ -20,6 +20,20 @@ namespace FPSCamera.Settings
         internal static void Load() => XMLFileUtils.Load<ModSettings>(SettingsFileName);
 
         internal static void Save() => XMLFileUtils.Save<ModSettings>(SettingsFileName);
+        [XmlIgnore]
+        public static ModSettings Instance
+        {
+            get
+            {
+                if (_modSettings == null)
+                {
+                    _modSettings = new ModSettings();
+                }
+                return _modSettings;
+            }
+        }
+        [XmlIgnore]
+        private static ModSettings _modSettings;
 
         // Remember edit values here if the settings have edited!
         internal static void ResetToDefaults()

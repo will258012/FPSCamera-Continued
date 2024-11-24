@@ -40,9 +40,17 @@ namespace FPSCamera.UI
                     {
                         if (value)
                         {
-                            var UUIpos = UnifiedUI.GUI.MainPanel.Instance.absolutePosition;
-                            var UUIwidth = UnifiedUI.GUI.MainPanel.Instance.width;
-                            var UUIheight = UnifiedUI.GUI.MainPanel.Instance.height;
+                            var UUIpos = UnifiedUI.GUI.MainPanel.Instance.isVisible
+                                ? UnifiedUI.GUI.MainPanel.Instance.absolutePosition
+                                : Object.FindObjectOfType<UnifiedUI.GUI.FloatingButton>().absolutePosition;
+
+                            var UUIwidth = UnifiedUI.GUI.MainPanel.Instance.isVisible
+                                ? UnifiedUI.GUI.MainPanel.Instance.width
+                                : Object.FindObjectOfType<UnifiedUI.GUI.FloatingButton>().width;
+
+                            var UUIheight = UnifiedUI.GUI.MainPanel.Instance.isVisible
+                                ? UnifiedUI.GUI.MainPanel.Instance.height
+                                : Object.FindObjectOfType<UnifiedUI.GUI.FloatingButton>().height;
                             // Position the main panel properly based on UUI button position
                             MainPanel.Instance.Panel.absolutePosition = new Vector3(
                             UUIpos.x + (UUIpos.x < Screen.width / 2f ?
