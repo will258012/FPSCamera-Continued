@@ -22,10 +22,10 @@ namespace FPSCamera.UI
             this.z_Slider = z_Slider;
             this.slidersPanel = slidersPanel;
         }
-        internal static OffsetSliders AddOffsetSlidersWithValue(UIComponent parent, float xPos, float yPos, string text, float min, float max, float step, Vector3 defaultValue, float width = 600f) =>
+        public static OffsetSliders AddOffsetSlidersWithValue(UIComponent parent, float xPos, float yPos, string text, float min, float max, float step, Vector3 defaultValue, float width = 600f) =>
             AddOffsetSlidersWithValue(parent, xPos, yPos, text, min, max, step, defaultValue, new SliderValueFormat(valueMultiplier: 1, roundToNearest: step, numberFormat: "N", suffix: null), width);
 
-        internal static OffsetSliders AddOffsetSlidersWithValue(UIComponent parent, float xPos, float yPos, string text, float min, float max, float step, Vector3 defaultValue, SliderValueFormat format, float width = 600f)
+        public static OffsetSliders AddOffsetSlidersWithValue(UIComponent parent, float xPos, float yPos, string text, float min, float max, float step, Vector3 defaultValue, SliderValueFormat format, float width = 600f)
         {
             // Slider panel configuration
             var slidersPanel = parent.AddUIComponent<UIPanel>();
