@@ -1,7 +1,6 @@
 ﻿using AlgernonCommons.Translation;
 using ColossalFramework.UI;
 using FPSCamera.Cam.Controller;
-using FPSCamera.Utils;
 using System;
 using UnityEngine;
 
@@ -82,7 +81,7 @@ namespace FPSCamera.UI
             button.pressedTextColor = new Color32(30, 30, 44, 255);
             button.eventClick += (_, p) =>
             {
-                FPSCamController.Instance.StartFollowing(GetPanelInstanceID(panel));
+                FPSCamController.Instance.StartFollowing(WorldInfoPanel.GetCurrentInstanceID());
                 panel.component.isVisible = false;
             };
             button.AlignTo(panel.component, UIAlignAnchor.BottomRight);
@@ -101,17 +100,10 @@ namespace FPSCamera.UI
         {
             if (panel.component.isVisible)
             {
-                var instanceID = GetPanelInstanceID(panel);
+                var instanceID = WorldInfoPanel.GetCurrentInstanceID();
                 button.isVisible = instanceID != default && (filter?.Invoke(instanceID) ?? true);
             }
         }
-        /// <summary>
-        /// Get the given panel's <see cref="InstanceID"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the panel.</typeparam>
-        /// <param name="panel">Given panel.</param>
-        /// <returns>The <see cref="InstanceID"/> of the given panel.</returns>
-        private InstanceID GetPanelInstanceID<T>(T panel) where T : WorldInfoPanel => AccessUtils.GetFieldValue<InstanceID>(panel, "m_InstanceID");
 
         private CitizenVehicleWorldInfoPanel citizenVehicleInfo_Panel;
         private UIButton citizenVehicleInfo_Button;

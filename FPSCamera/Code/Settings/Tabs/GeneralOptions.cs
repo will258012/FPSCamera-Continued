@@ -1,8 +1,11 @@
 ﻿using AlgernonCommons;
+using AlgernonCommons.Notifications;
 using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
 using ColossalFramework.UI;
+using FPSCamera.Settings.v2;
 using FPSCamera.UI;
+using System;
 using UnityEngine;
 
 namespace FPSCamera.Settings.Tabs
@@ -111,6 +114,38 @@ namespace FPSCamera.Settings.Tabs
             // Reset to defaults.
             defaults_Button = UIButtons.AddButton(panel, LeftMargin, currentY, Translations.Translate("SETTINGS_RESETBTN"), 200f, 40f);
             defaults_Button.eventClicked += (c, _) => Reset();
+
+            var importButton = UIButtons.AddButton(panel, LeftMargin + 200f + LeftMargin, currentY, Translations.Translate("SETTINGS_IMPORT"), 200f, 40f);
+            importButton.eventClicked += (c, _) =>
+            {
+                var notification = NotificationBase.ShowNotification<YesNoNotification>();
+                notification.AddParas(Translations.Translate("SETTINGS_IMPORTCONFIRM"));
+                notification.YesButton.eventClicked += (y, m) =>
+                {
+                    try
+                    {
+                        v2ModSettings.Load();
+                        ModSettings.Save();
+                        OptionsPanelManager<OptionsPanel>.LocaleChanged();
+                        MainPanel.Instance?.LocaleChanged();
+
+                        OffsetsSettings.Load();
+                        v2OffsetsSettings.Load();
+                        OffsetsSettings.Save();
+
+                        var successedNotification = NotificationBase.ShowNotification<ListNotification>();
+                        successedNotification.AddParas(Translations.Translate("SETTINGS_IMPORTSUCCESSED"));
+                    }
+                    catch (Exception e)
+                    {
+                        var failedNotification = NotificationBase.ShowNotification<ListNotification>();
+                        failedNotification.AddParas(Translations.Translate("ERROR"));
+                        failedNotification.AddSpacer();
+                        failedNotification.AddParas(e.ToString());
+                        Logging.LogException(e, "Failed to import FPSCamera v2 settings");
+                    }
+                };
+            };
         }
         /// <summary>
         /// <see cref="Reset()"/> for default button in <see cref="GeneralOptions"/>.
@@ -121,6 +156,7 @@ namespace FPSCamera.Settings.Tabs
             ModSettings.ResetToDefaults();
             ModSettings.Save();
             OptionsPanelManager<OptionsPanel>.LocaleChanged();
+            MainPanel.Instance?.LocaleChanged();
         }
     }
 }

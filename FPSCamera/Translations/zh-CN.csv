@@ -23,7 +23,8 @@
 "WHATSNEW_L1","此消息只是为了让您知晓模组已经更新。",""
 "WHATSNEW_L2","请访问创意工坊或 GitHub 以获取详细更新日志。",""
 "WHATSNEW_L3","感谢您的使用及支持！",""
-"MODDESCRIPTION","以不同的视角查看您的城市","Mod's Description"
+ERROR,抱歉，似乎出现了一些问题：
+"MODDESCRIPTION","以不同角度观察你的城市","Mod's Description"
 "SETTINGS_GROUPNAME_GENERAL","通用设置",""
 "SETTINGS_GROUPNAME_CAM","摄像机设置",""
 "SETTINGS_GROUPNAME_CAMCONTROL","摄像机控制",""
@@ -33,7 +34,10 @@
 "SETTINGS_GROUPNAME_KEYMAP","按键设置",""
 "SETTINGS_GROUPNAME_SMOOTHTRANS","平滑过渡设置",""
 "SETTINGS_GROUPNAME_OPT","优化设置",""
-"SETTINGS_RESETBTN","重置配置",""
+"SETTINGS_RESETBTN","重置模组设置",""
+SETTINGS_IMPORT,导入v2设置
+SETTINGS_IMPORTCONFIRM,是否确认导入来自 First Person Camera v2 的设置（包括模组设置和偏移设置）？将覆盖现有的模组设置以及合并导入的偏移设置和现有偏移设置。
+SETTINGS_IMPORTSUCCESSED,设置导入成功。
 "SETTINGS_HIDEUI","隐藏游戏UI",""
 "SETTINGS_SETBACKCAMERA","退出后重置摄像机位置",""
 "SETTINGS_SETBACKCAMERA_DETAIL","退出第一人称摄像机后，将摄像机位置重置回之前的位置",""
@@ -170,6 +174,7 @@
 "INFO_TIME","时间：",""
 "INFO_NAME","名称",""
 "INFO_STATUS","状态",""
+INFO_OFFSETSAVED,已保存 “{0}” 的偏移与旋转
 "FOLLOWBTN_TOOLTIP","进入跟随模式",""
 "WALKTHRUBTN_TEXT","进入漫游模式",""
 "MAINPANELBTN_TOOLTIP","第一人称摄像机","That is the localized short name of this mod."

@@ -160,11 +160,11 @@
                 currentY += manualSwitchWalk_CheckBox.height + Margin;
 
                 var walkThruBtn = UIButtons.AddButton(Panel, (Panel.width - 200f) / 2f, currentY, Translations.Translate("WALKTHRUBTN_TEXT"), 200f, 40f);
-
+                walkThruBtn.playAudioEvents = true;
                 walkThruBtn.eventClick += (_, m) =>
                 {
                     FPSCamController.Instance.StartWalkThruCam();
-                    Panel.isVisible = false;
+                    OnEsc();
                 };
                 Panel.height = currentY + walkThruBtn.height + Margin;
             }

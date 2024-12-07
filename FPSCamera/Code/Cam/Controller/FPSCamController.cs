@@ -1,4 +1,6 @@
 ﻿using AlgernonCommons;
+using AlgernonCommons.Notifications;
+using AlgernonCommons.Translation;
 using ColossalFramework;
 using FPSCamera.Game;
 using FPSCamera.Settings;
@@ -177,8 +179,13 @@ namespace FPSCamera.Cam.Controller
             }
             catch (Exception e)
             {
-                Logging.Error("FPS Camera is about to exit due to some issues (Update)");
-                Logging.LogException(e);
+                var notification = NotificationBase.ShowNotification<ListNotification>();
+                notification.AddParas(Translations.Translate("ERROR"));
+                notification.AddSpacer();
+                notification.AddParas(e.ToString());
+
+                Logging.Error();
+                Logging.LogException(e, "FPS Camera is about to exit due to some issues (Update)");
                 DisableCam();
             }
         }
@@ -210,6 +217,10 @@ namespace FPSCamera.Cam.Controller
                     Logging.Error("FPS Camera is about to exit due to some issues (LateUpdate)");
                     DisableCam();
                 }
+                var notification = NotificationBase.ShowNotification<ListNotification>();
+                notification.AddParas(Translations.Translate("ERROR"));
+                notification.AddSpacer();
+                notification.AddParas(e.ToString());
                 Logging.LogException(e);
             }
         }
@@ -351,7 +362,8 @@ namespace FPSCamera.Cam.Controller
             {
                 OffsetsSettings.Offsets[name] = _offset;
                 OffsetsSettings.Save();
-                Logging.Message($"Offset saved for \"{name}\"");
+                CamInfoPanel.Instance.SetFooterMessage(string.Format(Translations.Translate("INFO_OFFSETSAVED"), name));
+                Logging.Message($"Saved offset and rotation for \"{name}\"");
             }
         }
         /// <summary>
@@ -363,24 +375,24 @@ namespace FPSCamera.Cam.Controller
             OffsetsSettings.Load();
 
             var name = followCam?.GetPrefabName();
-            var newOffset = new Positioning(Vector3.zero);
+            _offset = default;
+            _offsetFromSetting = default;
 
             if (name != null && OffsetsSettings.Offsets.TryGetValue(name, out var offset))
             {
-                newOffset = offset;
+                _offset = offset;
             }
 
-            newOffset.pos += ModSettings.FollowCamOffset;
+            _offsetFromSetting += ModSettings.FollowCamOffset;
             if (followCam is CitizenCam)
-                newOffset.pos += ModSettings.PedestrianFixedOffset;
+                _offsetFromSetting += ModSettings.PedestrianFixedOffset;
             else if (followCam is VehicleCam cam)
             {
                 if (cam.GetVehicle().m_leadingVehicle != default && cam.GetPrefabName() != VehicleCam.GetVehicle(cam.GetFrontVehicleID()).Info.name)
-                    newOffset.pos += ModSettings.MidVehFixedOffset;
+                    _offsetFromSetting += ModSettings.MidVehFixedOffset;
                 else
-                    newOffset.pos += ModSettings.VehicleFixedOffset;
+                    _offsetFromSetting += ModSettings.VehicleFixedOffset;
             }
-            _offset = newOffset;
         }
 
         /// <summary>
@@ -389,7 +401,7 @@ namespace FPSCamera.Cam.Controller
         private void UpdateFollowCamPos()
         {
             // Calculate the desired position and rotation of the camera by applying the offset to the FPSCam's current position and rotation.
-            var instancePos = FPSCam.GetPositioning().pos + (FPSCam.GetPositioning().rotation * _offset.pos);
+            var instancePos = FPSCam.GetPositioning().pos + (FPSCam.GetPositioning().rotation * (_offset.pos + _offsetFromSetting));
             var instanceRotation = FPSCam.GetPositioning().rotation * _offset.rotation;
 
             // Limit the camera's position to the allowed area.
@@ -489,7 +501,7 @@ namespace FPSCamera.Cam.Controller
             {
                 _transitionTimer = 0f;
                 AfterTransition(_endPos);
-                _endPos = new Positioning(Vector3.zero);
+                _endPos = default;
                 return;
             }
             // Apply the transition position and rotation to the camera.
@@ -507,8 +519,9 @@ namespace FPSCamera.Cam.Controller
         }
         private static Transform CameraTransform => GameCamController.Instance.MainCamera.transform;
         private bool _isScrollTransitioning = false;
-        private Positioning _endPos = new Positioning(Vector3.zero);
-        private Positioning _offset = new Positioning(Vector3.zero);
+        private Positioning _endPos = default;
+        private Positioning _offset = default;
+        private Vector3 _offsetFromSetting = default;
         private float _targetFoV = ModSettings.CamFieldOfView;
 
         private float _transitionTimer = 0f;

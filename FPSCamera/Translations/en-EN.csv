@@ -23,6 +23,7 @@
 "WHATSNEW_L1","This message is just to let you know that the mod has been updated.",""
 "WHATSNEW_L2","For a detailed list of changes, please visit the Steam Workshop or GitHub.",""
 "WHATSNEW_L3","Thank you for your use and support!",""
+ERROR,Oops! Something went wrong:
 "MODDESCRIPTION","View your city from a different perspective","Mod's Description"
 "SETTINGS_GROUPNAME_GENERAL","General Options",""
 "SETTINGS_GROUPNAME_CAM","Camera Options",""
@@ -34,6 +35,9 @@
 "SETTINGS_GROUPNAME_SMOOTHTRANS","Smooth Transition Options",""
 "SETTINGS_GROUPNAME_OPT","Optimization Options",""
 "SETTINGS_RESETBTN","Reset Settings",""
+SETTINGS_IMPORT,Import v2 settings
+"SETTINGS_IMPORTCONFIRM","Do you confirm to import settings from First Person Camera v2 (including mod settings and offset settings)? Will overwrite existing mod settings, and merge imported offset settings with the existing."
+SETTINGS_IMPORTSUCCESSED,Your settings has been successfully imported.
 "SETTINGS_HIDEUI","Hide Game's UI",""
 "SETTINGS_SETBACKCAMERA","Set camera back after exiting",""
 "SETTINGS_SETBACKCAMERA_DETAIL","When exiting FPS Camera, set the camera position back to where it's left beforehand",""
@@ -170,6 +174,7 @@
 "INFO_TIME","Time: ",""
 "INFO_NAME","Name",""
 "INFO_STATUS","Status",""
+INFO_OFFSETSAVED,Saved offset and rotation for "{0}"
 "FOLLOWBTN_TOOLTIP","Start Follow Mode",""
 "WALKTHRUBTN_TEXT","Start Walk-Through",""
 "MAINPANELBTN_TOOLTIP","FPS Camera","That is the localized short name of this mod."

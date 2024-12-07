@@ -1,6 +1,7 @@
 ﻿namespace FPSCamera.UI
 {
     using AlgernonCommons;
+    using AlgernonCommons.Notifications;
     using AlgernonCommons.Translation;
     using FPSCamera.Cam;
     using FPSCamera.Cam.Controller;
@@ -16,7 +17,7 @@
         public void EnableCamInfoPanel()
         {
             _elapsedTime = 0f;
-            _lastBufferStrUpdateTime = -1f;
+            _lastBufferStrUpdateTime = _tempFooterElapsedTime = -1f;
             enabled = true;
         }
 
@@ -29,7 +30,7 @@
         private void Awake()
         {
             Instance = this;
-            _elapsedTime = 0f; _lastBufferStrUpdateTime = -1f;
+            _elapsedTime = 0f; _lastBufferStrUpdateTime = _tempFooterElapsedTime = -1f;
             _mid = _footer = "";
             _leftInfos = _rightInfos = new Dictionary<string, string>();
 
@@ -47,36 +48,63 @@
         {
             try
             {
-                if (Cam != null && Cam.IsValid())
+                if (Cam?.IsValid() ?? false)
                 {
                     _elapsedTime += Time.deltaTime;
                     if (_elapsedTime - _lastBufferStrUpdateTime > _bufferUpdateInterval)
                     {
-                        UpdateStatus(); UpdateTargetInfos(); UpdateSpeed();
+                        UpdateStatus();
+                        UpdateTargetInfos();
+                        UpdateSpeed();
 
-                        _footer = Translations.Translate("INFO_TIME");
-                        if (Cam is WalkThruCam walkThruCam)
+                        if (_tempFooterElapsedTime > _elapsedTime)
                         {
-                            var time = walkThruCam.GetElapsedTime();
-                            _footer += $"{(uint)time / 60:00}:{(uint)time % 60:00} / ";
+                            _footer = _tempFooter;
+                        }
+                        else
+                        {
+                            _footer = Translations.Translate("INFO_TIME");
+                            if (Cam is WalkThruCam walkThruCam)
+                            {
+                                var time = walkThruCam.GetElapsedTime();
+                                _footer += $"{(uint)time / 60:00}:{(uint)time % 60:00} / ";
+                            }
+
+                            _footer += $"{(uint)_elapsedTime / 60:00}:{(uint)_elapsedTime % 60:00}";
                         }
 
-                        _footer += $"{(uint)_elapsedTime / 60:00}:{(uint)_elapsedTime % 60:00}";
                         _lastBufferStrUpdateTime = _elapsedTime;
                     }
                 }
                 else
                 {
-                    _leftInfos.Clear(); _rightInfos.Clear();
-                    _footer = ""; _mid = Translations.Translate("INVALID");
+                    _leftInfos.Clear();
+                    _rightInfos.Clear();
+                    _footer = "";
+                    _mid = Translations.Translate("INVALID");
                 }
             }
             catch (System.Exception e)
             {
+                var notification = NotificationBase.ShowNotification<ListNotification>();
+                notification.AddParas(Translations.Translate("ERROR"));
+                notification.AddSpacer();
+                notification.AddParas(e.ToString());
+
                 Logging.Error("CamInfoPanel is disabled due to some issues");
                 Logging.LogException(e);
                 enabled = false;
             }
+        }
+        /// <summary>
+        /// Display a temporary message at the info panel's footer.
+        /// </summary>
+        /// <param name="message">Message to display.</param>
+        /// <param name="duration">Display time.</param>
+        public void SetFooterMessage(string message, float duration = 3f)
+        {
+            _tempFooter = message;
+            _tempFooterElapsedTime = _elapsedTime + duration;
         }
 
         private void UpdateStatus()
@@ -196,8 +224,10 @@
         private const float _fieldWidthRatio = .16f;
         private const float _fieldFontSizeRatio = .8f;
 
-
         private float _elapsedTime, _lastBufferStrUpdateTime;
+
+        private string _tempFooter;
+        private float _tempFooterElapsedTime;
 
         private string _mid, _footer;
         private Dictionary<string, string> _leftInfos, _rightInfos;
