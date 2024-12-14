@@ -205,9 +205,9 @@ namespace FPSCamera.Settings.v2
             {
                 var split = value.Split('+');
                 ModSettings.KeyUUIToggle = new AlgernonCommons.Keybinding.Keybinding((KeyCode)Enum.Parse(typeof(KeyCode), split[1]),
-                                                                                     split[0] == "Control",
-                                                                                     split[0] == "Shift",
-                                                                                     split[0] == "Alt");
+                                                                                     split[0].Contains("Control"),
+                                                                                     split[0].Contains("Shift"),
+                                                                                     split[0].Contains("Alt"));
             }
         }
 
