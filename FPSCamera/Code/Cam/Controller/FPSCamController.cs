@@ -69,6 +69,7 @@ namespace FPSCamera.Cam.Controller
         private void DisableCam()
         {
             Logging.KeyMessage("Disabling FPS Camera");
+            Status = CamStatus.Disabling;
             FPSCam?.DisableCam();
             FPSCam = null;
             if (ModSettings.ShowInfoPanel)
@@ -179,14 +180,17 @@ namespace FPSCamera.Cam.Controller
             }
             catch (Exception e)
             {
+                if (Status == CamStatus.Enabled || Status == CamStatus.PluginEnabled)
+                {
+                    Logging.Error("FPS Camera is about to exit due to some issues (Update)");
+                    DisableCam();
+                }
+
                 var notification = NotificationBase.ShowNotification<ListNotification>();
                 notification.AddParas(Translations.Translate("ERROR"));
                 notification.AddSpacer();
                 notification.AddParas(e.ToString());
-
-                Logging.Error();
-                Logging.LogException(e, "FPS Camera is about to exit due to some issues (Update)");
-                DisableCam();
+                Logging.LogException(e);
             }
         }
 
@@ -515,7 +519,8 @@ namespace FPSCamera.Cam.Controller
             Disabled,
             Enabled,
             PluginEnabled,
-            Transitioning
+            Transitioning,
+            Disabling
         }
         private static Transform CameraTransform => GameCamController.Instance.MainCamera.transform;
         private bool _isScrollTransitioning = false;
