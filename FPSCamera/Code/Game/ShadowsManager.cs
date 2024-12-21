@@ -1,6 +1,7 @@
 ﻿using AlgernonCommons;
 using System;
 using System.Collections;
+using UnityEngine;
 namespace FPSCamera.Game
 {
     public class ShadowsManager
@@ -12,12 +13,12 @@ namespace FPSCamera.Game
                 Logging.Message("-- Setting shadows distance");
                 if (status)
                 {
-                    _cachedDist = UnityEngine.QualitySettings.shadowDistance;
-                    UnityEngine.QualitySettings.shadowDistance = Opt;
+                    _cachedDist = QualitySettings.shadowDistance;
+                    QualitySettings.shadowDistance = Mathf.Min(Opt, _cachedDist);
                 }
                 else
                 {
-                    UnityEngine.QualitySettings.shadowDistance = _cachedDist;
+                    QualitySettings.shadowDistance = _cachedDist;
                 }
             }
 

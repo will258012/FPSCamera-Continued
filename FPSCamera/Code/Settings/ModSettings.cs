@@ -75,7 +75,7 @@ namespace FPSCamera.Settings
             StickToFrontVehicle = true;
             FollowCamOffset = Vector3.zero;
             VehicleFixedOffset = new Vector3(0f, 2f, 3f);
-            MidVehFixedOffset = new Vector3(0f, 3f, 2f);
+            MidVehFixedOffset = new Vector3(0f, 3f, -2f);
             PedestrianFixedOffset = new Vector3(0f, 2f, 0f);
 
             PeriodWalk = 20f;
@@ -274,7 +274,7 @@ namespace FPSCamera.Settings
         [XmlElement("MidVehFixedOffset")]
         public Vector3 XMLMidVehFixedOffset { get => MidVehFixedOffset; set => MidVehFixedOffset = value; }
         [XmlIgnore]
-        internal static Vector3 MidVehFixedOffset = new Vector3(0f, 3f, 2f);
+        internal static Vector3 MidVehFixedOffset = new Vector3(0f, 3f, -2f);
 
         [XmlElement("PedestrianFixedOffset")]
         public Vector3 XMLPedestrianFixedOffset { get => PedestrianFixedOffset; set => PedestrianFixedOffset = value; }
