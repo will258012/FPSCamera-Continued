@@ -20,10 +20,12 @@ namespace FPSCamera.Cam
             {
                 FollowInstance = id;
                 FollowID = FollowInstance.Citizen;
+                CitizenInstanceID = GetCitizen().m_instance;
                 IsActivated = true;
             }
             else if (id.Type == InstanceType.CitizenInstance)
             {
+                CitizenInstanceID = id.CitizenInstance;
                 var citizenId = CitizenManager.instance.m_instances.m_buffer[id.CitizenInstance].m_citizen;
                 FollowInstance = new InstanceID() { Citizen = citizenId };
                 FollowID = citizenId;
@@ -38,6 +40,8 @@ namespace FPSCamera.Cam
         /// Will be used if the citizen enters a vehicle. Use caution!
         /// </summary>
         public VehicleCam AnotherCam { get; private set; } = null;
+        public ushort CitizenInstanceID;
+        private bool IsinVehicle = false;
         private void CheckAnotherCam()
         {
             if (IsinVehicle)
@@ -64,15 +68,20 @@ namespace FPSCamera.Cam
         {
             var details = new Dictionary<string, string>();
             var flags = GetCitizen().m_flags;
-            details[Translations.Translate("INFO_HUMAN_HOME")] =
-            GetCitizen().m_homeBuilding != default ? BuildingManager.instance.GetBuildingName(GetCitizen().m_homeBuilding, new InstanceID() { Building = GetCitizen().m_homeBuilding }) :
-            Translations.Translate("INFO_HUMAN_HOMELESS");
-
+            if (GetCitizen().m_flags.IsFlagSet(Citizen.Flags.Tourist) && GetCitizen().m_hotelBuilding != default)
+            {
+                details[Translations.Translate("INFO_HUMAN_HOTEL")] =
+                    BuildingManager.instance.GetBuildingName(GetCitizen().m_hotelBuilding, InstanceID.Empty);
+            }
+            else
+            {
+                details[Translations.Translate("INFO_HUMAN_HOME")] =
+                GetCitizen().m_homeBuilding != default ? BuildingManager.instance.GetBuildingName(GetCitizen().m_homeBuilding, InstanceID.Empty) :
+                Translations.Translate("INFO_HUMAN_HOMELESS");
+            }
             details[Translations.Translate("INFO_HUMAN_OCCUPATION")] = GetOccupation();
 
-            if (GetCitizen().m_hotelBuilding != default)
-                details[Translations.Translate("INFO_HUMAN_HOTEL")] =
-                    BuildingManager.instance.GetBuildingName(GetCitizen().m_hotelBuilding, new InstanceID() { Building = GetCitizen().m_hotelBuilding });
+
             var anotherDetails = AnotherCam?.GetInfos();
             if (anotherDetails != null)
                 details = details.Concat(anotherDetails).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -147,10 +156,8 @@ namespace FPSCamera.Cam
             AnotherCam = null;
         }
 
-        private bool IsinVehicle = false;
-
         private Citizen GetCitizen() => CitizenManager.instance.m_citizens.m_buffer[FollowID];
-        private CitizenInstance GetCitizenInstance() => CitizenManager.instance.m_instances.m_buffer[GetCitizen().m_instance];
+        private CitizenInstance GetCitizenInstance() => CitizenManager.instance.m_instances.m_buffer[CitizenInstanceID];
         private string GetOccupation()
         {
             var currentSchoolLevel = GetCitizen().GetCurrentSchoolLevel(FollowID);
@@ -222,6 +229,7 @@ namespace FPSCamera.Cam
             }
             return text + " " + ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_LOCATIONPREPOSITION") + " " + Singleton<BuildingManager>.instance.GetBuildingName(workBuilding, FollowInstance);
         }
+
     }
 }
 
