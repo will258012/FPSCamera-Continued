@@ -41,7 +41,7 @@ namespace FPSCamera.Utils
             var pos = nn.m_position;
             //building
             ushort buildingId = FindTransportBuilding(pos, 100f);
-            savedName = GetTransportBuildingName(buildingId);
+            savedName = BuildingManager.instance.GetBuildingName(buildingId, InstanceID.Empty);
             if (!savedName.IsNullOrWhiteSpace())
             {
                 return savedName;
@@ -66,14 +66,6 @@ namespace FPSCamera.Utils
             }
             return $"<Somewhere>[{stopId}]";
         }
-
-        private static string GetTransportBuildingName(ushort buildingId)
-        {
-            InstanceID bid = default;
-            bid.Building = buildingId;
-            return Singleton<BuildingManager>.instance.GetBuildingName(buildingId, bid);
-        }
-
         private static string GetStationRoadName(Vector3 pos)
         {
             var segmentid = MapUtils.RayCastRoad(pos);
