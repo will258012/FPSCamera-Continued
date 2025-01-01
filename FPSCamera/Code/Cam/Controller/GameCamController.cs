@@ -69,6 +69,7 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void Initialize()
         {
+            CameraController.ClearTarget();
             CameraController.enabled = false;
             if (ModSettings.HideGameUI)
             {
@@ -104,6 +105,7 @@ namespace FPSCamera.Cam.Controller
         {
             if (_camDoF != null) _camDoF.enabled = IsDoFEnabled;
             if (_camTiltEffect != null) _camTiltEffect.enabled = IsTiltEffectEnabled;
+
             MainCamera.fieldOfView = _cachedfieldOfView;
             MainCamera.nearClipPlane = _cachednearClipPlane;
             if (ModSettings.HideGameUI)
@@ -117,6 +119,7 @@ namespace FPSCamera.Cam.Controller
             }
             else
                 SyncCameraControllerFromTransform();
+
             CameraController.enabled = true;
         }
         /// <summary>
@@ -134,39 +137,64 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Synchronizes the camera controller's position and angle with the <see cref="MainCamera"/> transform.
         /// This function adjusts the <see cref="CameraController"/> to match the camera's position and orientation in the scene.
+        /// 
         /// </summary>
         public void SyncCameraControllerFromTransform()
         {
-            //Calculate ground height.
-            var groundHeight = MapUtils.GetMinHeightAt(MainCamera.transform.position);
+            // Calculate the ground height.
+            var height = MapUtils.GetMinHeightAt(MainCamera.transform.position);
 
             // Set the target angle based on the camera's transform, clamping the angles to valid ranges.
-            CameraController.m_targetAngle = CameraController.m_currentAngle =
+            CameraController.m_currentAngle = CameraController.m_targetAngle =
                 new Vector2(MainCamera.transform.rotation.eulerAngles.y, MainCamera.transform.rotation.eulerAngles.x).ClampEulerAngles();
 
-            // Set the size (height difference between the camera height and the ground).
-            CameraController.m_targetSize = CameraController.m_currentSize =
-                (Mathf.Max(0f, MainCamera.transform.position.y - groundHeight)
-                ).Clamp(40f, 4000f);
+            // Calculate the new size (height difference between the camera height and the ground, with some adjust by angles)
+            var newSize = Mathf.Max(0f, MainCamera.transform.position.y - height)
+                / Mathf.Lerp(0.15f, 1f, Mathf.Sin(Mathf.Abs(CameraController.m_currentAngle.y) * Mathf.Deg2Rad));
+            newSize = newSize.Clamp(CameraController.m_minDistance, CameraController.m_maxDistance);
 
-            //Set the height (ground height).
-            CameraController.m_targetHeight = CameraController.m_currentHeight = groundHeight;
+            // Set the size if necessary.
+            if (Mathf.Abs(newSize - CameraController.m_targetSize) >= 100f)
+                CameraController.m_targetSize = CameraController.m_currentSize = newSize;
 
-            //Calculate distance (Z offset).
-            var dist = CameraController.m_targetSize
-                      * Mathf.Max(0f, 1f - groundHeight / CameraController.m_maxDistance)
-                      / Mathf.Tan(MainCamera.fieldOfView * Mathf.Deg2Rad);
+            // Calculate m_targetAngle.y if necessary.
+            if (!ToolManager.instance.m_properties.m_mode.IsFlagSet(ItemClass.Availability.ThemeEditor)
+                && !CameraController.m_unlimitedCamera)//This value would be set to true if there's another camera mod, such as ACME.
+            {
+                // Calculate m_targetAngle.y, which has tilt limit. Derive from the following formula:
+                // m_currentAngle.y = (90f - (90f - m_targetAngle.y) * (m_maxTiltDistance * 0.5f / (m_maxTiltDistance * 0.5f + m_targetSize)))
+                var newTargetAngleY =
+                    -((180f * CameraController.m_targetSize
+                    - CameraController.m_currentAngle.y * CameraController.m_maxTiltDistance
+                    - 2f * CameraController.m_currentAngle.y * CameraController.m_targetSize)
+                    / CameraController.m_maxTiltDistance);
+                CameraController.m_targetAngle.y = newTargetAngleY;
+            }
+            var distance = 0f;
+            var newPos = MainCamera.transform.position;
+            // Calculate CameraController position based on the camera's transform position.
+            for (int i = 1; i <= 3; i++)
+            {
+                height = TerrainManager.instance.SampleRawHeightSmoothWithWater(newPos, true, 2f);
+                newPos.y = height + CameraController.m_targetSize * 0.05f + 10f;
+                //Calculate distance (Z offset).
+                distance = CameraController.m_targetSize
+                            * Mathf.Max(0f, 1f - height / CameraController.m_maxDistance)
+                            / Mathf.Tan(MainCamera.fieldOfView * Mathf.Deg2Rad);
+                newPos = MainCamera.transform.position + (MainCamera.transform.forward * distance);
+                // Limit the camera's position to the allowed area.
+                newPos = CameraController.ClampCameraPosition(newPos);
+                if (newPos.sqrMagnitude < 0.0001f)
+                {
+                    break;
+                }
+            }
 
-            // Calculate the new position based on the Z offset, moving forward from the camera's transform.
-            var newPos = MainCamera.transform.position + (MainCamera.transform.rotation * Vector3.forward * dist);
-
-            newPos.y += CameraController.CalculateCameraHeightOffset(newPos, dist);
-
-            // Limit the camera's position to the allowed area.
-            newPos = CameraController.ClampCameraPosition(newPos);
-
-            // Update the CameraController's position based on the adjusted new position.
-            CameraController.m_targetPosition = CameraController.m_currentPosition = newPos;
+            // Update CameraController's position and height if necessary.
+            if (Vector3.Distance(newPos, CameraController.m_targetPosition) >= 10f)
+                CameraController.m_targetPosition = CameraController.m_currentPosition = newPos;
+            if (Mathf.Abs(height - CameraController.m_targetHeight) >= 10f)
+                CameraController.m_targetHeight = CameraController.m_currentHeight = height;
         }
 
         /// <summary>
