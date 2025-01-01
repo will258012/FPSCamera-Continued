@@ -43,25 +43,22 @@ namespace FPSCamera.Utils
             }
             propertyInfo.SetValue(obj, value, index);
         }
-        public static object InvokeMethod(string typeName, string methodName, object[] parameters, Type[] paramTypes = null)
+        public static object InvokeMethod(string typeName, string methodName, object[] parameters, Type[] paramTypes = null, object obj = null)
         {
             var type = Type.GetType(typeName);
-            if (type != null)
-            {
-                var method = AccessTools.Method(type, methodName, paramTypes);
-                if (method != null)
-                {
-                    return method.Invoke(null, parameters);
-                }
-                else
-                {
-                    throw new ArgumentException($"Method '{methodName}' not found.");
-                }
-            }
-            else
+            if (type == null)
             {
                 throw new ArgumentException($"Class '{typeName}' not found.");
             }
+
+            var method = AccessTools.Method(type, methodName, paramTypes);
+            if (method == null)
+            {
+                throw new ArgumentException($"Method '{methodName}' not found.");
+            }
+
+            return method.Invoke(obj, parameters);
         }
+
     }
 }
