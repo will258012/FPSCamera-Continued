@@ -50,6 +50,7 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void EnableCam(bool IsPlugin = false)
         {
+            OffsetsSettings.Load();
             if (ModSettings.ShowInfoPanel)
                 CamInfoPanel.Instance.EnableCamInfoPanel();
             if (ModSettings.HideGameUI)
@@ -376,8 +377,6 @@ namespace FPSCamera.Cam.Controller
         /// <param name="followCam">Given camera.</param>
         internal void SyncCamOffset(IFollowCam followCam)
         {
-            OffsetsSettings.Load();
-
             var name = followCam?.GetPrefabName();
             _offset = default;
             _offsetFromSetting = default;
