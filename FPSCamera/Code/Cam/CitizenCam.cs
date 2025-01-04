@@ -5,6 +5,7 @@ using ColossalFramework.Math;
 using FPSCamera.Cam.Controller;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using static FPSCamera.Utils.MathUtils;
 
 namespace FPSCamera.Cam
@@ -34,13 +35,13 @@ namespace FPSCamera.Cam
             Logging.KeyMessage("Citizen cam started");
         }
         public uint FollowID { get; private set; }
+        public ushort CitizenInstanceID { get; private set; }
         public bool IsActivated { get; private set; }
         public InstanceID FollowInstance { get; private set; }
         /// <summary>
         /// Will be used if the citizen enters a vehicle. Use caution!
         /// </summary>
         public VehicleCam AnotherCam { get; private set; } = null;
-        public ushort CitizenInstanceID;
         private bool IsinVehicle = false;
         private void CheckAnotherCam()
         {
@@ -91,9 +92,12 @@ namespace FPSCamera.Cam
         {
             if (IsinVehicle)
                 return AnotherCam.GetPositioning();
-            // We should check if CitizenInstance is valid. If not do so the game will crash!!
-            if (GetCitizen().m_instance == default) return default;
             GetCitizenInstance().GetSmoothPosition(GetCitizen().m_instance, out var pos, out var rotation);
+            //If the citizen sit down, adjust the rotation to adapt to the actual direction
+            if (GetCitizenInstance().m_flags.IsFlagSet(CitizenInstance.Flags.SittingDown))
+            {
+                rotation *= Quaternion.Euler(0, 180, 0);
+            }
             return new Positioning(pos, rotation);
         }
         public string GetFollowName() => CitizenManager.instance.GetCitizenName(FollowID);
@@ -118,8 +122,7 @@ namespace FPSCamera.Cam
 
         public bool IsValid()
         {
-            // We should check if CitizenInstance is valid. If not do so the game will crash!!
-            if (!IsActivated || GetCitizen().m_instance == default) return false;
+            if (!IsActivated) return false;
             var flags = GetCitizenInstance().m_flags;
             if (
                 !flags.IsFlagSet(CitizenInstance.Flags.None) &&
@@ -129,7 +132,7 @@ namespace FPSCamera.Cam
                 CheckAnotherCam();
                 return true;
             }
-            else return false;
+            return false;
         }
         public void SyncCamOffset()
         {
@@ -145,7 +148,7 @@ namespace FPSCamera.Cam
         }
         public void DisableCam()
         {
-            FollowID = default;
+            FollowID = CitizenInstanceID = default;
             FollowInstance = default;
             IsActivated = false;
             if (IsinVehicle)
