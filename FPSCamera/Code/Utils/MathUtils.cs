@@ -46,8 +46,8 @@ namespace FPSCamera.Utils
             for (int i = 0; i < 2; i++)
                 eulerAngles[i] = Mathf.Repeat(eulerAngles[i] + 180f, 360f) - 180f;
 
-            // Clamp pitch to the range of 0~90 degrees.
-            eulerAngles.y = Mathf.Clamp(eulerAngles.y, 0f, 90f);
+            // Clamp pitch to the range of -90~90 degrees.
+            eulerAngles.y = Mathf.Clamp(eulerAngles.y, -90f, 90f);
             return eulerAngles;
         }
 
