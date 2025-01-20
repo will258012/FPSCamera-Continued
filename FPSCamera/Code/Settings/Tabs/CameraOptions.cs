@@ -148,7 +148,7 @@ namespace FPSCamera.Settings.Tabs
             showCursorFree_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowCursorFree = isChecked;
             currentY += showCursorFree_CheckBox.height + Margin;
 
-            string[] groundClipingItems = new[]
+            string[] groundClippingItems = new[]
             {
                 Translations.Translate("SETTINGS_GROUNDCLIPING_NONE"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_ABOVE_GROUND"),
@@ -157,9 +157,9 @@ namespace FPSCamera.Settings.Tabs
                 Translations.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_ROAD")
             };
 
-            groundCliping_dropDown = UIDropDowns.AddPlainDropDown(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClipingItems, ModSettings.GroundClipping, 300);
+            groundCliping_dropDown = UIDropDowns.AddPlainDropDown(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClippingItems, (int)ModSettings.GroundClipping, 300);
             groundCliping_dropDown.tooltip = string.Format(Translations.Translate("SETTINGS_GROUNDCLIPING_DETAIL"), "\n");
-            groundCliping_dropDown.eventSelectedIndexChanged += (_, index) => ModSettings.GroundClipping = index;
+            groundCliping_dropDown.eventSelectedIndexChanged += (_, index) => ModSettings.GroundClipping = (ModSettings.GroundClippings)index;
             groundCliping_dropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += groundCliping_dropDown.parent.height + Margin;
 

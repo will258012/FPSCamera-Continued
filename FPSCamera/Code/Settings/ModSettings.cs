@@ -46,7 +46,7 @@ namespace FPSCamera.Settings
             SetBackCamera = true;
             ShowInfoPanel = true;
             InfoPanelHeightScale = 1f;
-            UseMetricUnit = true;
+            SpeedUnit = SpeedUnits.km_slash_h;
             Fade = true;
 
             LodOpt = 0;
@@ -65,7 +65,7 @@ namespace FPSCamera.Settings
             FoViewScrollfactor = 1.2f;
 
             ShowCursorFree = false;
-            GroundClipping = 0;
+            GroundClipping = GroundClippings.None;
             GroundLevelOffset = 0f;
             RoadLevelOffset = 0f;
             PathsDetection = true;
@@ -112,9 +112,22 @@ namespace FPSCamera.Settings
             KeyUUIToggle = new Keybinding(KeyCode.F, false, true, false);
             MainButtonPos = new Vector3(0f, 0f);
         }
+        public enum SpeedUnits
+        {
+            km_slash_h,
+            kph,
+            kmph,
+            mph
+        };
 
-
-
+        public enum GroundClippings
+        {
+            None,
+            AboveGround,
+            SnapToGround,
+            AboveRoad,
+            SnapToRoad
+        };
         #region General Options
         [XmlElement("HideGameUI")]
         public bool XMLHideGameUI { get => HideGameUI; set => HideGameUI = value; }
@@ -136,10 +149,10 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static float InfoPanelHeightScale = 1f;
 
-        [XmlElement("UseMetricUnit")]
-        public bool XMLUseMetricUnit { get => UseMetricUnit; set => UseMetricUnit = value; }
+        [XmlElement("SpeedUnit")]
+        public SpeedUnits XMLSpeedUnit { get => SpeedUnit; set => SpeedUnit = value; }
         [XmlIgnore]
-        internal static bool UseMetricUnit = true;
+        internal static SpeedUnits SpeedUnit = SpeedUnits.km_slash_h;
 
         [XmlElement("Fade")]
         public bool XMLFade { get => Fade; set => Fade = value; }
@@ -224,9 +237,9 @@ namespace FPSCamera.Settings
         internal static bool ShowCursorFree = false;
 
         [XmlElement("GroundClipping")]
-        public int XMLGroundClippingOption { get => GroundClipping; set => GroundClipping = value; }
+        public GroundClippings XMLGroundClippingOption { get => GroundClipping; set => GroundClipping = value; }
         [XmlIgnore]
-        internal static int GroundClipping = 0;
+        internal static GroundClippings GroundClipping = GroundClippings.None;
 
         [XmlElement("GroundLevelOffset")]
         public float XMLGroundLevelOffset { get => GroundLevelOffset; set => GroundLevelOffset = value; }
@@ -247,7 +260,6 @@ namespace FPSCamera.Settings
         public bool XMLRailsInRoads { get => TracksDetection; set => TracksDetection = value; }
         [XmlIgnore]
         internal static bool TracksDetection = true;
-
 
         #endregion
         #region Follow Mode Options

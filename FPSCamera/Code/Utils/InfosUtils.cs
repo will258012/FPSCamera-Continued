@@ -1,6 +1,7 @@
 ﻿using AlgernonCommons;
 using AlgernonCommons.Translation;
 using FPSCamera.Cam;
+using FPSCamera.Settings;
 using System.Collections.Generic;
 
 namespace FPSCamera.Utils
@@ -192,7 +193,15 @@ namespace FPSCamera.Utils
                 }
             }
         }
-
-
+        public static string ToSpeedUnitString(this ModSettings.SpeedUnits speedUnits)
+        {
+            if (speedUnits == ModSettings.SpeedUnits.km_slash_h) return "km/h";
+            return speedUnits.ToString();
+        }
+        public static bool IsMile(this ModSettings.SpeedUnits speedUnits)
+        {
+            if (speedUnits == ModSettings.SpeedUnits.mph) return true;
+            return false;
+        }
     }
 }
