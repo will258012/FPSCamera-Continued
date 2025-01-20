@@ -14,18 +14,16 @@
     public class CamInfoPanel : MonoBehaviour
     {
         public static CamInfoPanel Instance { get; private set; }
-        public void EnableCamInfoPanel()
+        private void OnEnable()
         {
             _elapsedTime = 0f;
             _lastBufferStrUpdateTime = _tempFooterElapsedTime = -1f;
-            enabled = true;
         }
 
-        public void DisableCamInfoPanel()
+        private void OnDisable()
         {
             _leftInfos.Clear();
             _rightInfos.Clear();
-            enabled = false;
         }
         private void Awake()
         {
@@ -91,8 +89,7 @@
                 notification.AddSpacer();
                 notification.AddParas(e.ToString());
 
-                Logging.Error("CamInfoPanel is disabled due to some issues");
-                Logging.LogException(e);
+                Logging.LogException(e, "CamInfoPanel is disabled due to some issues");
                 enabled = false;
             }
         }
@@ -137,8 +134,8 @@
         }
         private void UpdateSpeed()
             => _mid = string.Format("{0,5:F1} {1}",
-                ModSettings.UseMetricUnit ? Cam.GetSpeed().ToKilometer() : Cam.GetSpeed().ToMile(),
-                ModSettings.UseMetricUnit ? "km/h" : "mph");
+                ModSettings.SpeedUnit.IsMile() ? Cam.GetSpeed().ToMile() : Cam.GetSpeed().ToKilometer(),
+                ModSettings.SpeedUnit.ToSpeedUnitString());
 
         private void OnGUI()
         {

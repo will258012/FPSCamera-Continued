@@ -125,7 +125,7 @@
             fov_Slider.eventValueChanged += (_, value) => ModSettings.CamFieldOfView = value;
             currentY += fov_Slider.height + SliderMargin;
 
-            string[] groundClipingItems = new[]
+            string[] groundClippingItems = new[]
             {
                 Translations.Translate("SETTINGS_GROUNDCLIPING_NONE"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_ABOVE_GROUND"),
@@ -134,12 +134,12 @@
                 Translations.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_ROAD")
             };
 
-            var groundCliping_dropDown = UIDropDowns.AddPlainDropDown(Panel, Margin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClipingItems, ModSettings.GroundClipping, 150f);
-            groundCliping_dropDown.tooltip = string.Format(Translations.Translate("SETTINGS_GROUNDCLIPING_DETAIL"), "\n");
-            groundCliping_dropDown.eventSelectedIndexChanged += (_, index) => ModSettings.GroundClipping = index;
-            groundCliping_dropDown.parent.relativePosition = new Vector2(Margin, currentY);
-            groundCliping_dropDown.canFocus = false;
-            currentY += groundCliping_dropDown.parent.height + Margin;
+            var groundClipping_dropDown = UIDropDowns.AddPlainDropDown(Panel, Margin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClippingItems, (int)ModSettings.GroundClipping, 150f);
+            groundClipping_dropDown.tooltip = string.Format(Translations.Translate("SETTINGS_GROUNDCLIPING_DETAIL"), "\n");
+            groundClipping_dropDown.eventSelectedIndexChanged += (_, index) => ModSettings.GroundClipping = (ModSettings.GroundClippings)index;
+            groundClipping_dropDown.parent.relativePosition = new Vector2(Margin, currentY);
+            groundClipping_dropDown.canFocus = false;
+            currentY += groundClipping_dropDown.parent.height + Margin;
 
             if (ToolsModifierControl.isGame)
             {

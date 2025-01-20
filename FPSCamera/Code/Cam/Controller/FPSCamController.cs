@@ -52,7 +52,7 @@ namespace FPSCamera.Cam.Controller
         {
             OffsetsSettings.Load();
             if (ModSettings.ShowInfoPanel)
-                CamInfoPanel.Instance.EnableCamInfoPanel();
+                CamInfoPanel.Instance.enabled = true;
             if (ModSettings.HideGameUI)
                 StartCoroutine(UIManager.ToggleUI(false));
             if (ModSettings.LodOpt != 0)
@@ -74,7 +74,7 @@ namespace FPSCamera.Cam.Controller
             FPSCam?.DisableCam();
             FPSCam = null;
             if (ModSettings.ShowInfoPanel)
-                CamInfoPanel.Instance.DisableCamInfoPanel();
+                CamInfoPanel.Instance.enabled = false;
             if (ModSettings.LodOpt != 0)
                 StartCoroutine(LodManager.ToggleLODOpt(false));
             if (ModSettings.ShadowsOpt)
@@ -442,22 +442,14 @@ namespace FPSCamera.Cam.Controller
             var instancePos = CameraTransform.position + _offset.pos;
             var instanceRotation = _offset.rotation;
 
-            /*
-            Ground clipping options:
-            NONE = 0
-            ABOVEGROUND = 1
-            SNAPTOGROUND = 2
-            ABOVEROAD = 3
-            SNAPTOROAD = 4
-            */
-            if (ModSettings.GroundClipping != 0)
+            if (ModSettings.GroundClipping != ModSettings.GroundClippings.None)
             {
                 var minHeight = MapUtils.GetMinHeightAt(instancePos) + ModSettings.GroundLevelOffset; // Get minimum height including ground level offset.
 
-                if ((ModSettings.GroundClipping == 3 || ModSettings.GroundClipping == 4) && MapUtils.GetClosestSegmentLevel(instancePos, out var height))
+                if ((ModSettings.GroundClipping == ModSettings.GroundClippings.AboveRoad || ModSettings.GroundClipping == ModSettings.GroundClippings.SnapToRoad) && MapUtils.GetClosestSegmentLevel(instancePos, out var height))
                     minHeight = height + ModSettings.RoadLevelOffset; // Adjust minHeight if road height is applicable.
 
-                if (ModSettings.GroundClipping == 2 || ModSettings.GroundClipping == 4 || instancePos.y < minHeight)
+                if (ModSettings.GroundClipping == ModSettings.GroundClippings.SnapToGround || ModSettings.GroundClipping == ModSettings.GroundClippings.SnapToRoad || instancePos.y < minHeight)
                     instancePos.y = ModSettings.SmoothTransition &&
                         Math.Abs(instancePos.y - minHeight) <= ModSettings.MinTransDistance ?
                         Mathf.Lerp(instancePos.y, minHeight, Time.deltaTime * ModSettings.TransSpeed) :
