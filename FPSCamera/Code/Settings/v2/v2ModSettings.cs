@@ -32,11 +32,18 @@ namespace FPSCamera.Settings.v2
         public string SetBackCamera { get => ModSettings.SetBackCamera.ToString(); set => ModSettings.SetBackCamera = bool.Parse(value); }
 
         [XmlElement("UseMetricUnit")]
-        public string UseMetricUnit { get => ModSettings.UseMetricUnit.ToString(); set => ModSettings.UseMetricUnit = bool.Parse(value); }
+        public string UseMetricUnit
+        {
+            get => ModSettings.SpeedUnit.ToString();
+            set
+            {
+                var isMile = !bool.Parse(value);
+                ModSettings.SpeedUnit = isMile ? ModSettings.SpeedUnits.mph : ModSettings.SpeedUnits.km_slash_h;
+            }
+        }
 
         [XmlElement("ShowInfoPanel")]
         public string ShowInfoPanel { get => ModSettings.ShowInfoPanel.ToString(); set => ModSettings.ShowInfoPanel = bool.Parse(value); }
-
 
         [XmlElement("MaxPitchDeg")]
         public float MaxPitchDeg { get => ModSettings.MaxPitchDeg; set => ModSettings.MaxPitchDeg = value; }
@@ -76,19 +83,7 @@ namespace FPSCamera.Settings.v2
             get => ModSettings.GroundClipping.ToString();
             set
             {
-                int setValue;
-                switch (value)
-                {//v2.2.0
-                    case "None": setValue = 0; break;
-                    case "AboveGround": setValue = 1; break;
-                    case "SnapToGround": setValue = 2; break;
-                    case "AboveRoad": setValue = 3; break;
-                    case "SnapToRoad": setValue = 4; break;
-                    default: // v2.4.1
-                        setValue = int.Parse(value);
-                        break;
-                }
-                ModSettings.GroundClipping = setValue;
+                ModSettings.GroundClipping = (ModSettings.GroundClippings)Enum.Parse(typeof(ModSettings.GroundClippings), value);
             }
         }
 
