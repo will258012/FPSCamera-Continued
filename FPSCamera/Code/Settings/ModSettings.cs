@@ -122,10 +122,15 @@ namespace FPSCamera.Settings
 
         public enum GroundClippings
         {
+            [XmlEnum("0")]
             None,
+            [XmlEnum("1")]
             AboveGround,
+            [XmlEnum("2")]
             SnapToGround,
+            [XmlEnum("3")]
             AboveRoad,
+            [XmlEnum("4")]
             SnapToRoad
         };
         #region General Options
