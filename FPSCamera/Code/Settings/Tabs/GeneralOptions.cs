@@ -50,8 +50,8 @@ namespace FPSCamera.Settings.Tabs
             scrollPanel.relativePosition = new Vector2(0, Margin);
             scrollPanel.autoSize = false;
             scrollPanel.autoLayout = false;
-            scrollPanel.width = scrollPanel.width - 15f;
-            scrollPanel.height = scrollPanel.height - 15f;
+            scrollPanel.width = panel.width - 15f;
+            scrollPanel.height = panel.height - 15f;
             scrollPanel.clipChildren = true;
             scrollPanel.builtinKeyNavigation = true;
             scrollPanel.scrollWheelDirection = UIOrientation.Vertical;
@@ -109,6 +109,33 @@ namespace FPSCamera.Settings.Tabs
             fade_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.Fade = isChecked;
             currentY += fade_CheckBox.height + LeftMargin;
 
+
+            #region Smooth Transition Options
+            UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_SMOOTHTRANS"));
+            currentY += TitleMargin;
+
+            var smoothTransition_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SMOOTRANSITION"));
+            smoothTransition_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_SMOOTRANSITION_DETAIL"), "\n");
+            smoothTransition_CheckBox.isChecked = ModSettings.SmoothTransition;
+            smoothTransition_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.SmoothTransition = isChecked;
+            currentY += smoothTransition_CheckBox.height + Margin;
+
+            var transSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_TRANSSPEED"), 1f, 20f, 1f, ModSettings.TransSpeed);
+            transSpeed_Slider.eventValueChanged += (_, value) => ModSettings.TransSpeed = value;
+            currentY += transSpeed_Slider.height + SliderMargin;
+
+            var minTransDistance_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MINTRANSDISTANCE"), 5f, 50f, .1f, ModSettings.MinTransDistance, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: .1f, suffix: "m"));
+            minTransDistance_Slider.tooltip = string.Format(Translations.Translate("SETTINGS_MINTRANSDISTANCE_DETAIL"), "\n");
+            minTransDistance_Slider.eventValueChanged += (_, value) => ModSettings.MinTransDistance = value;
+            currentY += minTransDistance_Slider.height + SliderMargin;
+
+            var maxTransDistance_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MAXTRANSDISTANCE"), 100f, 2000f, 1f, ModSettings.MaxTransDistance, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "m"));
+            maxTransDistance_Slider.tooltip = string.Format(Translations.Translate("SETTINGS_MAXTRANSDISTANCE_DETAIL"), "\n");
+            maxTransDistance_Slider.eventValueChanged += (_, value) => ModSettings.MaxTransDistance = value;
+            currentY += maxTransDistance_Slider.height + SliderMargin;
+            #endregion
+
+            #region Optimizion Options
             UISpacers.AddTitleSpacer(scrollPanel, LeftMargin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_OPT"));
             currentY += TitleMargin;
 
@@ -131,12 +158,16 @@ namespace FPSCamera.Settings.Tabs
             ShadowsOpt_CheckBox.isChecked = ModSettings.ShadowsOpt;
             ShadowsOpt_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShadowsOpt = isChecked;
             currentY += ShadowsOpt_CheckBox.height + LeftMargin;
+            #endregion
+            
+            // Reset mod settings to defaults.
+            defaults_Button = UIButtons.AddButton(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_RESETBTN"));
+            defaults_Button.eventClicked += (c, _) => ResetModSettings();
 
-            // Reset to defaults.
-            defaults_Button = UIButtons.AddButton(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_RESETBTN"), 200f, 40f);
-            defaults_Button.eventClicked += (c, _) => Reset();
-
-            var importButton = UIButtons.AddButton(scrollPanel, LeftMargin + 200f + LeftMargin, currentY, Translations.Translate("SETTINGS_IMPORT"), 200f, 40f);
+            var offsetDefault_Button = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(defaults_Button), Translations.Translate("SETTINGS_RESETOFFSETBTN"), 400f, 30f);
+            offsetDefault_Button.eventClicked += (c,_) => ResetOffsetSettings();
+            
+            var importButton = UIButtons.AddButton(scrollPanel, UILayout.PositionUnder(defaults_Button), Translations.Translate("SETTINGS_IMPORT"));
             importButton.eventClicked += (c, _) =>
             {
                 var notification = NotificationBase.ShowNotification<YesNoNotification>();
@@ -154,8 +185,8 @@ namespace FPSCamera.Settings.Tabs
                         v2OffsetsSettings.Load();
                         OffsetsSettings.Save();
 
-                        var successedNotification = NotificationBase.ShowNotification<ListNotification>();
-                        successedNotification.AddParas(Translations.Translate("SETTINGS_IMPORTSUCCESSED"));
+                        var succussedNotification = NotificationBase.ShowNotification<ListNotification>();
+                        succussedNotification.AddParas(Translations.Translate("SETTINGS_IMPORTSUCCESSED"));
                     }
                     catch (Exception e)
                     {
@@ -167,17 +198,24 @@ namespace FPSCamera.Settings.Tabs
                     }
                 };
             };
+            var openWikiButton = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(importButton), Translations.Translate("SETTINGS_OPENWIKI"));
+            openWikiButton.eventClicked += (c, _) => Application.OpenURL("https://github.com/will258012/FPSCamera-Continued/wiki");
         }
         /// <summary>
-        /// <see cref="Reset()"/> for default button in <see cref="GeneralOptions"/>.
+        /// <see cref="ResetModSettings()"/> for default button in <see cref="GeneralOptions"/>.
         /// default values are in <seealso cref="ModSettings"/>.
         /// </summary>
-        internal static void Reset()
+        internal static void ResetModSettings()
         {
             ModSettings.ResetToDefaults();
             ModSettings.Save();
             OptionsPanelManager<OptionsPanel>.LocaleChanged();
             MainPanel.Instance?.LocaleChanged();
+        }
+        internal static void ResetOffsetSettings()
+        {
+            OffsetsSettings.ResetToDefaults();
+            OffsetsSettings.Save();
         }
     }
 }
