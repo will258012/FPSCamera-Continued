@@ -70,7 +70,7 @@
 			<SourceDir Include="$(TargetDir)\**\*.*" />
 		</ItemGroup>
 		<PropertyGroup>
-			<DeployDir>$(LOCALAPPDATA)/Colossal Order/Cities_Skylines/Addons/Mods/$(SolutionName)/</DeployDir>
+			<DeployDir>$(LOCALAPPDATA)/Colossal Order/Cities_Skylines/Addons/Mods/$(ProjectName)/</DeployDir>
 		</PropertyGroup>
 		
 		<Copy SourceFiles="@(SourceDir)" DestinationFolder="$(DeployDir)\%(RecursiveDir)" SkipUnchangedFiles="true" />
