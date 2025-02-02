@@ -35,11 +35,11 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Invoked after FPS Camera is enabled.
         /// </summary>
-        public Action OnCameraEnabled { get; set; }
+        public static Action OnCameraEnabled { get; set; }
         /// <summary>
         /// Invoked after FPS Camera is disabled.
         /// </summary>
-        public Action OnCameraDisabled { get; set; }
+        public static Action OnCameraDisabled { get; set; }
         /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
