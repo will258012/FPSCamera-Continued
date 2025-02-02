@@ -6,7 +6,7 @@ namespace FPSCamera.Settings
     {
         protected override void Setup()
         {
-            var tabStrip = AutoTabstrip.AddTabstrip(this, 0f, 0f, OptionsPanelManager<OptionsPanel>.PanelWidth, OptionsPanelManager<OptionsPanel>.PanelHeight, out _, tabHeight: 50f);
+            var tabStrip = AutoTabstrip.AddTabstrip(this, 0f, 0f, OptionsPanelManager<OptionsPanel>.PanelWidth, OptionsPanelManager<OptionsPanel>.PanelHeight, out _, tabHeight: 30f);
 
             _ = new GeneralOptions(tabStrip, 0);
             _ = new CameraOptions(tabStrip, 1);
