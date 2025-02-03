@@ -37,9 +37,11 @@
 "SETTINGS_GROUPNAME_SMOOTHTRANS","平滑过渡设置",""
 "SETTINGS_GROUPNAME_OPT","优化设置",""
 "SETTINGS_RESETBTN","重置模组设置",""
+"SETTINGS_RESETOFFSETBTN","重置种类偏移旋转设置",""
 "SETTINGS_IMPORT","导入v2设置",""
-"SETTINGS_IMPORTCONFIRM","是否确认导入来自 First Person Camera v2 的设置（包括模组设置和偏移设置）？将覆盖现有的模组设置以及合并导入的偏移设置和现有偏移设置。",""
+"SETTINGS_IMPORTCONFIRM","是否确认导入来自 First Person Camera v2 的设置（包括模组设置和种类偏移旋转设置）？将覆盖现有的模组设置，并将导入的种类设置和现有的相合并。",""
 "SETTINGS_IMPORTSUCCESSED","设置导入成功。",""
+SETTINGS_OPENWIKI,打开维基
 "SETTINGS_HIDEUI","隐藏游戏UI",""
 "SETTINGS_SETBACKCAMERA","退出后重置摄像机位置",""
 "SETTINGS_SETBACKCAMERA_DETAIL","退出第一人称摄像机后，将摄像机位置重置回之前的位置",""

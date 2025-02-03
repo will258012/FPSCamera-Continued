@@ -28,11 +28,14 @@ namespace FPSCamera.Settings
         }
 
         internal static void Save() => XMLFileUtils.Save<OffsetsSettings>(SettingsFileName);
+        internal static void ResetToDefaults() => Offsets = DefaultOffsets;
 
         [XmlElement("Offset")]
         public Dictionary<string, Positioning> XMLOffsets { get => Offsets; set => Offsets = value; }
         [XmlIgnore]
-        internal static Dictionary<string, Positioning> Offsets = new Dictionary<string, Positioning>
+        internal static Dictionary<string, Positioning> Offsets = DefaultOffsets;
+        [XmlIgnore]
+        private static Dictionary<string, Positioning> DefaultOffsets => new Dictionary<string, Positioning>
         {
             ["Bus"] = new Positioning(new Vector3(0f, .2f, 2.1f)),
             ["Biofuel Bus 01"] = new Positioning(new Vector3(0f, .2f, 2.1f)),
