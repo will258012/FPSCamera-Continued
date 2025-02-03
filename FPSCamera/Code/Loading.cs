@@ -53,7 +53,7 @@ namespace FPSCamera
                 }
 
             }
-            if (ModSettings.VehicleFixedOffset.y < 2f || ModSettings.PedestrianFixedOffset.y < 2f)
+            if (ModSettings.FollowCamOffset.y < 0f || ModSettings.VehicleFixedOffset.y < 2f || ModSettings.MidVehFixedOffset.y < 3f || ModSettings.PedestrianFixedOffset.y < 2f)
             {
                 var notification = NotificationBase.ShowNotification<SettingsIssueNotification>();
                 notification.AddParas(Translations.Translate("SETTINGS_ISSUE_DETECTED"));
