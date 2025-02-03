@@ -50,10 +50,9 @@ namespace FPSCamera.Settings.Tabs
         private static UICheckBox selectPublicTransit_CheckBox;
         private static UICheckBox selectService_CheckBox;
         private static UICheckBox selectCargo_CheckBox;
-        private static UICheckBox smoothTransition_CheckBox;
-        private static UISlider transSpeed_Slider;
-        private static UISlider minTransDistance_Slider;
-        private static UISlider maxTransDistance_Slider;
+
+        private float currentY = GroupMargin;
+        private UITabstrip tabStrip;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CameraOptions"/> class.
@@ -64,8 +63,21 @@ namespace FPSCamera.Settings.Tabs
         {
 
             var panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("SETTINGS_GROUPNAME_CAM"), tabIndex, out var _, autoLayout: false);
-            var currentY = GroupMargin;
-            var headerWidth = OptionsPanelManager<OptionsPanel>.PanelWidth - (Margin * 2f);
+            this.tabStrip = AutoTabstrip.AddTabstrip(panel, 0f, 0f, panel.width, panel.height, out _, tabHeight: 30f);
+            CameraControls(0);
+            FreeMode(1);
+            FollowMode(2);
+            WalkThruMode(3);
+
+            // Select first tab.
+            this.tabStrip.selectedIndex = -1;
+            this.tabStrip.selectedIndex = 0;
+        }
+        private void CameraControls(int tabIndex)
+        {
+            #region Camera Controls
+            var panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("SETTINGS_GROUPNAME_CAMCONTROL"), tabIndex, out var _, autoLayout: false);
+            currentY = GroupMargin;
 
             //Add Scrollbar. 
             var scrollPanel = panel.AddUIComponent<UIScrollablePanel>();
@@ -80,10 +92,6 @@ namespace FPSCamera.Settings.Tabs
             //Fix occasional content offset issue when switching pages (Why?)
             scrollPanel.eventVisibilityChanged += (_, isShow) => { if (isShow) scrollPanel.Reset(); };
             UIScrollbars.AddScrollbar(panel, scrollPanel);
-
-            #region Camera Controls
-            UISpacers.AddTitle(scrollPanel, Margin, currentY, Translations.Translate("SETTINGS_GROUPNAME_CAMCONTROL"));
-            currentY += TitleMargin;
 
             dof_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_ENABLEDOF"));
             dof_CheckBox.isChecked = ModSettings.Dof;
@@ -138,10 +146,24 @@ namespace FPSCamera.Settings.Tabs
             foViewScrollfactor_Slider.eventValueChanged += (_, value) => ModSettings.FoViewScrollfactor = value;
             currentY += foViewScrollfactor_Slider.height + SliderMargin;
             #endregion
+        }
+        private void FreeMode(int tabIndex)
+        {
             #region Free-Camera Mode Options
+            var panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("SETTINGS_GROUPNAME_FREECAM"), tabIndex, out var _, autoLayout: false);
+            currentY = GroupMargin;
 
-            UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_FREECAM"));
-            currentY += TitleMargin;
+            var scrollPanel = panel.AddUIComponent<UIScrollablePanel>();
+            scrollPanel.relativePosition = new Vector2(0, Margin);
+            scrollPanel.autoSize = false;
+            scrollPanel.autoLayout = false;
+            scrollPanel.width = panel.width - 15f;
+            scrollPanel.height = panel.height - 15f;
+            scrollPanel.clipChildren = true;
+            scrollPanel.builtinKeyNavigation = true;
+            scrollPanel.scrollWheelDirection = UIOrientation.Vertical;
+            scrollPanel.eventVisibilityChanged += (_, isShow) => { if (isShow) scrollPanel.Reset(); };
+            UIScrollbars.AddScrollbar(panel, scrollPanel);
 
             showCursorFree_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWCURSORFREE"));
             showCursorFree_CheckBox.isChecked = ModSettings.ShowCursorFree;
@@ -185,9 +207,24 @@ namespace FPSCamera.Settings.Tabs
             tracksDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.TracksDetection = isChecked;
             currentY += tracksDetection_CheckBox.height + Margin;
             #endregion
+        }
+        private void FollowMode(int tabIndex)
+        {
             #region Follow Mode Options
-            UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_FOLLOW"));
-            currentY += TitleMargin;
+            var panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("SETTINGS_GROUPNAME_FOLLOW"), tabIndex, out var _, autoLayout: false);
+            currentY = GroupMargin;
+
+            var scrollPanel = panel.AddUIComponent<UIScrollablePanel>();
+            scrollPanel.relativePosition = new Vector2(0, Margin);
+            scrollPanel.autoSize = false;
+            scrollPanel.autoLayout = false;
+            scrollPanel.width = panel.width - 15f;
+            scrollPanel.height = panel.height - 15f;
+            scrollPanel.clipChildren = true;
+            scrollPanel.builtinKeyNavigation = true;
+            scrollPanel.scrollWheelDirection = UIOrientation.Vertical;
+            scrollPanel.eventVisibilityChanged += (_, isShow) => { if (isShow) scrollPanel.Reset(); };
+            UIScrollbars.AddScrollbar(panel, scrollPanel);
 
             showCursorFollow_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWCURSORFOLLOW"));
             showCursorFollow_CheckBox.isChecked = ModSettings.ShowCursorFollow;
@@ -223,9 +260,24 @@ namespace FPSCamera.Settings.Tabs
             PedestrianFixedOffset.z_Slider.eventValueChanged += (_, value) => ModSettings.PedestrianFixedOffset.z = value;
             currentY += PedestrianFixedOffset.slidersPanel.height;
             #endregion
+        }
+        private void WalkThruMode(int tabIndex)
+        {
             #region Walk-Through Mode Options
-            UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_WALKTHRU"));
-            currentY += TitleMargin;
+            var panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("SETTINGS_GROUPNAME_WALKTHRU"), tabIndex, out var _, autoLayout: false);
+            currentY = GroupMargin;
+
+            var scrollPanel = panel.AddUIComponent<UIScrollablePanel>();
+            scrollPanel.relativePosition = new Vector2(0, Margin);
+            scrollPanel.autoSize = false;
+            scrollPanel.autoLayout = false;
+            scrollPanel.width = panel.width - 15f;
+            scrollPanel.height = panel.height - 15f;
+            scrollPanel.clipChildren = true;
+            scrollPanel.builtinKeyNavigation = true;
+            scrollPanel.scrollWheelDirection = UIOrientation.Vertical;
+            scrollPanel.eventVisibilityChanged += (_, isShow) => { if (isShow) scrollPanel.Reset(); };
+            UIScrollbars.AddScrollbar(panel, scrollPanel);
 
             periodWalk_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_PERIODWALK"), 5f, 200f, 1f, ModSettings.PeriodWalk, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "s"));
             periodWalk_Slider.eventValueChanged += (_, value) => ModSettings.PeriodWalk = value;
@@ -274,31 +326,6 @@ namespace FPSCamera.Settings.Tabs
             selectCargo_CheckBox.isChecked = ModSettings.SelectCargo;
             selectCargo_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.SelectCargo = isChecked;
             currentY += selectCargo_CheckBox.height + Margin;
-
-            #endregion
-            #region Smooth Transition Options
-            UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_SMOOTHTRANS"));
-            currentY += TitleMargin;
-
-            smoothTransition_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SMOOTRANSITION"));
-            smoothTransition_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_SMOOTRANSITION_DETAIL"), "\n");
-            smoothTransition_CheckBox.isChecked = ModSettings.SmoothTransition;
-            smoothTransition_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.SmoothTransition = isChecked;
-            currentY += smoothTransition_CheckBox.height + Margin;
-
-            transSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_TRANSSPEED"), 1f, 20f, 1f, ModSettings.TransSpeed);
-            transSpeed_Slider.eventValueChanged += (_, value) => ModSettings.TransSpeed = value;
-            currentY += transSpeed_Slider.height + SliderMargin;
-
-            minTransDistance_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MINTRANSDISTANCE"), 5f, 50f, .1f, ModSettings.MinTransDistance, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: .1f, suffix: "m"));
-            minTransDistance_Slider.tooltip = string.Format(Translations.Translate("SETTINGS_MINTRANSDISTANCE_DETAIL"), "\n");
-            minTransDistance_Slider.eventValueChanged += (_, value) => ModSettings.MinTransDistance = value;
-            currentY += minTransDistance_Slider.height + SliderMargin;
-
-            maxTransDistance_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MAXTRANSDISTANCE"), 100f, 2000f, 1f, ModSettings.MaxTransDistance, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "m"));
-            maxTransDistance_Slider.tooltip = string.Format(Translations.Translate("SETTINGS_MAXTRANSDISTANCE_DETAIL"), "\n");
-            maxTransDistance_Slider.eventValueChanged += (_, value) => ModSettings.MaxTransDistance = value;
-            currentY += maxTransDistance_Slider.height + SliderMargin;
 
             #endregion
         }

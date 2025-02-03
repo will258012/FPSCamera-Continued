@@ -9,7 +9,7 @@
 
 > 本模组是[First Person Camera v2.2.0 by Asu4ni](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667)的更新版本。
 
-> 如果你是初次使用，建议前往[原模组的Wiki](https://github.com/Asu4ni/CitiesSkylines-FPSCamera/wiki)了解模组功能以及使用方法。
+> 如果你是初次使用，建议前往[维基](https://github.com/will258012/FPSCamera-Continued/wiki)了解模组功能以及使用方法。
 
 ## 协助翻译：
 [![Crowdin](https://badges.crowdin.net/CSL_FPSCamera_Continued/localized.svg)](https://crowdin.com/project/CSL_FPSCamera_Continued)
