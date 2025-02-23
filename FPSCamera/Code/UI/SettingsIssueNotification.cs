@@ -7,6 +7,12 @@
 
     public class SettingsIssueNotification : ListNotification
     {
+
+        /// <summary>
+        /// Gets the "dont show again" button instance.
+        /// </summary>
+        public UIButton DSAButton { get; set; }
+
         /// <summary>
         /// Gets the "Quick fix" button instance.
         /// </summary>
@@ -15,7 +21,7 @@
         /// <summary>
         /// Gets the number of buttons for this panel (for layout).
         /// </summary>
-        protected override int NumButtons => 2;
+        protected override int NumButtons => 3;
 
         /// <summary>
         /// Adds buttons to the notification panel.
@@ -24,6 +30,8 @@
         {
             base.AddButtons();
             QuickFixButton = AddButton(2, NumButtons, Translations.Translate("SETTINGS_ISSUE_DETECTED_QUICKFIX"), () => { GeneralOptions.ResetModSettings(); Close(); });
+            // Add don't show again button.
+            DSAButton = AddButton(3, NumButtons, Translations.Translate("NOTE_DONTSHOWAGAIN"), Close);
         }
     }
 }
