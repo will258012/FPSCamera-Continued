@@ -40,7 +40,6 @@ namespace FPSCamera
                 gameObject.AddComponent<FollowButtons>();
             if (WhatsNew.LastNotifiedVersion < AssemblyUtils.CurrentVersion)
             {
-
                 if (ModSupport.FoundK45TLM)
                 {
                     var notification = NotificationBase.ShowNotification<DontShowAgainNotification>();
@@ -51,12 +50,16 @@ namespace FPSCamera
                         ModSettings.Save();
                     };
                 }
-
-            }
-            if (ModSettings.FollowCamOffset.y < 0f || ModSettings.VehicleFixedOffset.y < 2f || ModSettings.MidVehFixedOffset.y < 3f || ModSettings.PedestrianFixedOffset.y < 2f)
-            {
-                var notification = NotificationBase.ShowNotification<SettingsIssueNotification>();
-                notification.AddParas(Translations.Translate("SETTINGS_ISSUE_DETECTED"));
+                if (ModSettings.FollowCamOffset.y < 0f || ModSettings.VehicleFixedOffset.y < 2f || ModSettings.MidVehFixedOffset.y < 3f || ModSettings.PedestrianFixedOffset.y < 2f)
+                {
+                    var notification = NotificationBase.ShowNotification<SettingsIssueNotification>();
+                    notification.AddParas(Translations.Translate("SETTINGS_ISSUE_DETECTED"));
+                    notification.DSAButton.eventClicked += (_, clickEvent) =>
+                    {
+                        WhatsNew.LastNotifiedVersion = AssemblyUtils.CurrentVersion;
+                        ModSettings.Save();
+                    };
+                }
             }
         }
         public override void OnCreated(ILoading loading)
