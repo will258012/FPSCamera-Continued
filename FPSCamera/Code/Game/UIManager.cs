@@ -89,7 +89,7 @@ namespace FPSCamera.Game
         {
             if (!visibility)
             {
-                Object.FindObjectOfType<ToolsModifierControl>().ReallyCloseEverything();
+                Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
                 SaveState();
                 ToggleItManager.Instance.Apply(1, false);
                 ToggleItManager.Instance.Apply(2, false);
@@ -119,7 +119,7 @@ namespace FPSCamera.Game
             NetManager.instance.RoadNamesVisible = visibility;
             UICamera.enabled = visibility;
             if (!visibility)
-                Object.FindObjectOfType<ToolsModifierControl>().ReallyCloseEverything();
+                Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
         }
     }
 }
