@@ -2,7 +2,9 @@
 using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
 using ColossalFramework.UI;
+using FPSCamera.Utils;
 using UnityEngine;
+
 
 namespace FPSCamera.Settings.Tabs
 {
@@ -29,7 +31,7 @@ namespace FPSCamera.Settings.Tabs
         private static OptionsKeymapping KeyRotateRight;
         private static OptionsKeymapping KeyRotateUp;
         private static OptionsKeymapping KeyRotateDown;
-        private static OptionsKeymapping KeyUUIToggle;
+        private static UUISupport.UUIKeymapping KeyUUIToggle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HotKeyOptions"/> class.
@@ -69,9 +71,11 @@ namespace FPSCamera.Settings.Tabs
             currentY += KeyCursorToggle.Panel.height + Margin;
 
             KeyAutoMove = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYAUTOMOVE"), ModSettings.KeyAutoMove);
+            KeyAutoMove.Panel.tooltip = Translations.Translate("SETTINGS_KEYAUTOMOVE_DETAIL");
             currentY += KeyAutoMove.Panel.height + Margin;
 
             KeySaveOffset = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYSAVEFOFFSET"), ModSettings.KeySaveOffset);
+            KeySaveOffset.Panel.tooltip = Translations.Translate("SETTINGS_KEYSAVEFOFFSET_DETAIL");
             currentY += KeySaveOffset.Panel.height + Margin;
 
             KeyMoveForward = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYMOVEFORWARD"), ModSettings.KeyMoveForward);
@@ -104,7 +108,7 @@ namespace FPSCamera.Settings.Tabs
             KeyRotateDown = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYROTATEDOWN"), ModSettings.KeyRotateDown);
             currentY += KeyRotateDown.Panel.height + Margin;
 
-            KeyUUIToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYUUITOGGLE"), ModSettings.KeyUUIToggle);
+            KeyUUIToggle = UUISupport.UUIKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY);
         }
     }
 }
