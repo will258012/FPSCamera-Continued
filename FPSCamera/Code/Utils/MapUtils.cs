@@ -1,18 +1,18 @@
-﻿namespace FPSCamera.Utils
-{
-    using FPSCamera.Settings;
-    using UnityEngine;
+﻿using FPSCamera.Settings;
+using UnityEngine;
 
+namespace FPSCamera.Utils
+{
     public static class MapUtils
     {
         const float defaultHeightOffset = 2f;
-
-        public static float ToKilometer(this float gameDistance)
-            => gameDistance * 5f / 3f;
-
-        public static float ToMile(this float gameDistance)
-            => gameDistance.ToKilometer() * .621371f;
-
+        const float SPEED_TO_KMPH = 5f / 3f;
+        const float SPEED_TO_MPH = SPEED_TO_KMPH * .621371f;
+        public static float ToKmph(this float gameSpeed)
+            => gameSpeed * SPEED_TO_KMPH;
+        public static float FromKmph(this float Kmph) => Kmph / SPEED_TO_KMPH;
+        public static float ToMph(this float gameDistance)
+            => gameDistance * SPEED_TO_MPH;
         public static float GetTerrainLevel(Vector3 position)
             => TerrainManager.instance.SampleDetailHeightSmooth(position);
         public static float GetWaterLevel(Vector3 position)

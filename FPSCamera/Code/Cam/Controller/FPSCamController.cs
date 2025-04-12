@@ -83,8 +83,8 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.SetBackCamera)
             {
                 if (ModSettings.SmoothTransition)
-                    StartTransitioningOnDisabled(GameCamController.Instance._cachedPositioning);
-                else AfterTransition(GameCamController.Instance._cachedPositioning);
+                    StartTransitioningOnDisabled(GameCamController.Instance.cachedPositioning);
+                else AfterTransition(GameCamController.Instance.cachedPositioning);
             }
             else
             {
@@ -276,8 +276,8 @@ namespace FPSCamera.Cam.Controller
                 (FPSCam as IFollowCam)?.SaveCamOffset();
 
             { // key movement
-                var movementFactor = (InputManager.KeyPressed(ModSettings.KeySpeedUp) ? ModSettings.SpeedUpFactor : 1f)
-                                     * ModSettings.MovementSpeed * Time.deltaTime / MapUtils.ToKilometer(1f);
+                var movementFactor = ((InputManager.KeyPressed(ModSettings.KeySpeedUp) ? ModSettings.SpeedUpFactor : 1f)
+                                     * ModSettings.MovementSpeed * Time.deltaTime).FromKmph();
 
                 var LocalMovement = Vector3.zero;
                 if (InputManager.KeyPressed(ModSettings.KeyMoveForward)) LocalMovement += Vector3.forward * movementFactor;
@@ -435,7 +435,7 @@ namespace FPSCamera.Cam.Controller
             if (freeCam.AutoMove && !InputManager.MousePressed(InputManager.MouseButton.Secondary))
             {
                 var movement = Vector3.zero;
-                movement.z += Time.deltaTime * ModSettings.MovementSpeed / MapUtils.ToKilometer(1f);
+                movement.z += (Time.deltaTime * ModSettings.MovementSpeed).FromKmph();
                 _offset.pos += _offset.rotation * movement;
             }
             // Calculate the desired position and rotation of the camera by applying the offset to the camera's current position and rotation.
