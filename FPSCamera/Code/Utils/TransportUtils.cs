@@ -1,9 +1,10 @@
 ﻿using ColossalFramework;
+using TransportLinesManager.ModShared;
 using UnityEngine;
 
 namespace FPSCamera.Utils
 {
-    public class StationUtils
+    public class TransportUtils
     {
         public static readonly TransportInfo.TransportType[] stationTransportType =
         {
@@ -20,12 +21,12 @@ namespace FPSCamera.Utils
 
         public static string GetStationName(ushort stopId, ushort lineId)
         {
-            return ModSupport.FoundTLM ? GetStopNameByTLM(stopId, lineId) : GetStopName(stopId);
+            return ModSupport.FoundTLM ? GetStopNameByTLMImpt(stopId, lineId) : GetStopName(stopId);
         }
-        private static string GetStopNameByTLM(ushort stopId, ushort lineId)
+        private static string GetStopNameByTLMImpt(ushort stopId, ushort lineId)
         {
             var subService = TransportManager.instance.m_lines.m_buffer[lineId].Info.m_netSubService;
-            return TransportLinesManager.ModShared.TLMFacade.GetFullStationName(stopId, lineId, false, subService);
+            return TLMFacade.GetFullStationName(stopId, lineId, false, subService);
         }
         private static string GetStopName(ushort stopId)
         {
@@ -66,6 +67,12 @@ namespace FPSCamera.Utils
             }
             return $"<Somewhere>[{stopId}]";
         }
+        public static string GetLineCodeInTLM(ushort lineId)
+        {
+            if (!ModSupport.FoundTLM) return string.Empty;
+            return GetLineCodeInTLMImpl(lineId);
+        }
+        private static string GetLineCodeInTLMImpl(ushort lineId) => TLMFacade.GetLineStringId(lineId, false);
         private static string GetStationRoadName(Vector3 pos)
         {
             var segmentid = MapUtils.RayCastRoad(pos);
