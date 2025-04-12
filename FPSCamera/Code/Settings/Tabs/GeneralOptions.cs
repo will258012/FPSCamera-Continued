@@ -115,7 +115,7 @@ namespace FPSCamera.Settings.Tabs
             currentY += TitleMargin;
 
             var smoothTransition_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SMOOTRANSITION"));
-            smoothTransition_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_SMOOTRANSITION_DETAIL"), "\n");
+            smoothTransition_CheckBox.tooltip = Translations.Translate("SETTINGS_SMOOTRANSITION_DETAIL");
             smoothTransition_CheckBox.isChecked = ModSettings.SmoothTransition;
             smoothTransition_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.SmoothTransition = isChecked;
             currentY += smoothTransition_CheckBox.height + Margin;
@@ -125,12 +125,12 @@ namespace FPSCamera.Settings.Tabs
             currentY += transSpeed_Slider.height + SliderMargin;
 
             var minTransDistance_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MINTRANSDISTANCE"), 5f, 50f, .1f, ModSettings.MinTransDistance, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: .1f, suffix: "m"));
-            minTransDistance_Slider.tooltip = string.Format(Translations.Translate("SETTINGS_MINTRANSDISTANCE_DETAIL"), "\n");
+            minTransDistance_Slider.tooltip = Translations.Translate("SETTINGS_MINTRANSDISTANCE_DETAIL");
             minTransDistance_Slider.eventValueChanged += (_, value) => ModSettings.MinTransDistance = value;
             currentY += minTransDistance_Slider.height + SliderMargin;
 
             var maxTransDistance_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MAXTRANSDISTANCE"), 100f, 2000f, 1f, ModSettings.MaxTransDistance, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "m"));
-            maxTransDistance_Slider.tooltip = string.Format(Translations.Translate("SETTINGS_MAXTRANSDISTANCE_DETAIL"), "\n");
+            maxTransDistance_Slider.tooltip = Translations.Translate("SETTINGS_MAXTRANSDISTANCE_DETAIL");
             maxTransDistance_Slider.eventValueChanged += (_, value) => ModSettings.MaxTransDistance = value;
             currentY += maxTransDistance_Slider.height + SliderMargin;
             #endregion
@@ -148,7 +148,7 @@ namespace FPSCamera.Settings.Tabs
             };
 
             LodOpt_DropDown = UIDropDowns.AddPlainDropDown(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_LODOPT"), LodOpt_Items, ModSettings.LodOpt, 300);
-            LodOpt_DropDown.tooltip = string.Format(Translations.Translate("SETTINGS_LODOPT_DETAIL"), "\n");
+            LodOpt_DropDown.tooltip = Translations.Translate("SETTINGS_LODOPT_DETAIL");
             LodOpt_DropDown.eventSelectedIndexChanged += (_, value) => ModSettings.LodOpt = value;
             LodOpt_DropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += LodOpt_DropDown.parent.height + Margin;
@@ -159,14 +159,14 @@ namespace FPSCamera.Settings.Tabs
             ShadowsOpt_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShadowsOpt = isChecked;
             currentY += ShadowsOpt_CheckBox.height + LeftMargin;
             #endregion
-            
+
             // Reset mod settings to defaults.
             defaults_Button = UIButtons.AddButton(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_RESETBTN"));
             defaults_Button.eventClicked += (c, _) => ResetModSettings();
 
             var offsetDefault_Button = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(defaults_Button), Translations.Translate("SETTINGS_RESETOFFSETBTN"), 400f, 30f);
-            offsetDefault_Button.eventClicked += (c,_) => ResetOffsetSettings();
-            
+            offsetDefault_Button.eventClicked += (c, _) => ResetOffsetSettings();
+
             var importButton = UIButtons.AddButton(scrollPanel, UILayout.PositionUnder(defaults_Button), Translations.Translate("SETTINGS_IMPORT"));
             importButton.eventClicked += (c, _) =>
             {

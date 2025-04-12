@@ -45,10 +45,16 @@
 "SETTINGS_FIELDOFVIEW","摄像机视野",""
 "SETTINGS_PATHS_DETECTION","启用对路径的位置检测",""
 "SETTINGS_TRACKS_DETECTION","启用对轨道的位置检测",""
-"SETTINGS_DETECTIONS_DETAIL","此选项用于更精确地更新摄像机的位置。{0}当对创意工坊资产效果不佳时可禁用",""
+"SETTINGS_DETECTIONS_DETAIL","此选项用于更精确地更新摄像机的位置。
+当对创意工坊资产效果不佳时可禁用",""
 "SETTINGS_SHOWCURSORFREE","自由模式下始终显示光标",""
 "SETTINGS_GROUNDCLIPING","地面贴靠选项",""
-"SETTINGS_GROUNDCLIPING_DETAIL","自由模式下：{0}-[无] 自由移动{0}-[高于地面] 摄像机始终在地面上方{0}-[贴近地面] 摄像机贴着地面移动{0}-[高于道路] 摄像机始终在最近的道路上方{0}-[贴近道路] 摄像机贴着最近的道路或地面移动",""
+"SETTINGS_GROUNDCLIPING_DETAIL","自由模式下：
+-[无] 自由移动
+-[高于地面] 摄像机始终在地面上方
+-[贴近地面] 摄像机贴着地面移动
+-[高于道路] 摄像机始终在最近的道路上方
+-[贴近道路] 摄像机贴着最近的道路或地面移动",""
 "SETTINGS_GROUNDCLIPING_NONE","无",""
 "SETTINGS_GROUNDCLIPING_ABOVE_GROUND","高于地面",""
 "SETTINGS_GROUNDCLIPING_SNAP_TO_GROUND","贴近地面",""
@@ -81,8 +87,9 @@
 "SETTINGS_KEYCURSORTOGGLE","切换光标可见性",""
 "SETTINGS_KEYAUTOMOVE","自由模式下自动移动",""
 "SETTINGS_KEYAUTOMOVE_DETAIL","在自由模式下，按下此键后摄像机会自动向前移动",""
-"SETTINGS_KEYSAVEFOFFSET","保存当前摄像机设置为默认值",""
-"SETTINGS_KEYSAVEFOFFSET_DETAIL","在跟随/漫游模式下，保存跟随目标的当前摄像机设置",""
+"SETTINGS_KEYSAVEFOFFSET","保存种类偏移设置",""
+"SETTINGS_KEYSAVEFOFFSET_DETAIL","在跟随/漫游模式下，将当前摄像机偏移、旋转设置
+保存为跟随目标的类型设置",""
 "SETTINGS_KEYMOVEFORWARD","向前移动/偏移",""
 "SETTINGS_KEYMOVEBACKWARD","向后移动/偏移",""
 "SETTINGS_KEYMOVELEFT","向左移动/偏移",""
@@ -93,14 +100,17 @@
 "SETTINGS_KEYROTATERIGHT","向右旋转/查看",""
 "SETTINGS_KEYROTATEUP","向上旋转/查看",""
 "SETTINGS_KEYROTATEDOWN","向下旋转/查看",""
-"SETTINGS_KEYUUITOGGLE","切换主面板（需要订阅UUI模组）",""
+"SETTINGS_KEYUUITOGGLE","切换主面板（需UUI模组）",""
 "SETTINGS_SMOOTRANSITION","启用平滑过渡",""
-"SETTINGS_SMOOTRANSITION_DETAIL","摄像机移动、旋转或缩放时，过渡可以是平滑的或瞬时的。{0}启用此选项会使摄像机看起来有延迟。",""
+"SETTINGS_SMOOTRANSITION_DETAIL","摄像机移动、旋转或缩放时，过渡可以是平滑的或瞬时的。
+启用此选项会使摄像机看起来有延迟。",""
 "SETTINGS_TRANSSPEED","平滑过渡速率",""
 "SETTINGS_MINTRANSDISTANCE","平滑过渡最小距离",""
-"SETTINGS_MINTRANSDISTANCE_DETAIL","在跟随模式下，即使启用了平滑过渡，摄像机也需要及时地跟随目标。{0}这设置了应用平滑过渡的最小距离。",""
+"SETTINGS_MINTRANSDISTANCE_DETAIL","在跟随模式下，即使启用了平滑过渡，摄像机也需要及时地跟随目标。
+此选项设置了应用平滑过渡的最小距离。",""
 "SETTINGS_MAXTRANSDISTANCE","平滑过渡最大距离",""
-"SETTINGS_MAXTRANSDISTANCE_DETAIL","摄像机目标位置越远，平滑过渡需要的时间越长。{0}这设置了应用平滑过渡的最大距离。",""
+"SETTINGS_MAXTRANSDISTANCE_DETAIL","摄像机目标位置越远，平滑过渡需要的时间越长。
+此选项设置了应用平滑过渡的最大距离。",""
 "SETTINGS_DELTAPOSMIN","平滑过渡的最小移动",""
 "SETTINGS_DELTAPOSMAX","平滑过渡的最大移动",""
 "SETTINGS_ROTATEMIN","平滑过渡的最小旋转",""
@@ -110,7 +120,11 @@
 "SETTINGS_FOVIEWSCROLLFACTOR_DETAIL","调整在第一人称摄像机中，滚轮缩放的速度",""
 "SETTINGS_MAXEXITINGDURATION","退出第一人称摄像机的最大持续时间",""
 "SETTINGS_LODOPT","LOD优化程度（实验性）",""
-"SETTINGS_LODOPT_DETAIL","在第一人称摄像机启用时：{0}-[禁用] 禁用LOD优化{0}-[低] 仅优化较远处的市民、车辆、树木及道路的LOD距离{0}-[中] 在上一级的基础上增加对较远处道具及楼房的优化{0}-[高] 在上一级的基础上进一步缩小LOD距离",""
+"SETTINGS_LODOPT_DETAIL","在第一人称摄像机启用时：
+-[禁用] 禁用LOD优化
+-[低] 仅优化较远处的市民、车辆、树木及道路的LOD距离
+-[中] 在上一级的基础上增加对较远处道具及楼房的优化
+-[高] 在上一级的基础上进一步缩小LOD距离",""
 "SETTINGS_SHADOWSOPT","启用阴影距离优化",""
 "SETTINGS_SHADOWSOPT_DETAIL","当第一人称摄像机开启时，进行阴影距离的调整。",""
 "VEHICLE_AITYPE_BUS","公交",""
