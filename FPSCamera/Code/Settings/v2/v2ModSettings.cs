@@ -195,11 +195,11 @@ namespace FPSCamera.Settings.v2
         [XmlElement("KeyUUIToggle")]
         public string KeyUUIToggle
         {
-            get => ModSettings.KeyUUIToggle.ToString();
+            get => Utils.UUISupport.UUIKey.Keybinding.ToString();
             set
             {
                 var split = value.Split('+');
-                ModSettings.KeyUUIToggle = new AlgernonCommons.Keybinding.Keybinding((KeyCode)Enum.Parse(typeof(KeyCode), split[1]),
+                Utils.UUISupport.UUIKey.Keybinding = new AlgernonCommons.Keybinding.Keybinding((KeyCode)Enum.Parse(typeof(KeyCode), split[1]),
                                                                                      split[0].Contains("Control"),
                                                                                      split[0].Contains("Shift"),
                                                                                      split[0].Contains("Alt"));
