@@ -15,7 +15,7 @@ namespace FPSCamera.Cam
     {
         uint FollowID { get; }
         InstanceID FollowInstance { get; }
-        Dictionary<string, string> GetInfos();
+        Dictionary<string, string> GetInfo();
         string GetFollowName();
         string GetPrefabName();
         string GetStatus();

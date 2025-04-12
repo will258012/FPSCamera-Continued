@@ -65,7 +65,7 @@ namespace FPSCamera.Cam
                 Logging.KeyMessage("Citizen cam: Started another cam");
             }
         }
-        public Dictionary<string, string> GetInfos()
+        public Dictionary<string, string> GetInfo()
         {
             var details = new Dictionary<string, string>();
             var flags = GetCitizen().m_flags;
@@ -83,7 +83,7 @@ namespace FPSCamera.Cam
             details[Translations.Translate("INFO_HUMAN_OCCUPATION")] = GetOccupation();
 
 
-            var anotherDetails = AnotherCam?.GetInfos();
+            var anotherDetails = AnotherCam?.GetInfo();
             if (anotherDetails != null)
                 details = details.Concat(anotherDetails).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             return details;

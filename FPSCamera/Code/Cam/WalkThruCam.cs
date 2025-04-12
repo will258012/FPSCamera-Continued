@@ -19,12 +19,12 @@ namespace FPSCamera.Cam
         public float GetSpeed() => CurrentCam?.GetSpeed() ?? default;
         public string GetFollowName() => CurrentCam?.GetFollowName();
         public string GetPrefabName() => CurrentCam?.GetPrefabName();
-        public Dictionary<string, string> GetInfos() => CurrentCam?.GetInfos();
+        public Dictionary<string, string> GetInfo() => CurrentCam?.GetInfo();
         public string GetStatus() => CurrentCam?.GetStatus();
         public Positioning GetPositioning() => CurrentCam?.GetPositioning() ?? default;
         public void SwitchTarget() => SetRandomCam();
-        public void ElapseTime(float seconds) => _elapsedTime += seconds;
-        public float GetElapsedTime() => _elapsedTime;
+        public void ElapseTime(float seconds) => elapsedTime += seconds;
+        public float GetElapsedTime() => elapsedTime;
         public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
         public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
         public bool IsValid()
@@ -32,7 +32,7 @@ namespace FPSCamera.Cam
             if (!IsActivated) return false;
             var status = CurrentCam?.IsValid() ?? false;
             if (!ModSettings.ManualSwitchWalk &&
-                _elapsedTime > ModSettings.PeriodWalk) status = false;
+                elapsedTime > ModSettings.PeriodWalk) status = false;
             if (!status)
             {
                 SetRandomCam();
@@ -93,7 +93,7 @@ namespace FPSCamera.Cam
             }
             while (!(CurrentCam?.IsValid() ?? false) && --attempt >= 0);
 
-            _elapsedTime = 0f;
+            elapsedTime = 0f;
             SyncCamOffset();
         }
 
@@ -105,7 +105,7 @@ namespace FPSCamera.Cam
             IsActivated = false;
         }
         private const VehicleInfo.VehicleCategory CityServiceCopters = VehicleInfo.VehicleCategory.AmbulanceCopter | VehicleInfo.VehicleCategory.FireCopter | VehicleInfo.VehicleCategory.PoliceCopter | VehicleInfo.VehicleCategory.DisasterCopter;
-        private float _elapsedTime;
+        private float elapsedTime;
         private IEnumerable<InstanceID> items;
         private readonly AudioClip disabledClickSound = UIView.GetAView().defaultDisabledClickSound;
 
