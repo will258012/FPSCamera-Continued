@@ -41,21 +41,21 @@ namespace FPSCamera.Cam
 
         public InstanceID FollowInstance { get; private set; }
 
-        public Dictionary<string, string> GetInfos()
+        public Dictionary<string, string> GetInfo()
         {
-            var infos = new Dictionary<string, string>();
+            var info = new Dictionary<string, string>();
             var headVehicle = GetVehicle(GetHeadVehicleID());
-            var ownerid = headVehicle.Info.m_vehicleAI.GetOwnerID(GetHeadVehicleID(), ref headVehicle);
-            switch (ownerid.Type)
+            var ownerId = headVehicle.Info.m_vehicleAI.GetOwnerID(GetHeadVehicleID(), ref headVehicle);
+            switch (ownerId.Type)
             {
                 case InstanceType.Building:
-                    infos[Translations.Translate("INFO_VEHICLE_OWNER")] = BuildingManager.instance.GetBuildingName(ownerid.Building, ownerid); break;
+                    info[Translations.Translate("INFO_VEHICLE_OWNER")] = BuildingManager.instance.GetBuildingName(ownerId.Building, ownerId); break;
                 case InstanceType.Citizen:
-                    infos[Translations.Translate("INFO_VEHICLE_OWNER")] = CitizenManager.instance.GetCitizenName(ownerid.Citizen); break;
+                    info[Translations.Translate("INFO_VEHICLE_OWNER")] = CitizenManager.instance.GetCitizenName(ownerId.Citizen); break;
             }
 
-            InfosUtils.GetMoreInfos(ref infos, headVehicle, GetHeadVehicleID());
-            return infos;
+            InfoUtils.GetMoreInfo(ref info, headVehicle, GetHeadVehicleID());
+            return info;
         }
 
         public Positioning GetPositioning()

@@ -1,16 +1,16 @@
-﻿namespace FPSCamera.UI
-{
-    using AlgernonCommons.Translation;
-    using AlgernonCommons.UI;
-    using ColossalFramework;
-    using ColossalFramework.UI;
-    using FPSCamera.Cam.Controller;
-    using FPSCamera.Settings;
-    using FPSCamera.Utils;
-    using System;
-    using UnifiedUI.GUI;
-    using UnityEngine;
+﻿using AlgernonCommons.Translation;
+using AlgernonCommons.UI;
+using ColossalFramework;
+using ColossalFramework.UI;
+using FPSCamera.Cam.Controller;
+using FPSCamera.Settings;
+using FPSCamera.Utils;
+using System;
+using UnifiedUI.GUI;
+using UnityEngine;
 
+namespace FPSCamera.UI
+{
     public class MainPanel : MonoBehaviour
     {
         public UIButton GetMainButton() => _mainBtn ?? UUISupport.UUIButton as UIButton;

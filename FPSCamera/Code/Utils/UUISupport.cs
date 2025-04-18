@@ -1,14 +1,16 @@
 ﻿using AlgernonCommons;
+using AlgernonCommons.Keybinding;
 using AlgernonCommons.Translation;
 using ColossalFramework;
 using ColossalFramework.UI;
 using FPSCamera.Settings;
+using FPSCamera.UI;
 using System.IO;
 using UnifiedUI.API;
 using UnifiedUI.Helpers;
 using UnityEngine;
 
-namespace FPSCamera.UI
+namespace FPSCamera.Utils
 {
     internal class UUISupport
     {
@@ -18,9 +20,9 @@ namespace FPSCamera.UI
         internal static UIComponent UUIButton { get; set; }
 
         /// <summary>
-        /// Gets or sets the SavedInputKey reference for communicating with UUI.
+        /// Gets or sets the <see cref="UnsavedInputKey"/> reference for communicating with UUI.
         /// </summary>
-        internal static SavedInputKey UUIKey => new SavedInputKey("KeyUUIToggle", "FPSCamera", ModSettings.KeyUUIToggle.Encode(), true);
+        internal static UnsavedInputKey UUIKey { get; set; } = new UnsavedInputKey("FPSCamera UUI Key", new Keybinding(KeyCode.F, false, true, false));
 
         /// <summary>
         /// Register the UUI button.
@@ -83,5 +85,52 @@ namespace FPSCamera.UI
                 Logging.LogException(e);
             }
         }
+        internal class UnsavedInputKey : UnifiedUI.Helpers.UnsavedInputKey
+        {
+            public UnsavedInputKey(string keyName, Keybinding inputKey) : base(keyName, "FPSCamera", inputKey.Encode()) { }
+            /// <summary>
+            /// Used for setting saving.
+            /// </summary>
+            public Keybinding Keybinding
+            {
+                get => new Keybinding(Key, Control, Shift, Alt);
+                set => this.value = value.Encode();
+            }
+            public override void OnConflictResolved() => ModSettings.Save();
+        }
+
+        internal class UUIKeymapping : OptionsKeymapping
+        {
+            /// <summary>
+            /// Adds a UUI keymapping control.
+            /// </summary>
+            /// <param name="parent">Parent component.</param>
+            /// <param name="xPos">Relative x-position.</param>
+            /// <param name="yPos">Relative y-position.</param>
+            /// <returns>New <see cref="UUIKeymapping"/> control.</returns>
+            public static UUIKeymapping AddKeymapping(UIComponent parent, float xPos, float yPos)
+            {
+                // Basic setup.
+                var newKeymapping = parent.gameObject.AddComponent<UUIKeymapping>();
+                newKeymapping.Label = Translations.Translate("SETTINGS_KEYUUITOGGLE");
+                newKeymapping.Binding = UUIKey.Keybinding;
+                newKeymapping.Panel.relativePosition = new Vector2(xPos, yPos);
+
+                return newKeymapping;
+            }
+            /// <summary>
+            /// Gets or sets the mod's UUI key.
+            /// </summary>
+            public override InputKey KeySetting
+            {
+                get => UUIKey.value;
+                set
+                {
+                    UUIKey.value = value;
+                    ButtonLabel = SavedInputKey.ToLocalizedString("KEYNAME", KeySetting);
+                }
+            }
+        }
     }
+
 }

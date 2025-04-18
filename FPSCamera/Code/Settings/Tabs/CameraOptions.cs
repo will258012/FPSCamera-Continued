@@ -111,7 +111,7 @@ namespace FPSCamera.Settings.Tabs
             currentY += invertRotateVertical_CheckBox.height + Margin;
 
 
-            movementSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.MovementSpeed);
+            movementSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.MovementSpeed, new UISliders.SliderValueFormat(1, 0.5f, "N", "km/h"));
             movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
             currentY += movementSpeed_Slider.height + SliderMargin;
 
@@ -180,7 +180,7 @@ namespace FPSCamera.Settings.Tabs
             };
 
             groundCliping_dropDown = UIDropDowns.AddPlainDropDown(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClippingItems, (int)ModSettings.GroundClipping, 300);
-            groundCliping_dropDown.tooltip = string.Format(Translations.Translate("SETTINGS_GROUNDCLIPING_DETAIL"), "\n");
+            groundCliping_dropDown.tooltip = Translations.Translate("SETTINGS_GROUNDCLIPING_DETAIL");
             groundCliping_dropDown.eventSelectedIndexChanged += (_, index) => ModSettings.GroundClipping = (ModSettings.GroundClippings)index;
             groundCliping_dropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += groundCliping_dropDown.parent.height + Margin;
@@ -196,13 +196,13 @@ namespace FPSCamera.Settings.Tabs
             currentY += roadLevelOffset_Slider.height + SliderMargin;
 
             pathsDetection_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_PATHS_DETECTION"));
-            pathsDetection_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_DETECTIONS_DETAIL"), "\n");
+            pathsDetection_CheckBox.tooltip = Translations.Translate("SETTINGS_DETECTIONS_DETAIL");
             pathsDetection_CheckBox.isChecked = ModSettings.PathsDetection;
             pathsDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.PathsDetection = isChecked;
             currentY += pathsDetection_CheckBox.height + Margin;
 
             tracksDetection_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_TRACKS_DETECTION"));
-            tracksDetection_CheckBox.tooltip = string.Format(Translations.Translate("SETTINGS_DETECTIONS_DETAIL"), "\n");
+            tracksDetection_CheckBox.tooltip = Translations.Translate("SETTINGS_DETECTIONS_DETAIL");
             tracksDetection_CheckBox.isChecked = ModSettings.TracksDetection;
             tracksDetection_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.TracksDetection = isChecked;
             currentY += tracksDetection_CheckBox.height + Margin;

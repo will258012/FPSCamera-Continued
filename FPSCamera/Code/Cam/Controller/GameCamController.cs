@@ -73,29 +73,29 @@ namespace FPSCamera.Cam.Controller
             CameraController.enabled = false;
             if (ModSettings.HideGameUI)
             {
-                _cachedRect = Camera.main.rect;//need to control Camera.main instead of MainCamera we got, fixed for Dynamic Resolution
+                cachedRect = Camera.main.rect;//need to control Camera.main instead of MainCamera we got, fixed for Dynamic Resolution
                 Camera.main.rect = CameraController.kFullScreenRect;
             }
-            if (_camTiltEffect != null) _camTiltEffect.enabled = false;
+            if (camTiltEffect != null) camTiltEffect.enabled = false;
             if (ModSettings.Dof)
             {
-                if (_camDoF != null)
-                    _camDoF.enabled = true;
+                if (camDoF != null)
+                    camDoF.enabled = true;
             }
             else
             {
-                if (_camDoF != null && IsDoFEnabled)
-                    _camDoF.enabled = false;
+                if (camDoF != null && IsDoFEnabled)
+                    camDoF.enabled = false;
             }
             if (ModSettings.SetBackCamera)
             {
-                _cachedPositioning = new Positioning(MainCamera.transform.position, MainCamera.transform.rotation);
-                _savedCameraView = new CameraController.SavedCameraView(CameraController);
+                cachedPositioning = new Positioning(MainCamera.transform.position, MainCamera.transform.rotation);
+                savedCameraView = new CameraController.SavedCameraView(CameraController);
             }
 
-            _cachedfieldOfView = MainCamera.fieldOfView;
+            cachedFoV = MainCamera.fieldOfView;
             MainCamera.fieldOfView = ModSettings.CamFieldOfView;
-            _cachednearClipPlane = MainCamera.nearClipPlane;
+            cachedNearClipPlane = MainCamera.nearClipPlane;
             MainCamera.nearClipPlane = ModSettings.CamNearClipPlane;
         }
         /// <summary>
@@ -103,19 +103,19 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void Restore()
         {
-            if (_camDoF != null) _camDoF.enabled = IsDoFEnabled;
-            if (_camTiltEffect != null) _camTiltEffect.enabled = IsTiltEffectEnabled;
+            if (camDoF != null) camDoF.enabled = IsDoFEnabled;
+            if (camTiltEffect != null) camTiltEffect.enabled = IsTiltEffectEnabled;
 
-            MainCamera.fieldOfView = _cachedfieldOfView;
-            MainCamera.nearClipPlane = _cachednearClipPlane;
+            MainCamera.fieldOfView = cachedFoV;
+            MainCamera.nearClipPlane = cachedNearClipPlane;
             if (ModSettings.HideGameUI)
-                Camera.main.rect = _cachedRect;
+                Camera.main.rect = cachedRect;
 
             if (ModSettings.SetBackCamera)
             {
-                ResetFromSavedCameraView(_savedCameraView);
-                _cachedPositioning = new Positioning(Vector3.zero);
-                _savedCameraView = default;
+                ResetFromSavedCameraView(savedCameraView);
+                cachedPositioning = new Positioning(Vector3.zero);
+                savedCameraView = default;
             }
             else
                 SyncCameraControllerFromTransform();
@@ -208,17 +208,17 @@ namespace FPSCamera.Cam.Controller
                 Logging.Error("CameraController is not found");
                 return;
             }
-            _camDoF = GetComponent<DepthOfField>();
-            _camTiltEffect = GetComponent<TiltShiftEffect>();
+            camDoF = GetComponent<DepthOfField>();
+            camTiltEffect = GetComponent<TiltShiftEffect>();
         }
-        private readonly DepthOfField _camDoF;
-        private readonly TiltShiftEffect _camTiltEffect;
+        private readonly DepthOfField camDoF;
+        private readonly TiltShiftEffect camTiltEffect;
 
-        internal Positioning _cachedPositioning;
-        private CameraController.SavedCameraView _savedCameraView;
-        internal Rect _cachedRect = CameraController.kFullScreenWithoutMenuBarRect;
+        internal Positioning cachedPositioning;
+        private CameraController.SavedCameraView savedCameraView;
+        internal Rect cachedRect = CameraController.kFullScreenWithoutMenuBarRect;
 
-        private float _cachedfieldOfView;
-        private float _cachednearClipPlane;
+        private float cachedFoV;
+        private float cachedNearClipPlane;
     }
 }
