@@ -45,10 +45,16 @@
 "SETTINGS_FIELDOFVIEW","攝影機視野",""
 "SETTINGS_PATHS_DETECTION","Enable position detection for pedestrian paths",""
 "SETTINGS_TRACKS_DETECTION","Enable position detection for tracks",""
-"SETTINGS_DETECTIONS_DETAIL","This option is used to update the camera position more precisely. {0}Disable if it does not work well with Steam Workshop assets",""
+"SETTINGS_DETECTIONS_DETAIL","This option is used to update the camera position more precisely. 
+Disable it if it not works well with Steam Workshop assets",""
 "SETTINGS_SHOWCURSORFREE","自由模式下總是顯示遊標",""
 "SETTINGS_GROUNDCLIPING","地面貼靠選項",""
-"SETTINGS_GROUNDCLIPING_DETAIL","For Free-Camera Mode:{0}-[None] free movement{0}-[Above ground] camera always above ground{0}-[Snap to ground] camera sticks to ground{0}-[Above road] camera always above the closest road{0}-[Snap to road] camera sticks to the closest road or ground",""
+"SETTINGS_GROUNDCLIPING_DETAIL","For Free-Camera Mode:
+-[None] free movement
+-[Above ground] camera always above ground
+-[Snap to ground] camera sticks to ground
+-[Above road] camera always above the closest road
+-[Snap to road] camera sticks to the closest road or ground",""
 "SETTINGS_GROUNDCLIPING_NONE","無",""
 "SETTINGS_GROUNDCLIPING_ABOVE_GROUND","高於地面",""
 "SETTINGS_GROUNDCLIPING_SNAP_TO_GROUND","貼近地面",""
@@ -81,8 +87,9 @@
 "SETTINGS_KEYCURSORTOGGLE","切換遊標可見性",""
 "SETTINGS_KEYAUTOMOVE","自由模式下自動移動",""
 "SETTINGS_KEYAUTOMOVE_DETAIL","在自由模式下，攝影機會自動向前移動。",""
-"SETTINGS_KEYSAVEFOFFSET","儲存目前攝影機設定為預設值",""
-"SETTINGS_KEYSAVEFOFFSET_DETAIL","在跟隨/漫遊模式下，儲存跟隨目標的目前攝影機設定",""
+"SETTINGS_KEYSAVEFOFFSET","Save type offset setting",""
+"SETTINGS_KEYSAVEFOFFSET_DETAIL","In Follow/Walk-Through mode, save the current camera offset and rotation settings
+as the type settings for the followed target",""
 "SETTINGS_KEYMOVEFORWARD","向前移動/偏移",""
 "SETTINGS_KEYMOVEBACKWARD","向後移動/偏移",""
 "SETTINGS_KEYMOVELEFT","向左移動/偏移",""
@@ -93,14 +100,16 @@
 "SETTINGS_KEYROTATERIGHT","向右旋轉/檢視",""
 "SETTINGS_KEYROTATEUP","向上旋轉/查看",""
 "SETTINGS_KEYROTATEDOWN","向下旋轉/檢視",""
-"SETTINGS_KEYUUITOGGLE","Toggle main panel (need to subscribe to UUI mod)",""
+"SETTINGS_KEYUUITOGGLE","Toggle main panel (requires UUI mod)",""
 "SETTINGS_SMOOTRANSITION","啟用平滑過渡",""
-"SETTINGS_SMOOTRANSITION_DETAIL","When camera moves, rotates or zooms, the transition could be either smooth or instant.{0}Enabling the option could make camera look lagging.",""
+"SETTINGS_SMOOTRANSITION_DETAIL","When camera moves, rotates or zooms, the transition could be either smooth or instant.
+Enabling the option could make camera look lagging.",""
 "SETTINGS_TRANSSPEED","平滑過渡速率",""
 "SETTINGS_MINTRANSDISTANCE","平滑過渡最小距離",""
 "SETTINGS_MINTRANSDISTANCE_DETAIL","In Follow Mode, camera needs to move instantly with the target even when smooth transition is enabled.{0}This sets the minimum distance to start applying smooth transition.",""
 "SETTINGS_MAXTRANSDISTANCE","Max distance for smooth transition",""
-"SETTINGS_MAXTRANSDISTANCE_DETAIL","When the camera target position is too far, smooth transition takes too long.{0}This number sets the distance to give up the transition.",""
+"SETTINGS_MAXTRANSDISTANCE_DETAIL","When the camera target position is too far, smooth transition takes too long.
+This number sets the distance to give up the transition.",""
 "SETTINGS_DELTAPOSMIN","平滑過渡的最小移動",""
 "SETTINGS_DELTAPOSMAX","平滑過渡的最大移動",""
 "SETTINGS_ROTATEMIN","Min rotation for smooth transition",""
@@ -110,7 +119,11 @@
 "SETTINGS_FOVIEWSCROLLFACTOR_DETAIL","Adjusting the speed of scroll wheel scaling in the FPS Camera",""
 "SETTINGS_MAXEXITINGDURATION","Max duration for exiting FPS Camera",""
 "SETTINGS_LODOPT","LOD optimization level (experimental)",""
-"SETTINGS_LODOPT_DETAIL","When FPS Camera is enabled:{0}-[Disabled] Disable LOD optimization{0}-[Low] Optimize LOD distances only for distant citizens, vehicles, trees, and roads{0}-[Medium] Further optimize distant props and buildings based on the previous level{0}-[High] Further reduce LOD distances based on the previous level",""
+"SETTINGS_LODOPT_DETAIL","When FPS Camera is enabled:
+-[Disabled] Disable LOD optimization
+-[Low] Optimize LOD distances only for distant citizens, vehicles, trees, and roads
+-[Medium] Further optimize distant props and buildings based on the previous level
+-[High] Further reduce LOD distances based on the previous level",""
 "SETTINGS_SHADOWSOPT","Apply shadows distance optimization",""
 "SETTINGS_SHADOWSOPT_DETAIL","When the FPS Camera is enabled, perform shadows distance adjustment.",""
 "VEHICLE_AITYPE_BUS","巴士",""
