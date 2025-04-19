@@ -45,7 +45,8 @@
 "SETTINGS_FIELDOFVIEW","카메라 시야각",""
 "SETTINGS_PATHS_DETECTION","Enable position detection for pedestrian paths",""
 "SETTINGS_TRACKS_DETECTION","Enable position detection for tracks",""
-"SETTINGS_DETECTIONS_DETAIL","This option is used to update the camera position more precisely. {0}Disable if it does not work well with Steam Workshop assets",""
+"SETTINGS_DETECTIONS_DETAIL","This option is used to update the camera position more precisely. 
+Disable it if it not works well with Steam Workshop assets",""
 "SETTINGS_SHOWCURSORFREE","자유 카메라 모드에서 커서 보이기",""
 "SETTINGS_GROUNDCLIPING","땅에 붙이기 옵션",""
 "SETTINGS_GROUNDCLIPING_DETAIL","자유 카메라 모드의 경우:
@@ -87,7 +88,8 @@
 "SETTINGS_KEYAUTOMOVE","자유 카메라 모드에서 자동으로 이동",""
 "SETTINGS_KEYAUTOMOVE_DETAIL","이 기능을 활성화하면 카메라가 자동으로 앞으로 이동합니다.",""
 "SETTINGS_KEYSAVEFOFFSET","현재 카메라 설정을 기본값으로 저장",""
-"SETTINGS_KEYSAVEFOFFSET_DETAIL","In Follow/Walk-Through mode, save the current camera setting \n for the followed target",""
+"SETTINGS_KEYSAVEFOFFSET_DETAIL","In Follow/Walk-Through mode, save the current camera offset and rotation settings
+as the type settings for the followed target",""
 "SETTINGS_KEYMOVEFORWARD","앞으로 이동",""
 "SETTINGS_KEYMOVEBACKWARD","뒤로 이동",""
 "SETTINGS_KEYMOVELEFT","왼쪽으로 이동",""
@@ -98,7 +100,7 @@
 "SETTINGS_KEYROTATERIGHT","회전/오른쪽으로 보기",""
 "SETTINGS_KEYROTATEUP","회전/위로 보기",""
 "SETTINGS_KEYROTATEDOWN","회전/아래로 보기",""
-"SETTINGS_KEYUUITOGGLE","Toggle main panel (need to subscribe to UUI mod)",""
+"SETTINGS_KEYUUITOGGLE","Toggle main panel (requires UUI mod)",""
 "SETTINGS_SMOOTRANSITION","부드러운 전환 적용",""
 "SETTINGS_SMOOTRANSITION_DETAIL","카메라가 움직이거나 회전하거나 확대/축소될 때 전환이 부드럽거나 즉시 이루어집니다.
 해당 옵션을 활성화하면 카메라가 느리게 보일 수 있습니다.",""
