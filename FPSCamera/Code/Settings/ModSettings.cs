@@ -41,6 +41,7 @@ namespace FPSCamera.Settings
             Translations.CurrentLanguage = "default";
             Logging.DetailLogging = false;
             WhatsNew.LastNotifiedVersionString = "0.0";
+            DSAForCameraIssue = false;
 
             HideGameUI = true;
             SetBackCamera = true;
@@ -109,7 +110,8 @@ namespace FPSCamera.Settings
             KeyRotateRight = new KeyOnlyBinding(KeyCode.RightArrow);
             KeyRotateUp = new KeyOnlyBinding(KeyCode.UpArrow);
             KeyRotateDown = new KeyOnlyBinding(KeyCode.DownArrow);
-            KeyUUIToggle = new Keybinding(KeyCode.F, false, true, false);
+            Utils.UUISupport.UUIKey.Keybinding = new Keybinding(KeyCode.F, false, true, false);
+
             MainButtonPos = new Vector3(0f, 0f);
         }
         public enum SpeedUnits
@@ -452,14 +454,17 @@ namespace FPSCamera.Settings
         internal static KeyOnlyBinding KeyRotateDown = new KeyOnlyBinding(KeyCode.DownArrow);
 
         [XmlElement("KeyUUIToggle")]
-        public Keybinding XMLKeyUUIToggle { get => KeyUUIToggle; set => KeyUUIToggle = value; }
-        [XmlIgnore]
-        internal static Keybinding KeyUUIToggle = new Keybinding(KeyCode.F, false, true, false);
+        public Keybinding XMLKeyUUIToggle { get => Utils.UUISupport.UUIKey.Keybinding; set => Utils.UUISupport.UUIKey.Keybinding = value; }
         #endregion
 
         [XmlElement("MainButtonPos")]
         public Vector3 XMLMainButtonPos { get => MainButtonPos; set => MainButtonPos = value; }
         [XmlIgnore]
         internal static Vector3 MainButtonPos = new Vector3(0f, 0f);
+
+        [XmlElement("DSAForCameraIssue")]
+        public bool XMLDSAForCameraIssue { get => DSAForCameraIssue; set => DSAForCameraIssue = value; }
+        [XmlIgnore]
+        internal static bool DSAForCameraIssue = false;
     }
 }

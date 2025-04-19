@@ -13,12 +13,12 @@ namespace FPSCamera.Game
                 Logging.Message("-- Setting shadows distance");
                 if (status)
                 {
-                    _cachedDist = QualitySettings.shadowDistance;
-                    QualitySettings.shadowDistance = Mathf.Min(Opt, _cachedDist);
+                    cachedDist = QualitySettings.shadowDistance;
+                    QualitySettings.shadowDistance = Mathf.Min(Opt, cachedDist);
                 }
                 else
                 {
-                    QualitySettings.shadowDistance = _cachedDist;
+                    QualitySettings.shadowDistance = cachedDist;
                 }
             }
 
@@ -28,7 +28,7 @@ namespace FPSCamera.Game
             }
             yield break;
         }
-        private static float _cachedDist;
+        private static float cachedDist;
         private const float Opt = 512f;
     }
 

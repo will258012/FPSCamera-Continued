@@ -50,16 +50,20 @@ namespace FPSCamera
                         ModSettings.Save();
                     };
                 }
-                if (ModSettings.FollowCamOffset.y < 0f || ModSettings.VehicleFixedOffset.y < 2f || ModSettings.MidVehFixedOffset.y < 3f || ModSettings.PedestrianFixedOffset.y < 2f)
+            }
+            if (!ModSettings.DSAForCameraIssue &&
+                (ModSettings.FollowCamOffset.y < 0f ||
+                (ModSettings.VehicleFixedOffset.y + ModSettings.FollowCamOffset.y) < 2f ||
+                (ModSettings.MidVehFixedOffset.y + ModSettings.FollowCamOffset.y) < 3f ||
+                (ModSettings.PedestrianFixedOffset.y + ModSettings.FollowCamOffset.y) < 2f))
+            {
+                var notification = NotificationBase.ShowNotification<SettingsIssueNotification>();
+                notification.AddParas(Translations.Translate("SETTINGS_ISSUE_DETECTED"));
+                notification.DSAButton.eventClicked += (_, clickEvent) =>
                 {
-                    var notification = NotificationBase.ShowNotification<SettingsIssueNotification>();
-                    notification.AddParas(Translations.Translate("SETTINGS_ISSUE_DETECTED"));
-                    notification.DSAButton.eventClicked += (_, clickEvent) =>
-                    {
-                        WhatsNew.LastNotifiedVersion = AssemblyUtils.CurrentVersion;
-                        ModSettings.Save();
-                    };
-                }
+                    ModSettings.DSAForCameraIssue = true;
+                    ModSettings.Save();
+                };
             }
         }
         public override void OnCreated(ILoading loading)

@@ -12,7 +12,6 @@ namespace FPSCamera.Game
             {
                 if (status)
                 {
-                    LodConfig.SaveLodConfig();
                     if (ModSettings.LodOpt == 1)
                         LodConfig.ActiveConfig = LodConfig.Low;
                     else if (ModSettings.LodOpt == 2)
@@ -22,11 +21,10 @@ namespace FPSCamera.Game
                 }
                 else
                 {
-                    LodConfig.ActiveConfig = LodConfig.Saved;
+                    LodConfig.ActiveConfig = null;
                 }
                 Logging.Message("-- Refreshing LOD");
                 RefreshLODs();
-                if (!status) LodConfig.ActiveConfig = null;
             }
 
             catch (Exception e)
@@ -40,7 +38,6 @@ namespace FPSCamera.Game
             refreshLods<TreeInfo>();
             refreshLods<PropInfo>();
             refreshLods<BuildingInfo>();
-            refreshLods<BuildingInfoSub>();
             refreshLods<NetInfo>();
             refreshLods<VehicleInfo>();
             refreshLods<CitizenInfo>();
@@ -65,38 +62,6 @@ namespace FPSCamera.Game
             if (ToolsModifierControl.toolController && ToolsModifierControl.toolController.m_editPrefabInfo is T)
             {
                 ToolsModifierControl.toolController.m_editPrefabInfo.RefreshLevelOfDetail();
-            }
-        }
-
-        public static float GetLodDistance<T>() where T : PrefabInfo
-        {
-            var prefab = PrefabCollection<T>.GetLoaded((uint)(PrefabCollection<T>.LoadedCount() - 1));
-            switch (prefab)
-            {
-                case CitizenInfo info:
-                    return info.m_lodRenderDistance;
-                case TreeInfo info:
-                    return info.m_lodRenderDistance;
-                default:
-                    throw new InvalidOperationException($"Unsupported PrefabInfo type: {typeof(T)}");
-            }
-        }
-        public static float GetLodDistance<T>(T manager, bool IsPropManager_MaxRenderDistance = false) where T : ISimulationManager
-        {
-            switch (manager)
-            {
-                case BuildingManager buildingManager:
-                    return buildingManager.m_buildings.m_buffer[0].Info.m_minLodDistance;
-                case PropManager propManager when !IsPropManager_MaxRenderDistance:
-                    return propManager.m_props.m_buffer[0].Info.m_lodRenderDistance;
-                case PropManager propManager when IsPropManager_MaxRenderDistance:
-                    return propManager.m_props.m_buffer[0].Info.m_maxRenderDistance;
-                case NetManager netManager:
-                    return netManager.m_segments.m_buffer[0].Info.m_segments[0].m_lodRenderDistance;
-                case VehicleManager vehicleManager:
-                    return vehicleManager.m_vehicles.m_buffer[0].Info.m_lodRenderDistance;
-                default:
-                    throw new InvalidOperationException($"Unsupported SimulationManager type: {typeof(T)}");
             }
         }
         internal class LodConfig
@@ -126,8 +91,6 @@ namespace FPSCamera.Game
             internal float NetworkLodDistance { get; set; }
             internal float VehicleLodDistance { get; set; }
 
-            internal static LodConfig Saved { get; private set; }
-
             internal static LodConfig Low =>
                 new LodConfig(256f,
                     256f,
@@ -156,36 +119,6 @@ namespace FPSCamera.Game
                     128f
                     );
             internal static LodConfig ActiveConfig = null;
-
-            internal static void SaveLodConfig()
-            {
-                try
-                {
-                    Saved = new LodConfig(
-                        citizenLodDistance: GetLodDistance<CitizenInfo>(),
-                        treeLodDistance: GetLodDistance<TreeInfo>(),
-                        propLodDistance: GetLodDistance(PropManager.instance),
-                        decalPropFadeDistance: GetLodDistance(PropManager.instance, true),
-                        buildingLodDistance: GetLodDistance(BuildingManager.instance),
-                        networkLodDistance: GetLodDistance(NetManager.instance),
-                        vehicleLodDistance: GetLodDistance(VehicleManager.instance));
-                    Logging.Message($"Saved LOD Config:\n" +
-                        $"  CitizenLodDistance = {Saved.CitizenLodDistance}\n" +
-                        $"  TreeLodDistance = {Saved.TreeLodDistance}\n" +
-                        $"  PropLodDistance = {Saved.PropLodDistance}\n" +
-                        $"  DecalPropFadeDistance = {Saved.DecalPropFadeDistance}\n" +
-                        $"  BuildingLodDistance = {Saved.BuildingLodDistance}\n" +
-                        $"  NetworkLodDistance = {Saved.NetworkLodDistance}\n" +
-                        $"  VehicleLodDistance = {Saved.VehicleLodDistance}\n");
-
-                }
-                catch (Exception e)
-                {
-                    Logging.LogException(e);
-                }
-
-            }
-
         }
     }
 }

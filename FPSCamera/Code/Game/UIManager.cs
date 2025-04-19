@@ -15,12 +15,12 @@ namespace FPSCamera.Game
         {
             get
             {
-                if (_uiCamera == null)
-                    _uiCamera = Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
-                return _uiCamera;
+                if (uiCamera == null)
+                    uiCamera = Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
+                return uiCamera;
             }
         }
-        private static Camera _uiCamera = null;
+        private static Camera uiCamera = null;
         private class UIState
         {
             internal bool NotificationsVisible { get; set; }
@@ -89,7 +89,7 @@ namespace FPSCamera.Game
         {
             if (!visibility)
             {
-                Object.FindObjectOfType<ToolsModifierControl>().ReallyCloseEverything();
+                Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
                 SaveState();
                 ToggleItManager.Instance.Apply(1, false);
                 ToggleItManager.Instance.Apply(2, false);
@@ -119,7 +119,7 @@ namespace FPSCamera.Game
             NetManager.instance.RoadNamesVisible = visibility;
             UICamera.enabled = visibility;
             if (!visibility)
-                Object.FindObjectOfType<ToolsModifierControl>().ReallyCloseEverything();
+                Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
         }
     }
 }

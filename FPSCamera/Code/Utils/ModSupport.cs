@@ -1,5 +1,5 @@
 ﻿using AlgernonCommons;
-using HarmonyLib;
+using ColossalFramework.Plugins;
 using System;
 using System.Collections.Generic;
 namespace FPSCamera.Utils
@@ -15,48 +15,76 @@ namespace FPSCamera.Utils
 
         internal static List<string> CheckModConflicts()
         {
-            var list = new List<string>();
-            if (AccessTools.TypeByName("FPSCamera.FPSCamera") != null) list.Add("First Person Camera: Updated");
-            if (AccessTools.TypeByName("FPSCamera.Controller") != null) list.Add("First Person Camera v2.x");
-            if (AssemblyUtils.IsAssemblyPresent("EnhancedZoom")) list.Add("Enhanced Zoom Continued");
-            if (AssemblyUtils.IsAssemblyPresent("IINS.AutoWalking")) list.Add("First-person Auto-walking");
-            return list;
+            var conflictModNames = new List<string>();
+            foreach (var plugin in PluginManager.instance.GetPluginsInfo())
+            {
+                foreach (var assembly in plugin.GetAssemblies())
+                {
+                    switch (assembly.GetName().Name)
+                    {
+                        case "FPSCamera":
+                            if (assembly.GetType("FPSCamera.FPSCamera") != null)
+                                conflictModNames.Add("First Person Camera: Updated");
+                            else if (assembly.GetType("FPSCamera.Controller") != null)
+                                conflictModNames.Add("First Person Camera v2.x");
+                            break;
+                        case "EnhancedZoom":
+                            conflictModNames.Add("Enhanced Zoom Continued");
+                            break;
+                        case "IINS.AutoWalking":
+                            conflictModNames.Add("First-person Auto-walking");
+                            break;
+                    }
+                }
+            }
+            return conflictModNames;
         }
         internal static void Initialize()
         {
             try
             {
-                if (AssemblyUtils.IsAssemblyPresent("ToggleIt"))
-                    FoundToggleIt = true;
-
-                if (AssemblyUtils.IsAssemblyPresent("UnifiedUIMod"))
-                    FoundUUI = true;
-
-                if (AssemblyUtils.IsAssemblyPresent("TrainDisplay"))
-                    FoundTrainDisplay = true;
-
-                var assembly = AssemblyUtils.GetEnabledAssembly("TransportLinesManager");
-
-                if (assembly != null)
+                Logging.Message("ModSupport: Start search for supported enabled mods");
+                foreach (var plugin in PluginManager.instance.GetPluginsInfo())
                 {
-                    var n = assembly?.GetType("Klyte.TransportLinesManager.TLMController");
-
-                    if (n != null)
-                    {
-                        Logging.KeyMessage("ModSupport: Found an older version of Transport Lines Manager by Klyte45");
-                        FoundK45TLM = true;
-                    }
-                    else
-                    {
-                        FoundTLM = true;
-                    }
+                    if (plugin.isEnabled)
+                        foreach (var assembly in plugin.GetAssemblies())
+                        {
+                            switch (assembly.GetName().Name)
+                            {
+                                case "ToggleIt":
+                                    FoundToggleIt = true;
+                                    Logging.KeyMessage("found ToggleIt, version ", assembly.GetName().Version);
+                                    break;
+                                case "UnifiedUIMod":
+                                    FoundUUI = true;
+                                    Logging.KeyMessage("found UUI, version ", assembly.GetName().Version);
+                                    break;
+                                case "TrainDisplay":
+                                    FoundTrainDisplay = true;
+                                    Logging.KeyMessage("found TrainDisplay, version ", assembly.GetName().Version);
+                                    break;
+                                case "TransportLinesManager":
+                                    {
+                                        if (assembly.GetType("Klyte.TransportLinesManager.TLMController") != null)
+                                        {
+                                            Logging.KeyMessage("found an older version of TLM by Klyte45");
+                                            FoundK45TLM = true;
+                                        }
+                                        else
+                                        {
+                                            Logging.KeyMessage("found TLM by t1a2l, version ", assembly.GetName().Version);
+                                            FoundTLM = true;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
                 }
             }
 
             catch (Exception e)
             {
-                Logging.Error($"ModSupport: Failed to finding the mod");
-                Logging.LogException(e);
+                Logging.LogException(e, $"ModSupport: Failed to search mods");
             }
         }
     }

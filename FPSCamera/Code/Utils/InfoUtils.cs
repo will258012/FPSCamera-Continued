@@ -6,21 +6,21 @@ using System.Collections.Generic;
 
 namespace FPSCamera.Utils
 {
-    public static class InfosUtils
+    public static class InfoUtils
     {
         /// <summary>
         /// Retrieves geographical information about the current camera position.
         /// </summary>
         /// <returns>A dictionary containing geographical information.</returns>
-        public static Dictionary<string, string> GetGeoInfos(IFPSCam followCam)
+        public static Dictionary<string, string> GetGeoInfo(IFPSCam followCam)
         {
-            var infos = new Dictionary<string, string>();
+            var info = new Dictionary<string, string>();
             var pos = followCam.GetPositioning().pos;
             if (MapUtils.RayCastDistrict(pos) is InstanceID disID && disID.District != default)
             {
                 var name = DistrictManager.instance.GetDistrictName(disID.District);
                 if (!string.IsNullOrEmpty(name))
-                    infos[Translations.Translate("INFO_DISTRICT")] = name;
+                    info[Translations.Translate("INFO_DISTRICT")] = name;
             }
             if (MapUtils.RayCastPark(pos) is InstanceID parkID && parkID.Park != default)
             {
@@ -31,19 +31,19 @@ namespace FPSCamera.Utils
                     switch (parkGruop)
                     {
                         case DistrictPark.ParkGroup.ParkLife:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_PARK")] = name;
+                            info[Translations.Translate("INFO_DLCDISTRICT_PARK")] = name;
                             break;
                         case DistrictPark.ParkGroup.Industry:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_INDUSTRY")] = name;
+                            info[Translations.Translate("INFO_DLCDISTRICT_INDUSTRY")] = name;
                             break;
                         case DistrictPark.ParkGroup.Campus:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_CAMPUS")] = name;
+                            info[Translations.Translate("INFO_DLCDISTRICT_CAMPUS")] = name;
                             break;
                         case DistrictPark.ParkGroup.Airport:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_AIRPORT")] = name;
+                            info[Translations.Translate("INFO_DLCDISTRICT_AIRPORT")] = name;
                             break;
                         case DistrictPark.ParkGroup.PedestrianZone:
-                            infos[Translations.Translate("INFO_DLCDISTRICT_PEDZONE")] = name;
+                            info[Translations.Translate("INFO_DLCDISTRICT_PEDZONE")] = name;
                             break;
                         default:
                             Logging.Error($"Unknown parkGruop: {parkGruop}");
@@ -57,72 +57,72 @@ namespace FPSCamera.Utils
             {
                 var name = NetManager.instance.GetSegmentName(segID.NetSegment);
                 if (!string.IsNullOrEmpty(name))
-                    infos[Translations.Translate("INFO_ROAD")] = name;
+                    info[Translations.Translate("INFO_ROAD")] = name;
             }
-            return infos;
+            return info;
         }
-        internal static void GetMoreInfos(ref Dictionary<string, string> infos, Vehicle vehicle, ushort vehicleid)
+        internal static void GetMoreInfo(ref Dictionary<string, string> info, Vehicle vehicle, ushort vehicleid)
         {
-            var modifyInfos = infos;
+            var modifyInfo = info;
             var ai = vehicle.Info.m_vehicleAI;
             switch (ai)
             {
-                case BusAI _: TransitInfos(Translations.Translate("VEHICLE_AITYPE_BUS")); break;
+                case BusAI _: TransitInfo(Translations.Translate("VEHICLE_AITYPE_BUS")); break;
                 case TramAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_TRAM")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_TRAM")); break;
                 case MetroTrainAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_METRO")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_METRO")); break;
                 case PassengerTrainAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_TRAIN")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_TRAIN")); break;
                 case PassengerPlaneAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_FLIGHT")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_FLIGHT")); break;
                 case PassengerBlimpAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_BLIMP")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_BLIMP")); break;
                 case CableCarAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_GONDOLA")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_GONDOLA")); break;
                 case TrolleybusAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_TROLLEYBUS")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_TROLLEYBUS")); break;
                 case PassengerFerryAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_FERRY")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_FERRY")); break;
                 case PassengerShipAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_SHIP")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_SHIP")); break;
                 case PassengerHelicopterAI _:
-                    TransitInfos(Translations.Translate("VEHICLE_AITYPE_HELICOPTER")); break;
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_HELICOPTER")); break;
 
                 case CargoTruckAI _:
                 case CargoTrainAI _:
                 case CargoShipAI _:
-                case CargoPlaneAI _: CargoInfos(); break;
+                case CargoPlaneAI _: CargoInfo(); break;
 
                 case AmbulanceAI _:
                 case AmbulanceCopterAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_MEDICAL")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_MEDICAL")); break;
                 case DisasterResponseVehicleAI _:
                 case DisasterResponseCopterAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_DISASTERRESPONSE")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_DISASTERRESPONSE")); break;
                 case FireCopterAI _:
                 case FireTruckAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_FIREFIGHTING")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_FIREFIGHTING")); break;
                 case PoliceCopterAI _:
                 case PoliceCarAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_POLICE")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_POLICE")); break;
                 case GarbageTruckAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_GARBAGE")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_GARBAGE")); break;
                 case HearseAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_DEATHCARE")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_DEATHCARE")); break;
                 case PostVanAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_POSTAL")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_POSTAL")); break;
                 case SnowTruckAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_SNOWPLOWING")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_SNOWPLOWING")); break;
                 case WaterTruckAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_WATERPUMPING")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_WATERPUMPING")); break;
                 case BankVanAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_BANK")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_BANK")); break;
                 case TaxiAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_TAXI"), true); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_TAXI"), true); break;
                 case MaintenanceTruckAI _:
                 case ParkMaintenanceVehicleAI _:
-                    ServiceInfos(Translations.Translate("VEHICLE_AITYPE_MAINTENANCE"), true); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_MAINTENANCE"), true); break;
 
                 case PrivatePlaneAI _:
                 case PassengerCarAI _:
@@ -130,29 +130,29 @@ namespace FPSCamera.Utils
                 case BalloonAI _:
                 case FishingBoatAI _:
                 case RocketAI _:
-                    return;//These have no more infos
+                    return;//These have no more info
 
                 default:
                     Logging.Error($"Vehicle(ID:{vehicleid} of type [{ai.GetType().Name}] is not recognized.");
                     return;
             }
-            infos = modifyInfos;
+            info = modifyInfo;
             return;
 
-            void TransitInfos(string typeName)
+            void TransitInfo(string typeName)
             {
                 var transitID = vehicle.m_transportLine;
                 var transitTypeKey = GetTranslateKey();
                 var transitLineName = transitID != default ? TransportManager.instance.GetLineName(transitID) : Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_IRREGULAR");
 
-                modifyInfos[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_TRANSIT")] = $"{typeName}> {transitLineName}";
+                modifyInfo[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_TRANSIT")] = $"{typeName}> {transitLineName}";
 
                 var hasNextStation = TryGetNextStation(out var name);
                 if (hasNextStation)
-                    modifyInfos[Translations.Translate(transitTypeKey)] = name;
+                    modifyInfo[Translations.Translate(transitTypeKey)] = name;
 
                 vehicle.Info.m_vehicleAI.GetBufferStatus(vehicleid, ref vehicle, out _, out var load, out var capacity);
-                modifyInfos[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_PASSENGER")] = $"{load,4} /{capacity,4}";
+                modifyInfo[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_PASSENGER")] = $"{load,4} /{capacity,4}";
 
                 string GetTranslateKey() =>
                     typeName == Translations.Translate("VEHICLE_AITYPE_TRAM") ||
@@ -165,7 +165,7 @@ namespace FPSCamera.Utils
                 {
                     if (transitID != default)
                     {
-                        stopName = StationUtils.GetStationName(vehicle.m_targetBuilding, transitID);
+                        stopName = TransportUtils.GetStationName(vehicle.m_targetBuilding, transitID);
                         return true;
                     }
                     stopName = null;
@@ -173,23 +173,23 @@ namespace FPSCamera.Utils
                 }
 
             }
-            void CargoInfos()
+            void CargoInfo()
             {
                 vehicle.Info.m_vehicleAI.GetBufferStatus(vehicleid, ref vehicle, out _, out var load, out var capacity);
-                modifyInfos[Translations.Translate("INFO_VEHICLE_LOAD")] = capacity > 0 ? ((float)load / capacity).ToString("P1")
+                modifyInfo[Translations.Translate("INFO_VEHICLE_LOAD")] = capacity > 0 ? ((float)load / capacity).ToString("P1")
                                              : Translations.Translate("INVALID");
             }
-            void ServiceInfos(string typename, bool work_shift = false)
+            void ServiceInfo(string typename, bool work_shift = false)
             {
-                modifyInfos[Translations.Translate("INFO_VEHICLE_SERVICE")] = typename;
+                modifyInfo[Translations.Translate("INFO_VEHICLE_SERVICE")] = typename;
                 vehicle.Info.m_vehicleAI.GetBufferStatus(vehicleid, ref vehicle, out _, out var load, out var capacity);
                 if (work_shift)
                 {
-                    if (capacity > 0) modifyInfos[Translations.Translate("INFO_VEHICLE_WORKSHIFT")] = ((float)load / capacity).ToString("P1");
+                    if (capacity > 0) modifyInfo[Translations.Translate("INFO_VEHICLE_WORKSHIFT")] = ((float)load / capacity).ToString("P1");
                 }
                 else
                 {
-                    if (capacity > 0) modifyInfos[Translations.Translate("INFO_VEHICLE_LOAD")] = ((float)load / capacity).ToString("P1");
+                    if (capacity > 0) modifyInfo[Translations.Translate("INFO_VEHICLE_LOAD")] = ((float)load / capacity).ToString("P1");
                 }
             }
         }
