@@ -1,0 +1,4 @@
+files:
+  - source: FPSCamera/Translations/en-EN.csv
+    translation: /**/FPSCamera/Translations/%locale%.csv
+    scheme: 'identifier,source_or_translation,context'
