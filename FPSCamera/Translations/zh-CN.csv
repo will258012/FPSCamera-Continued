@@ -117,14 +117,9 @@
 "SETTINGS_MAXTRANSDISTANCE","平滑过渡最大距离",""
 "SETTINGS_MAXTRANSDISTANCE_DETAIL","摄像机目标位置越远，平滑过渡需要的时间越长。
 此选项设置了应用平滑过渡的最大距离。",""
-"SETTINGS_DELTAPOSMIN","平滑过渡的最小移动",""
-"SETTINGS_DELTAPOSMAX","平滑过渡的最大移动",""
-"SETTINGS_ROTATEMIN","平滑过渡的最小旋转",""
-"SETTINGS_ROTATEMAX","平滑过渡的最大旋转",""
 "SETTINGS_CAMNEARCLIPPLANE","摄像机近裁剪平面",""
 "SETTINGS_FOVIEWSCROLLFACTOR","滚轮缩放的视野缩放因子",""
 "SETTINGS_FOVIEWSCROLLFACTOR_DETAIL","调整在第一人称摄像机中，滚轮缩放的速度",""
-"SETTINGS_MAXEXITINGDURATION","退出第一人称摄像机的最大持续时间",""
 "SETTINGS_LODOPT","LOD优化程度",""
 "SETTINGS_LODOPT_DETAIL","在第一人称摄像机启用时：
 -[禁用] 禁用LOD优化
