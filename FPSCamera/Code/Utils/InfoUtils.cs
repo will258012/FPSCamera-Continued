@@ -1,7 +1,6 @@
 ﻿using AlgernonCommons;
 using AlgernonCommons.Translation;
 using FPSCamera.Cam;
-using FPSCamera.Settings;
 using System.Collections.Generic;
 
 namespace FPSCamera.Utils
@@ -61,6 +60,7 @@ namespace FPSCamera.Utils
             }
             return info;
         }
+
         internal static void GetMoreInfo(ref Dictionary<string, string> info, Vehicle vehicle, ushort vehicleid)
         {
             var modifyInfo = info;
@@ -179,29 +179,16 @@ namespace FPSCamera.Utils
                 modifyInfo[Translations.Translate("INFO_VEHICLE_LOAD")] = capacity > 0 ? ((float)load / capacity).ToString("P1")
                                              : Translations.Translate("INVALID");
             }
-            void ServiceInfo(string typename, bool work_shift = false)
+            void ServiceInfo(string typeName, bool workShift = false)
             {
-                modifyInfo[Translations.Translate("INFO_VEHICLE_SERVICE")] = typename;
+                modifyInfo[Translations.Translate("INFO_VEHICLE_SERVICE")] = typeName;
                 vehicle.Info.m_vehicleAI.GetBufferStatus(vehicleid, ref vehicle, out _, out var load, out var capacity);
-                if (work_shift)
-                {
-                    if (capacity > 0) modifyInfo[Translations.Translate("INFO_VEHICLE_WORKSHIFT")] = ((float)load / capacity).ToString("P1");
-                }
-                else
-                {
-                    if (capacity > 0) modifyInfo[Translations.Translate("INFO_VEHICLE_LOAD")] = ((float)load / capacity).ToString("P1");
-                }
+                if (capacity > 0)
+                    if (workShift)
+                        modifyInfo[Translations.Translate("INFO_VEHICLE_WORKSHIFT")] = ((float)load / capacity).ToString("P1");
+                    else
+                        modifyInfo[Translations.Translate("INFO_VEHICLE_LOAD")] = ((float)load / capacity).ToString("P1");
             }
-        }
-        public static string ToSpeedUnitString(this ModSettings.SpeedUnits speedUnits)
-        {
-            if (speedUnits == ModSettings.SpeedUnits.km_slash_h) return "km/h";
-            return speedUnits.ToString();
-        }
-        public static bool IsMile(this ModSettings.SpeedUnits speedUnits)
-        {
-            if (speedUnits == ModSettings.SpeedUnits.mph) return true;
-            return false;
         }
     }
 }

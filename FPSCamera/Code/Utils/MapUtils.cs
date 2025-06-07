@@ -13,6 +13,8 @@ namespace FPSCamera.Utils
         public static float FromKmph(this float Kmph) => Kmph / SPEED_TO_KMPH;
         public static float ToMph(this float gameDistance)
             => gameDistance * SPEED_TO_MPH;
+        public static string GetSpeedUnitString(this ModSettings.SpeedUnits speedUnits) => speedUnits == ModSettings.SpeedUnits.km_slash_h ? "km/h" : speedUnits.ToString();
+        public static bool IsMile(this ModSettings.SpeedUnits speedUnits) => speedUnits == ModSettings.SpeedUnits.mph;
         public static float GetTerrainLevel(Vector3 position)
             => TerrainManager.instance.SampleDetailHeightSmooth(position);
         public static float GetWaterLevel(Vector3 position)
