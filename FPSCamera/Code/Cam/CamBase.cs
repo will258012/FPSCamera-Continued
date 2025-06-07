@@ -4,12 +4,10 @@ namespace FPSCamera.Cam
 {
     public interface IFPSCam
     {
-        bool IsActivated { get; }
         float GetSpeed();
         Positioning GetPositioning();
         bool IsValid();
         void DisableCam();
-
     }
     public interface IFollowCam : IFPSCam
     {
