@@ -119,7 +119,7 @@ This sets the minimum distance to start applying smooth transition.",""
 "SETTINGS_CAMNEARCLIPPLANE","평면 근처의 카메라 속도",""
 "SETTINGS_FOVIEWSCROLLFACTOR","스크롤을 통한 시야 배율 조정 속도",""
 "SETTINGS_FOVIEWSCROLLFACTOR_DETAIL","1인칭 카메라에서 스크롤을 통한 시야 배율 조정 속도를 조절합니다.",""
-"SETTINGS_LODOPT","LOD 최적화 레벨(실험 기능)",""
+"SETTINGS_LODOPT","LOD 최적화 레벨",""
 "SETTINGS_LODOPT_DETAIL","1인칭 카메라가 활성화된 경우:
 -[비활성화] LOD 최적화 비활성화
 -[낮음] 먼 거리의 시민, 차량, 나무 및 도로에 대해서만 LOD 적용
