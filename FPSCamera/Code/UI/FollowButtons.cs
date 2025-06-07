@@ -37,13 +37,7 @@ namespace FPSCamera.UI
             FPSCamController.OnCameraEnabled -= SetDisable;
             FPSCamController.OnCameraDisabled -= SetEnable;
         }
-        /// <summary>
-        /// For action.
-        /// </summary>
         private void SetEnable() => enabled = true;
-        /// <summary>
-        /// For action.
-        /// </summary>
         private void SetDisable() => enabled = false;
         /// <summary>
         /// Initialize follow button for the given panel.
@@ -62,7 +56,7 @@ namespace FPSCamera.UI
         /// <typeparam name="T">The type of the panel.</typeparam>
         /// <param name="panel">Given panel.</param>
         /// <returns>The follow button.</returns>
-        private UIButton CreateCameraButton<T>(T panel) where T : WorldInfoPanel
+        private static UIButton CreateCameraButton<T>(T panel) where T : WorldInfoPanel
         {
             var button = panel.component.AddUIComponent<UIButton>();
             button.name = panel.component.name + "_StartFollow";
@@ -96,7 +90,7 @@ namespace FPSCamera.UI
          /// <param name="panel">Given panel.</param>
          /// <param name="button">Given follow button.</param>
          /// <param name="filter">Additional filters.</param>
-        private void UpdateButtonVisibility<T>(T panel, UIButton button, Func<InstanceID, bool> filter = null) where T : WorldInfoPanel
+        private static void UpdateButtonVisibility<T>(T panel, UIButton button, Func<InstanceID, bool> filter = null) where T : WorldInfoPanel
         {
             if (panel.component.isVisible)
             {
