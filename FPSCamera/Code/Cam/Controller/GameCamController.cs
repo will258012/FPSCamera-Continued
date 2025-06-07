@@ -1,5 +1,4 @@
-﻿using AlgernonCommons;
-using ColossalFramework;
+﻿using ColossalFramework;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
 using UnityEngine;
@@ -13,8 +12,7 @@ namespace FPSCamera.Cam.Controller
     public class GameCamController
     {
         /// <summary>
-        /// Gets the instance of <see cref="GameCamController"/>.
-        /// If the instance does not exist or <see cref="global::CameraController"/> is null, a new instance is created.
+        /// Gets the active instance reference of <see cref="GameCamController"/>.
         /// </summary>
         public static GameCamController Instance
         {
@@ -30,8 +28,16 @@ namespace FPSCamera.Cam.Controller
         }
         private static GameCamController _instance = null;
         /// <summary>
+        /// public constructor for the <see cref="GameCamController"/>.
+        /// </summary>
+        public GameCamController()
+        {
+            camDoF = GetComponent<DepthOfField>();
+            camTiltEffect = GetComponent<TiltShiftEffect>();
+        }
+
+        /// <summary>
         /// Gets the game's main camera instance.
-        /// If it has not been initialized, it retrieves the camera instance using reflection.
         /// </summary>
         public Camera MainCamera
         {
@@ -51,12 +57,12 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Checks Dof status.
         /// </summary>
-        private bool IsDoFEnabled => !CameraController.isDepthOfFieldDisabled;
+        public bool IsDoFEnabled => !CameraController.isDepthOfFieldDisabled;
 
         /// <summary>
         /// Checks Tilt Shift status.
         /// </summary>
-        private bool IsTiltEffectEnabled => !CameraController.isTiltShiftDisabled;
+        public bool IsTiltEffectEnabled => !CameraController.isTiltShiftDisabled;
         /// <summary>
         /// Gets a component from the CameraController.
         /// </summary>
@@ -69,8 +75,8 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void Initialize()
         {
-            CameraController.ClearTarget();
             CameraController.enabled = false;
+            ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.SetTool<DefaultTool>();
             if (ModSettings.HideGameUI)
             {
                 cachedRect = Camera.main.rect;//need to control Camera.main instead of MainCamera we got, fixed for Dynamic Resolution
@@ -111,7 +117,7 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.HideGameUI)
                 Camera.main.rect = cachedRect;
 
-            if (ModSettings.SetBackCamera)
+            if (ModSettings.SetBackCamera && CameraController.GetTarget().IsEmpty)
             {
                 ResetFromSavedCameraView(savedCameraView);
                 cachedPositioning = new Positioning(Vector3.zero);
@@ -128,15 +134,15 @@ namespace FPSCamera.Cam.Controller
         /// <param name="view">The <see cref="CameraController.SavedCameraView"/> to restore the camera to.</param>
         public void ResetFromSavedCameraView(CameraController.SavedCameraView view)
         {
+            CameraController.m_targetPosition = CameraController.m_currentPosition = view.m_position;
             CameraController.m_targetSize = CameraController.m_currentSize = view.m_size;
             //CameraController.m_targetAngle = CameraController.m_currentAngle = view.m_angle;
             CameraController.m_targetHeight = CameraController.m_currentHeight = view.m_height;
-            CameraController.m_targetPosition = CameraController.m_currentPosition = view.m_position;
         }
 
         /// <summary>
         /// Synchronizes the camera controller's position and angle with the <see cref="MainCamera"/> transform.
-        /// This function adjusts the <see cref="CameraController"/> to match the camera's position and orientation in the scene.
+        /// Adjusts the <see cref="CameraController"/> to match the camera's position and orientation in the scene.
         /// 
         /// </summary>
         public void SyncCameraControllerFromTransform()
@@ -170,7 +176,6 @@ namespace FPSCamera.Cam.Controller
                     / CameraController.m_maxTiltDistance);
                 CameraController.m_targetAngle.y = newTargetAngleY;
             }
-            var distance = 0f;
             var newPos = MainCamera.transform.position;
             // Calculate CameraController position based on the camera's transform position.
             for (int i = 1; i <= 3; i++)
@@ -178,7 +183,7 @@ namespace FPSCamera.Cam.Controller
                 height = TerrainManager.instance.SampleRawHeightSmoothWithWater(newPos, true, 2f);
                 newPos.y = height + CameraController.m_targetSize * 0.05f + 10f;
                 //Calculate distance (Z offset).
-                distance = CameraController.m_targetSize
+                float distance = CameraController.m_targetSize
                             * Mathf.Max(0f, 1f - height / CameraController.m_maxDistance)
                             / Mathf.Tan(MainCamera.fieldOfView * Mathf.Deg2Rad);
                 newPos = MainCamera.transform.position + (MainCamera.transform.forward * distance);
@@ -195,22 +200,14 @@ namespace FPSCamera.Cam.Controller
                 CameraController.m_targetPosition = CameraController.m_currentPosition = newPos;
             if (Mathf.Abs(height - CameraController.m_targetHeight) >= 10f)
                 CameraController.m_targetHeight = CameraController.m_currentHeight = height;
+
+            // Update CameraController's cached fields.
+            AccessUtils.SetFieldValue(CameraController, "m_cachedPosition", CameraController.m_targetPosition);
+            AccessUtils.SetFieldValue(CameraController, "m_cachedSize", CameraController.m_targetSize);
+            AccessUtils.SetFieldValue(CameraController, "m_cachedAngle", CameraController.m_targetAngle);
+            AccessUtils.SetFieldValue(CameraController, "m_cachedHeight", CameraController.m_targetHeight);
         }
 
-        /// <summary>
-        /// Private constructor for the <see cref="GameCamController"/>.
-        /// Initializes components if <see cref="global::CameraController"/> is found.
-        /// </summary>
-        private GameCamController()
-        {
-            if (CameraController == null)
-            {
-                Logging.Error("CameraController is not found");
-                return;
-            }
-            camDoF = GetComponent<DepthOfField>();
-            camTiltEffect = GetComponent<TiltShiftEffect>();
-        }
         private readonly DepthOfField camDoF;
         private readonly TiltShiftEffect camTiltEffect;
 

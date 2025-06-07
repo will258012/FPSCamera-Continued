@@ -1,5 +1,4 @@
 ﻿using AlgernonCommons;
-using AlgernonCommons.Notifications;
 using AlgernonCommons.Translation;
 using FPSCamera.Cam;
 using FPSCamera.Cam.Controller;
@@ -14,6 +13,7 @@ namespace FPSCamera.UI
     public class CamInfoPanel : MonoBehaviour
     {
         public static CamInfoPanel Instance { get; private set; }
+        public bool UIEnabled { get; set; }
         private void OnEnable()
         {
             elapsedTime = 0f;
@@ -25,6 +25,8 @@ namespace FPSCamera.UI
             leftInfo.Clear();
             rightInfo.Clear();
         }
+        private void SetEnable() { enabled = true; if (ModSettings.ShowInfoPanel) UIEnabled = true; }
+        private void SetDisable() { enabled = false; UIEnabled = false; }
         private void Awake()
         {
             Instance = this;
@@ -38,8 +40,9 @@ namespace FPSCamera.UI
             infoFieldTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             infoFieldTexture.SetPixel(0, 0, new Color32(255, 255, 255, 40));
             infoFieldTexture.Apply();
-
-            enabled = false;
+            FPSCamController.OnCameraEnabled += SetEnable;
+            FPSCamController.OnCameraDisabled += SetDisable;
+            enabled = UIEnabled = false;
         }
 
         private void Update()
@@ -49,7 +52,7 @@ namespace FPSCamera.UI
                 if (Cam?.IsValid() ?? false)
                 {
                     elapsedTime += Time.deltaTime;
-                    if (elapsedTime - lastBufferStrUpdateTime > bufferUpdateInterval)
+                    if (elapsedTime - lastBufferStrUpdateTime > bufferUpdateInterval && UIEnabled)
                     {
                         UpdateStatus();
                         UpdateTargetInfo();
@@ -75,23 +78,19 @@ namespace FPSCamera.UI
                     }
                 }
                 else
-                {
-                    leftInfo.Clear();
-                    rightInfo.Clear();
-                    footer = "";
-                    mid = Translations.Translate("INVALID");
-                }
+                    enabled = false;
             }
             catch (System.Exception e)
             {
-                var notification = NotificationBase.ShowNotification<ListNotification>();
-                notification.AddParas(Translations.Translate("ERROR"));
-                notification.AddSpacer();
-                notification.AddParas(e.ToString());
-
-                Logging.LogException(e, "CamInfoPanel is disabled due to some issues");
                 enabled = false;
+                Logging.LogException(e, "CamInfoPanel is disabled due to some issues");
             }
+        }
+
+        private void OnDestroy()
+        {
+            FPSCamController.OnCameraEnabled -= SetEnable;
+            FPSCamController.OnCameraDisabled -= SetDisable;
         }
         /// <summary>
         /// Display a temporary message at the info panel's footer.
@@ -135,10 +134,11 @@ namespace FPSCamera.UI
         private void UpdateSpeed()
             => mid = string.Format("{0,5:F1} {1}",
                 ModSettings.SpeedUnit.IsMile() ? Cam.GetSpeed().ToMph() : Cam.GetSpeed().ToKmph(),
-                ModSettings.SpeedUnit.ToSpeedUnitString());
+                ModSettings.SpeedUnit.GetSpeedUnitString());
 
         private void OnGUI()
         {
+            if (!UIEnabled) return;
             var width = (float)Screen.width;
             var height = (Screen.height * heightRatio).Clamp(100f, 800f)
                                                        * ModSettings.InfoPanelHeightScale;

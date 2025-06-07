@@ -94,7 +94,10 @@ namespace FPSCamera.Settings
             MinTransDistance = 15f;
             MaxTransDistance = 500f;
 
-            KeyCamToggle = new KeyOnlyBinding(KeyCode.BackQuote);
+            KeyCamToggle = new Keybinding(KeyCode.BackQuote, false, false, false);
+            KeyWalkThruToggle = new Keybinding(KeyCode.BackQuote, true, false, false);
+            KeyFollowToggle = new Keybinding(KeyCode.BackQuote, false, true, false);
+            KeyInfoPanelToggle = new KeyOnlyBinding(KeyCode.RightBracket);
             KeySpeedUp = new KeyOnlyBinding(KeyCode.CapsLock);
             KeyCamReset = new KeyOnlyBinding(KeyCode.Minus);
             KeyCursorToggle = new KeyOnlyBinding(KeyCode.Tab);
@@ -374,9 +377,24 @@ namespace FPSCamera.Settings
 
         #region Key Mappings
         [XmlElement("KeyCamToggle")]
-        public KeyOnlyBinding XMLKeyCamToggle { get => KeyCamToggle; set => KeyCamToggle = value; }
+        public Keybinding XMLKeyCamToggle { get => KeyCamToggle; set => KeyCamToggle = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyCamToggle = new KeyOnlyBinding(KeyCode.BackQuote);
+        internal static Keybinding KeyCamToggle = new Keybinding(KeyCode.BackQuote, false, false, false);
+
+        [XmlElement("KeyWalkThruToggle")]
+        public Keybinding XMLKeyWalkThruToggle { get => KeyWalkThruToggle; set => KeyWalkThruToggle = value; }
+        [XmlIgnore]
+        internal static Keybinding KeyWalkThruToggle = new Keybinding(KeyCode.BackQuote, true, false, false);
+
+        [XmlElement("KeyFollowToggle")]
+        public Keybinding XMLKeyFollowToggle { get => KeyFollowToggle; set => KeyFollowToggle = value; }
+        [XmlIgnore]
+        internal static Keybinding KeyFollowToggle = new Keybinding(KeyCode.BackQuote, false, true, false);
+
+        [XmlElement("KeyInfoPanelToggle")]
+        public KeyOnlyBinding XMLKeyInfoPanelToggle { get => KeyInfoPanelToggle; set => KeyInfoPanelToggle = value; }
+        [XmlIgnore]
+        internal static KeyOnlyBinding KeyInfoPanelToggle = new KeyOnlyBinding(KeyCode.RightBracket);
 
         [XmlElement("KeySpeedUp")]
         public KeyOnlyBinding XMLKeySpeedUp { get => KeySpeedUp; set => KeySpeedUp = value; }

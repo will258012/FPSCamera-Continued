@@ -63,7 +63,7 @@ namespace FPSCamera.Settings.Tabs
         {
 
             var panel = UITabstrips.AddTextTab(tabStrip, Translations.Translate("SETTINGS_GROUPNAME_CAM"), tabIndex, out var _, autoLayout: false);
-            this.tabStrip = AutoTabstrip.AddTabstrip(panel, 0f, 0f, panel.width, panel.height, out _, tabHeight: 30f);
+            this.tabStrip = AutoTabstrip.AddTabstrip(panel, 0f, 0f, panel.width, panel.height, out _, tabHeight: 40f);
             CameraControls(0);
             FreeMode(1);
             FollowMode(2);

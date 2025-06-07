@@ -12,12 +12,18 @@ namespace FPSCamera.Game
             {
                 if (status)
                 {
-                    if (ModSettings.LodOpt == 1)
-                        LodConfig.ActiveConfig = LodConfig.Low;
-                    else if (ModSettings.LodOpt == 2)
-                        LodConfig.ActiveConfig = LodConfig.Mid;
-                    else if (ModSettings.LodOpt == 3)
-                        LodConfig.ActiveConfig = LodConfig.High;
+                    switch (ModSettings.LodOpt)
+                    {
+                        case 1:
+                            LodConfig.ActiveConfig = LodConfig.Low;
+                            break;
+                        case 2:
+                            LodConfig.ActiveConfig = LodConfig.Mid;
+                            break;
+                        case 3:
+                            LodConfig.ActiveConfig = LodConfig.High;
+                            break;
+                    }
                 }
                 else
                 {
@@ -29,7 +35,7 @@ namespace FPSCamera.Game
 
             catch (Exception e)
             {
-                Logging.LogException(e);
+                Logging.LogException(e, "Failed to perform LOD optimization");
             }
             yield break;
         }

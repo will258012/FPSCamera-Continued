@@ -42,14 +42,20 @@ namespace FPSCamera.Game
                 }
                 catch (System.Exception e)
                 {
-                    Logging.Error($"ModSupport: Failed to toggle UI using \"Toggle It!\". Falling back to the vanilla way.");
-                    Logging.LogException(e);
+                    Logging.LogException(e, "Failed to toggle UI using \"Toggle It!\". Falling back to the vanilla way");
                     SetUIVisibilityDirectly(visibility);
                 }
             }
             else
             {
-                SetUIVisibilityDirectly(visibility);
+                try
+                {
+                    SetUIVisibilityDirectly(visibility);
+                }
+                catch (System.Exception e)
+                {
+                    Logging.LogException(e, "Failed to toggle UI");
+                }
             }
             yield break;
         }
