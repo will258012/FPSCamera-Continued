@@ -10,9 +10,6 @@ namespace FPSCamera.Cam
     /// </summary>
     public class FreeCam : IFPSCam
     {
-        public FreeCam() => IsActivated = true;
-
-        public bool IsActivated { get; private set; }
         public Positioning GetPositioning() =>
             new Positioning(GameCamController.Instance.MainCamera.transform.position,
             GameCamController.Instance.MainCamera.transform.rotation);
@@ -21,7 +18,7 @@ namespace FPSCamera.Cam
         public void ToggleAutoMove() => AutoMove = !AutoMove;
         public float GetSpeed() => speed;
         public bool IsValid() => true;
-        public void DisableCam() { IsActivated = false; AutoMove = false; speed = 0f; }
+        public void DisableCam() { AutoMove = false; speed = 0f; }
 
         private float speed = 0f;
     }

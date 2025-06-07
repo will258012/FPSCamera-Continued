@@ -11,31 +11,27 @@ namespace FPSCamera.Cam
 {
     public class WalkThruCam : IFollowCam, IFPSCam
     {
-        public WalkThruCam() => IsActivated = true;
         public IFollowCam CurrentCam { get; private set; } = null;
         public uint FollowID => CurrentCam?.FollowID ?? default;
         public InstanceID FollowInstance => CurrentCam?.FollowInstance ?? default;
-        public bool IsActivated { get; private set; }
         public float GetSpeed() => CurrentCam?.GetSpeed() ?? default;
         public string GetFollowName() => CurrentCam?.GetFollowName();
         public string GetPrefabName() => CurrentCam?.GetPrefabName();
         public Dictionary<string, string> GetInfo() => CurrentCam?.GetInfo();
         public string GetStatus() => CurrentCam?.GetStatus();
         public Positioning GetPositioning() => CurrentCam?.GetPositioning() ?? default;
-        public void SwitchTarget() => SetRandomCam();
         public void ElapseTime(float seconds) => elapsedTime += seconds;
         public float GetElapsedTime() => elapsedTime;
         public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
         public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
         public bool IsValid()
         {
-            if (!IsActivated) return false;
             var status = CurrentCam?.IsValid() ?? false;
             if (!ModSettings.ManualSwitchWalk &&
                 elapsedTime > ModSettings.PeriodWalk) status = false;
             if (!status)
             {
-                SetRandomCam();
+                SwitchTarget();
                 status = CurrentCam?.IsValid() ?? false;
                 if (!status)
                 {
@@ -45,7 +41,7 @@ namespace FPSCamera.Cam
             }
             return status;
         }
-        private void SetRandomCam()
+        public void SwitchTarget()
         {
             CurrentCam?.DisableCam();
             CurrentCam = null;
@@ -96,13 +92,10 @@ namespace FPSCamera.Cam
             elapsedTime = 0f;
             SyncCamOffset();
         }
-
-
         public void DisableCam()
         {
             CurrentCam?.DisableCam();
             CurrentCam = null;
-            IsActivated = false;
         }
         private const VehicleInfo.VehicleCategory CityServiceCopters = VehicleInfo.VehicleCategory.AmbulanceCopter | VehicleInfo.VehicleCategory.FireCopter | VehicleInfo.VehicleCategory.PoliceCopter | VehicleInfo.VehicleCategory.DisasterCopter;
         private float elapsedTime;

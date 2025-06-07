@@ -22,7 +22,6 @@ namespace FPSCamera.Cam
                 FollowInstance = id;
                 FollowID = FollowInstance.Citizen;
                 CitizenInstanceID = GetCitizen().m_instance;
-                IsActivated = true;
             }
             else if (id.Type == InstanceType.CitizenInstance)
             {
@@ -30,13 +29,11 @@ namespace FPSCamera.Cam
                 var citizenId = CitizenManager.instance.m_instances.m_buffer[id.CitizenInstance].m_citizen;
                 FollowInstance = new InstanceID() { Citizen = citizenId };
                 FollowID = citizenId;
-                IsActivated = true;
             }
             Logging.KeyMessage("Citizen cam started");
         }
         public uint FollowID { get; private set; }
         public ushort CitizenInstanceID { get; private set; }
-        public bool IsActivated { get; private set; }
         public InstanceID FollowInstance { get; private set; }
         /// <summary>
         /// Will be used if the citizen enters a vehicle. Use caution!
@@ -122,7 +119,6 @@ namespace FPSCamera.Cam
 
         public bool IsValid()
         {
-            if (!IsActivated) return false;
             var flags = GetCitizenInstance().m_flags;
             if (
                 !flags.IsFlagSet(CitizenInstance.Flags.None) &&
@@ -150,7 +146,6 @@ namespace FPSCamera.Cam
         {
             FollowID = CitizenInstanceID = default;
             FollowInstance = default;
-            IsActivated = false;
             if (IsinVehicle)
             {
                 AnotherCam.DisableCam();
