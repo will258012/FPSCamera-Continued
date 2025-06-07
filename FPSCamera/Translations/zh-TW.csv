@@ -113,7 +113,8 @@ as the type settings for the followed target",""
 Enabling the option could make camera look lagging.",""
 "SETTINGS_TRANSSPEED","平滑過渡速率",""
 "SETTINGS_MINTRANSDISTANCE","平滑過渡最小距離",""
-"SETTINGS_MINTRANSDISTANCE_DETAIL","In Follow Mode, camera needs to move instantly with the target even when smooth transition is enabled.{0}This sets the minimum distance to start applying smooth transition.",""
+"SETTINGS_MINTRANSDISTANCE_DETAIL","In Follow Mode, camera needs to move instantly with the target even when smooth transition is enabled.
+This sets the minimum distance to start applying smooth transition.",""
 "SETTINGS_MAXTRANSDISTANCE","Max distance for smooth transition",""
 "SETTINGS_MAXTRANSDISTANCE_DETAIL","攝影機目標位置越遠，平滑過渡需要的時間越長。
 這設定關閉平滑過渡的距離。",""
