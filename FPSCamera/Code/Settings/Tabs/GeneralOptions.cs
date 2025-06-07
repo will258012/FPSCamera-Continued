@@ -97,7 +97,7 @@ namespace FPSCamera.Settings.Tabs
             speedUnit_DropDown = UIDropDowns.AddPlainDropDown(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SPEEDUNIT"),
                 Enum.GetValues(typeof(ModSettings.SpeedUnits))
                .Cast<ModSettings.SpeedUnits>()
-               .Select(speedUnit => speedUnit.ToSpeedUnitString())
+               .Select(speedUnit => speedUnit.GetSpeedUnitString())
                .ToArray(),
                 (int)ModSettings.SpeedUnit);
             speedUnit_DropDown.eventSelectedIndexChanged += (_, index) => ModSettings.SpeedUnit = (ModSettings.SpeedUnits)index;
@@ -164,7 +164,7 @@ namespace FPSCamera.Settings.Tabs
             defaults_Button = UIButtons.AddButton(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_RESETBTN"));
             defaults_Button.eventClicked += (c, _) => ResetModSettings();
 
-            var offsetDefault_Button = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(defaults_Button), Translations.Translate("SETTINGS_RESETOFFSETBTN"), 400f, 30f);
+            var offsetDefault_Button = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(defaults_Button), Translations.Translate("SETTINGS_RESETOFFSETBTN"));
             offsetDefault_Button.eventClicked += (c, _) => ResetOffsetSettings();
 
             var importButton = UIButtons.AddButton(scrollPanel, UILayout.PositionUnder(defaults_Button), Translations.Translate("SETTINGS_IMPORT"));
@@ -186,14 +186,10 @@ namespace FPSCamera.Settings.Tabs
                         OffsetsSettings.Save();
 
                         var succussedNotification = NotificationBase.ShowNotification<ListNotification>();
-                        succussedNotification.AddParas(Translations.Translate("SETTINGS_IMPORTSUCCESSED"));
+                        succussedNotification?.AddParas(Translations.Translate("SETTINGS_IMPORTSUCCESSED"));
                     }
                     catch (Exception e)
                     {
-                        var failedNotification = NotificationBase.ShowNotification<ListNotification>();
-                        failedNotification.AddParas(Translations.Translate("ERROR"));
-                        failedNotification.AddSpacer();
-                        failedNotification.AddParas(e.ToString());
                         Logging.LogException(e, "Failed to import FPSCamera v2 settings");
                     }
                 };

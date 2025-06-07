@@ -81,8 +81,7 @@ namespace FPSCamera.Utils
             }
             catch (System.Exception e)
             {
-                Logging.Error("UUISupport: \n");
-                Logging.LogException(e);
+                Logging.LogException(e, "Failed to register UUI button");
             }
         }
         internal class UnsavedInputKey : UnifiedUI.Helpers.UnsavedInputKey

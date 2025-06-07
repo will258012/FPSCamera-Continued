@@ -17,14 +17,11 @@ namespace FPSCamera.Game
                     QualitySettings.shadowDistance = Mathf.Min(Opt, cachedDist);
                 }
                 else
-                {
                     QualitySettings.shadowDistance = cachedDist;
-                }
             }
-
             catch (Exception e)
             {
-                Logging.LogException(e);
+                Logging.LogException(e, "Failed to perform shadows distance optimization");
             }
             yield break;
         }

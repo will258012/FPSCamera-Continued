@@ -15,29 +15,37 @@ namespace FPSCamera.Utils
 
         internal static List<string> CheckModConflicts()
         {
-            var conflictModNames = new List<string>();
-            foreach (var plugin in PluginManager.instance.GetPluginsInfo())
+            try
             {
-                foreach (var assembly in plugin.GetAssemblies())
+                var conflictModNames = new List<string>();
+                foreach (var plugin in PluginManager.instance.GetPluginsInfo())
                 {
-                    switch (assembly.GetName().Name)
+                    foreach (var assembly in plugin.GetAssemblies())
                     {
-                        case "FPSCamera":
-                            if (assembly.GetType("FPSCamera.FPSCamera") != null)
-                                conflictModNames.Add("First Person Camera: Updated");
-                            else if (assembly.GetType("FPSCamera.Controller") != null)
-                                conflictModNames.Add("First Person Camera v2.x");
-                            break;
-                        case "EnhancedZoom":
-                            conflictModNames.Add("Enhanced Zoom Continued");
-                            break;
-                        case "IINS.AutoWalking":
-                            conflictModNames.Add("First-person Auto-walking");
-                            break;
+                        switch (assembly.GetName().Name)
+                        {
+                            case "FPSCamera":
+                                if (assembly.GetType("FPSCamera.FPSCamera") != null)
+                                    conflictModNames.Add("First Person Camera: Updated");
+                                else if (assembly.GetType("FPSCamera.Controller") != null)
+                                    conflictModNames.Add("First Person Camera v2.x");
+                                break;
+                            case "EnhancedZoom":
+                                conflictModNames.Add("Enhanced Zoom Continued");
+                                break;
+                            case "IINS.AutoWalking":
+                                conflictModNames.Add("First-person Auto-walking");
+                                break;
+                        }
                     }
                 }
+                return conflictModNames;
             }
-            return conflictModNames;
+            catch (Exception e)
+            {
+                Logging.LogException(e, "Failed to search conflict mods");
+            }
+            return null;
         }
         internal static void Initialize()
         {
@@ -84,7 +92,7 @@ namespace FPSCamera.Utils
 
             catch (Exception e)
             {
-                Logging.LogException(e, $"ModSupport: Failed to search mods");
+                Logging.LogException(e, "Failed to search supported mods");
             }
         }
     }

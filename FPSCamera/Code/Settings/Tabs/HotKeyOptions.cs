@@ -58,8 +58,20 @@ namespace FPSCamera.Settings.Tabs
             scrollPanel.eventVisibilityChanged += (_, isShow) => { if (isShow) scrollPanel.Reset(); };
             UIScrollbars.AddScrollbar(panel, scrollPanel);
 
-            KeyCamToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KETCAMTOGGLE"), ModSettings.KeyCamToggle);
+            KeyCamToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYCAMTOGGLE"), ModSettings.KeyCamToggle);
+            KeyCamToggle.Panel.tooltip = Translations.Translate("SETTINGS_KEYTOGGLE_DETAIL");
             currentY += KeyCamToggle.Panel.height + Margin;
+
+            var KeyWalkThruToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYWALKTHRUTOGGLE"), ModSettings.KeyWalkThruToggle);
+            KeyWalkThruToggle.Panel.tooltip = Translations.Translate("SETTINGS_KEYTOGGLE_DETAIL");
+            currentY += KeyWalkThruToggle.Panel.height + Margin;
+
+            var KeyFollowToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYFOLLOWTOGGLE"), ModSettings.KeyFollowToggle);
+            KeyFollowToggle.Panel.tooltip = Translations.Translate("SETTINGS_KEYFOLLOWTOGGLE_DETAIL");
+            currentY += KeyFollowToggle.Panel.height + Margin;
+
+            var KeyInfoPanelToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYINFOPANELTOGGLE"), ModSettings.KeyInfoPanelToggle);
+            currentY += KeyInfoPanelToggle.Panel.height + Margin;
 
             KeySpeedUp = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYSPPEDUP"), ModSettings.KeySpeedUp);
             currentY += KeySpeedUp.Panel.height + Margin;

@@ -43,12 +43,15 @@ namespace FPSCamera
                 if (ModSupport.FoundK45TLM)
                 {
                     var notification = NotificationBase.ShowNotification<DontShowAgainNotification>();
-                    notification.AddParas(Translations.Translate("K45_TLM_DETECTED"));
-                    notification.DSAButton.eventClicked += (_, clickEvent) =>
+                    if (notification != null)
                     {
-                        WhatsNew.LastNotifiedVersion = AssemblyUtils.CurrentVersion;
-                        ModSettings.Save();
-                    };
+                        notification.AddParas(Translations.Translate("K45_TLM_DETECTED"));
+                        notification.DSAButton.eventClicked += (_, clickEvent) =>
+                        {
+                            WhatsNew.LastNotifiedVersion = AssemblyUtils.CurrentVersion;
+                            ModSettings.Save();
+                        };
+                    }
                 }
             }
             if (!ModSettings.DSAForCameraIssue &&
@@ -58,12 +61,15 @@ namespace FPSCamera
                 (ModSettings.PedestrianFixedOffset.y + ModSettings.FollowCamOffset.y) < 2f))
             {
                 var notification = NotificationBase.ShowNotification<SettingsIssueNotification>();
-                notification.AddParas(Translations.Translate("SETTINGS_ISSUE_DETECTED"));
-                notification.DSAButton.eventClicked += (_, clickEvent) =>
+                if (notification != null)
                 {
-                    ModSettings.DSAForCameraIssue = true;
-                    ModSettings.Save();
-                };
+                    notification.AddParas(Translations.Translate("SETTINGS_ISSUE_DETECTED"));
+                    notification.DSAButton.eventClicked += (_, clickEvent) =>
+                    {
+                        ModSettings.DSAForCameraIssue = true;
+                        ModSettings.Save();
+                    };
+                }
             }
         }
         public override void OnCreated(ILoading loading)

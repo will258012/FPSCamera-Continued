@@ -74,7 +74,7 @@ namespace FPSCamera.UI
             _mainBtn.eventClick += (_, m) =>
             {
                 Panel.absolutePosition = new Vector3(_mainBtn.absolutePosition.x +
-                    (_mainBtn.absolutePosition.x < Screen.height / 2f ? _mainBtn.width - 10f : -Panel.width + 10f),
+                    (_mainBtn.absolutePosition.x < Screen.width / 2f ? _mainBtn.width - 10f : -Panel.width + 10f),
                                                            _mainBtn.absolutePosition.y +
                 (_mainBtn.absolutePosition.y < Screen.height / 2f ? _mainBtn.height - 15f : -Panel.height + 15f));
                 Panel.isVisible = !Panel.isVisible;
@@ -166,6 +166,9 @@ namespace FPSCamera.UI
                     FPSCamController.Instance.StartWalkThruCam();
                     OnEsc();
                 };
+                currentY += walkThruBtn.height + Margin;
+                var allSettingsBtn = UIButtons.AddButton(Panel, UILayout.PositionUnder(walkThruBtn), Translations.Translate("ALLSETTINGSBTN_TEXT"));
+                allSettingsBtn.eventClick += (_, e) => OpenSettingsPanel();
                 Panel.height = currentY + walkThruBtn.height + Margin;
             }
             else
@@ -179,7 +182,6 @@ namespace FPSCamera.UI
 
             Destroy(Panel);
             Destroy(GetMainButton());
-
         }
         private void Close()
         {
@@ -206,6 +208,12 @@ namespace FPSCamera.UI
             Close();
             AddSettings();
         }
+        public static void OpenSettingsPanel(string modName)
+        {
+            var panel = UIView.library.ShowModal<OptionsMainPanel>("OptionsPanel");
+            panel.SelectMod(modName);
+        }
+        internal static void OpenSettingsPanel() => OpenSettingsPanel(Mod.Instance.Name);
         private void OnChangedVisibility(UIComponent component, bool value)
         {
             if (isAnimating) return;
