@@ -113,7 +113,8 @@ as the type settings for the followed target",""
 Enabling the option could make camera look lagging.",""
 "SETTINGS_TRANSSPEED","Smooth transition rate",""
 "SETTINGS_MINTRANSDISTANCE","Min distance for smooth transition",""
-"SETTINGS_MINTRANSDISTANCE_DETAIL","In Follow Mode, camera needs to move instantly with the target even when smooth transition is enabled.{0}This sets the minimum distance to start applying smooth transition.",""
+"SETTINGS_MINTRANSDISTANCE_DETAIL","In Follow Mode, camera needs to move instantly with the target even when smooth transition is enabled.
+This sets the minimum distance to start applying smooth transition.",""
 "SETTINGS_MAXTRANSDISTANCE","Max distance for smooth transition",""
 "SETTINGS_MAXTRANSDISTANCE_DETAIL","When the camera target position is too far, smooth transition takes too long.
 This number sets the distance to give up the transition.",""
