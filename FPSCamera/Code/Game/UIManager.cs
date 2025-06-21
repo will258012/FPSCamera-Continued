@@ -3,7 +3,6 @@ using FPSCamera.Utils;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
-using ToggleItManager = ToggleIt.Managers.ToggleManager;
 namespace FPSCamera.Game
 {
     public class UIManager
@@ -21,111 +20,34 @@ namespace FPSCamera.Game
             }
         }
         private static Camera uiCamera = null;
-        private class UIState
+        public static IEnumerator ToggleUI(bool visible)
         {
-            internal bool NotificationsVisible { get; set; }
-            internal bool BordersVisible { get; set; }
-            internal bool DirectNamesVisible { get; set; }
-            internal bool RoadNamesVisible { get; set; }
-            internal bool ContoursVisible { get; set; }
-        }
-
-        private static UIState savedState;
-
-        public static IEnumerator ToggleUI(bool visibility)
-        {
-            if (ModSupport.FoundToggleIt)
+            try
             {
-                try
+                if (ModSupport.FoundToggleIt)
                 {
-                    SetUIVisibilityByToggleIt(visibility);
+                    ModSupport.ToggleIt_ToggleUI(visible);
                 }
-                catch (System.Exception e)
+                else
                 {
-                    Logging.LogException(e, "Failed to toggle UI using \"Toggle It!\". Falling back to the vanilla way");
-                    SetUIVisibilityDirectly(visibility);
+                    NotificationManager.instance.NotificationsVisible = visible;
+                    GameAreaManager.instance.BordersVisible = visible;
+                    DistrictManager.instance.NamesVisible = visible;
+                    NetManager.instance.RoadNamesVisible = visible;
                 }
+                GuideManager.instance.TutorialDisabled = !visible;
+                DisasterManager.instance.MarkersVisible = visible;
+                PropManager.instance.MarkersVisible = visible;
+
+                UICamera.enabled = visible;
+                if (!visible)
+                    Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
             }
-            else
+            catch (System.Exception e)
             {
-                try
-                {
-                    SetUIVisibilityDirectly(visibility);
-                }
-                catch (System.Exception e)
-                {
-                    Logging.LogException(e, "Failed to toggle UI");
-                }
+                Logging.LogException(e, "Failed to toggle UI");
             }
             yield break;
-        }
-
-        private static void SaveState()
-        {
-            savedState = new UIState
-            {
-                NotificationsVisible = ToggleItManager.Instance.GetById(1).On,
-                RoadNamesVisible = ToggleItManager.Instance.GetById(2).On,
-                BordersVisible = ToggleItManager.Instance.GetById(4).On,
-                ContoursVisible = ToggleItManager.Instance.GetById(5).On,
-                DirectNamesVisible = ToggleItManager.Instance.GetById(10).On,
-            };
-            Logging.Message($"ModSupport: Saved UI state from \"Toggle It!\":\n" +
-                     $"  NotificationIcons = {savedState.NotificationsVisible}\n" +
-                     $"  BorderLines = {savedState.BordersVisible}\n" +
-                     $"  ContourLines = {savedState.ContoursVisible}\n" +
-                     $"  RoadNames = {savedState.RoadNamesVisible}\n" +
-                     $"  DistrictNames = {savedState.DirectNamesVisible}");
-        }
-
-        private static void RestoreState()
-        {
-            if (savedState != null)
-            {
-                ToggleItManager.Instance.Apply(1, savedState.NotificationsVisible);
-                ToggleItManager.Instance.Apply(2, savedState.RoadNamesVisible);
-                ToggleItManager.Instance.Apply(4, savedState.BordersVisible);
-                ToggleItManager.Instance.Apply(5, savedState.ContoursVisible);
-                ToggleItManager.Instance.Apply(10, savedState.DirectNamesVisible);
-                Logging.Message("ModSupport: Restored saved UI state using \"Toggle It!\"");
-            }
-        }
-
-        private static void SetUIVisibilityByToggleIt(bool visibility)
-        {
-            if (!visibility)
-            {
-                Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
-                SaveState();
-                ToggleItManager.Instance.Apply(1, false);
-                ToggleItManager.Instance.Apply(2, false);
-                ToggleItManager.Instance.Apply(4, false);
-                ToggleItManager.Instance.Apply(5, false);
-                ToggleItManager.Instance.Apply(10, false);
-                Logging.Message("ModSupport: Hid UI using \"Toggle It!\"");
-            }
-            else
-            {
-                RestoreState();
-            }
-            PropManager.instance.MarkersVisible = visibility;
-            GuideManager.instance.TutorialDisabled = !visibility;
-            DisasterManager.instance.MarkersVisible = visibility;
-            UICamera.enabled = visibility;
-        }
-
-        private static void SetUIVisibilityDirectly(bool visibility)
-        {
-            NotificationManager.instance.NotificationsVisible = visibility;
-            GameAreaManager.instance.BordersVisible = visibility;
-            DistrictManager.instance.NamesVisible = visibility;
-            PropManager.instance.MarkersVisible = visibility;
-            GuideManager.instance.TutorialDisabled = !visibility;
-            DisasterManager.instance.MarkersVisible = visibility;
-            NetManager.instance.RoadNamesVisible = visibility;
-            UICamera.enabled = visibility;
-            if (!visibility)
-                Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
         }
     }
 }

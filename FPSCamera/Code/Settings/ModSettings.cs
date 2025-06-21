@@ -56,7 +56,6 @@ namespace FPSCamera.Settings
             Dof = false;
             InvertRotateHorizontal = false;
             InvertRotateVertical = false;
-            MovementSpeed = 30f;
             SpeedUpFactor = 4f;
             RotateSensitivity = 5f;
             RotateKeyFactor = 8f;
@@ -66,6 +65,7 @@ namespace FPSCamera.Settings
             FoViewScrollfactor = 1.2f;
 
             ShowCursorFree = false;
+            MovementSpeed = 30f;
             GroundClipping = GroundClippings.None;
             GroundLevelOffset = 0f;
             RoadLevelOffset = 0f;
@@ -73,6 +73,7 @@ namespace FPSCamera.Settings
             TracksDetection = true;
 
             ShowCursorFollow = false;
+            OffsetMovementSpeed = 10f;
             StickToFrontVehicle = true;
             FollowCamOffset = Vector3.zero;
             VehicleFixedOffset = new Vector3(0f, 2f, 3f);
@@ -200,11 +201,6 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static bool InvertRotateVertical = false;
 
-        [XmlElement("MovementSpeed")]
-        public float XMLMovementSpeed { get => MovementSpeed; set => MovementSpeed = value; }
-        [XmlIgnore]
-        internal static float MovementSpeed = 30f;
-
         [XmlElement("SpeedUpFactor")]
         public float XMLSpeedUpFactor { get => SpeedUpFactor; set => SpeedUpFactor = value; }
         [XmlIgnore]
@@ -241,6 +237,11 @@ namespace FPSCamera.Settings
 
         #endregion
         #region Free-Camera Mode Options
+        [XmlElement("MovementSpeed")]
+        public float XMLMovementSpeed { get => MovementSpeed; set => MovementSpeed = value; }
+        [XmlIgnore]
+        internal static float MovementSpeed = 30f;
+
         [XmlElement("ShowCursorFree")]
         public bool XMLShowCursorFree { get => ShowCursorFree; set => ShowCursorFree = value; }
         [XmlIgnore]
@@ -273,6 +274,11 @@ namespace FPSCamera.Settings
 
         #endregion
         #region Follow Mode Options
+        [XmlElement("OffsetMovementSpeed")]
+        public float XMLOffsetMovementSpeed { get => OffsetMovementSpeed; set => OffsetMovementSpeed = value; }
+        [XmlIgnore]
+        internal static float OffsetMovementSpeed = 10f;
+
         [XmlElement("ShowCursorFollow")]
         public bool XMLShowCursorFollow { get => ShowCursorFollow; set => ShowCursorFollow = value; }
         [XmlIgnore]

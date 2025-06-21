@@ -98,27 +98,16 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(false));
 
-            if (ModSettings.SetBackCamera && GameCamController.Instance.CameraController.GetTarget().IsEmpty)
-            {
-                if (ModSettings.SmoothTransition)
-                    StartTransitioningOnDisabling(GameCamController.Instance.cachedPositioning);
-                else AfterTransition(GameCamController.Instance.cachedPositioning);
-            }
-            else
-            {
-                if (ModSettings.HideGameUI)
-                    StartCoroutine(UIManager.ToggleUI(true));
-                GameCamController.Instance.Restore();
-                Status = CamStatus.Disabled;
-            }
+            if (ModSettings.SmoothTransition && (ModSettings.SetBackCamera || ModSupport.ACMEDisabling) && GameCamController.Instance.CameraController.GetTarget().IsEmpty)
+                StartTransitioningOnDisabling();
+            else AfterTransition();
+
             OnCameraDisabled?.Invoke();
         }
-        private void AfterTransition(Positioning positioning)
+        private void AfterTransition()
         {
             if (ModSettings.HideGameUI)
                 StartCoroutine(UIManager.ToggleUI(true));
-            GameCamController.Instance.MainCamera.transform.position = positioning.pos;
-            GameCamController.Instance.MainCamera.transform.rotation = positioning.rotation;
             GameCamController.Instance.Restore();
             Status = CamStatus.Disabled;
         }
@@ -135,6 +124,7 @@ namespace FPSCamera.Cam.Controller
                 Logging.Error("Given InstanceID is empty");
                 return;
             }
+            instanceID = InstanceManager.GetLocation(instanceID);
             switch (instanceID.Type)
             {
                 case InstanceType.Vehicle:
@@ -173,18 +163,17 @@ namespace FPSCamera.Cam.Controller
         /// Starts transitioning when the camera needs to be disabled.
         /// </summary>
         /// <param name="endPos">where to end transitioning.</param>
-        public void StartTransitioningOnDisabling(Positioning endPos)
+        public void StartTransitioningOnDisabling()
         {
             transitionTimer = 0f;
             targetFoV = ModSettings.CamFieldOfView;
-            if (CameraTransform.position.DistanceTo(endPos.pos) <= 2f ||
-                CameraTransform.position.DistanceTo(endPos.pos) > ModSettings.MaxTransDistance)
+            float dist = CameraTransform.position.DistanceTo(GameCamController.Instance.transitionEndPositioning.pos);
+            if (dist <= 2f || dist > ModSettings.MaxTransDistance)
             {
-                AfterTransition(endPos);
+                AfterTransition();
                 return;
             }
             Status = CamStatus.Transitioning;
-            this.endPos = endPos;
         }
         /// <summary>
         /// Updates the camera state each frame.
@@ -276,7 +265,7 @@ namespace FPSCamera.Cam.Controller
                         GameCamController.Instance.CameraController.SetTarget(followCam.FollowInstance, followCam.GetPositioning().pos, true);
                         FPSCam = null;
                     }
-                    else if (FPSCam == null && !GameCamController.Instance.CameraController.GetTarget().IsEmpty)
+                    else if (Status == CamStatus.Disabled && !GameCamController.Instance.CameraController.GetTarget().IsEmpty)
                         StartFollowing(GameCamController.Instance.CameraController.GetTarget());
                 }
             }
@@ -304,7 +293,7 @@ namespace FPSCamera.Cam.Controller
 
             { // key movement
                 var movementFactor = ((ModSettings.KeySpeedUp.IsPressed() ? ModSettings.SpeedUpFactor : 1f)
-                                     * ModSettings.MovementSpeed * Time.deltaTime).FromKmph();
+                                     * (FPSCam is IFollowCam ? ModSettings.OffsetMovementSpeed : ModSettings.MovementSpeed) * Time.deltaTime).FromKmph();
 
                 var LocalMovement = Vector3.zero;
                 if (ModSettings.KeyMoveForward.IsPressed()) LocalMovement += Vector3.forward * movementFactor;
@@ -485,8 +474,8 @@ namespace FPSCamera.Cam.Controller
             // Limit the camera's position to the allowed area.
             instancePos = CameraController.ClampCameraPosition(instancePos);
 
-            //Update the speed for info panel to display.
-            if (ModSettings.ShowInfoPanel)
+            // When in free-camera mode, update the speed for info panel to display.
+            if (CamInfoPanel.Instance.UIEnabled)
                 freeCam.UpdateSpeed(CameraTransform.position, instancePos);
 
             // Apply the calculated position and rotation to the camera.
@@ -517,19 +506,18 @@ namespace FPSCamera.Cam.Controller
         {
             transitionTimer += Time.deltaTime;
             // If we've reached the distance of the end or time is out
-            if (CameraTransform.position.DistanceTo(endPos.pos) <= 2f ||
+            if (CameraTransform.position.DistanceTo(GameCamController.Instance.transitionEndPositioning.pos) <= 2f ||
                 transitionTimer >= MaxTransitioningTime)
             {
                 transitionTimer = 0f;
-                AfterTransition(endPos);
-                endPos = default;
+                AfterTransition();
                 return;
             }
             // Apply the transition position and rotation to the camera.
             CameraTransform.position =
-                Vector3.Lerp(CameraTransform.position, endPos.pos, Time.deltaTime * ModSettings.TransSpeed);
+                Vector3.Lerp(CameraTransform.position, GameCamController.Instance.transitionEndPositioning.pos, Time.deltaTime * ModSettings.TransSpeed);
             CameraTransform.rotation =
-                Quaternion.Slerp(CameraTransform.rotation, endPos.rotation, Time.deltaTime * ModSettings.TransSpeed);
+                Quaternion.Slerp(CameraTransform.rotation, GameCamController.Instance.transitionEndPositioning.rotation, Time.deltaTime * ModSettings.TransSpeed);
         }
         public enum CamStatus
         {
@@ -541,7 +529,6 @@ namespace FPSCamera.Cam.Controller
         }
         private static Transform CameraTransform => GameCamController.Instance.MainCamera.transform;
         private bool isScrollTransitioning = false;
-        private Positioning endPos = default;
         private Positioning offset = default;
         private Vector3 offsetFromSetting = default;
         private float targetFoV = ModSettings.CamFieldOfView;

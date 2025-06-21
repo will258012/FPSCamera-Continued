@@ -12,6 +12,14 @@
     <Deterministic>True</Deterministic>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="Code\Patches\ACMEPatches.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="ACME">
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\workshop\content\255710\2778750497\ACME.dll</HintPath>
+      <Private>False</Private>
+      <Aliases>ACME</Aliases>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <Private>False</Private>
     </Reference>

@@ -10,7 +10,11 @@ namespace FPSCamera.Utils
             var fieldInfo = AccessTools.Field(obj.GetType(), fieldName) ?? throw new ArgumentException($"Field '{fieldName}' not found in type '{obj.GetType().FullName}'.");
             return (T)fieldInfo.GetValue(obj);
         }
-
+        public static T GetStaticFieldValue<T>(Type type, string fieldName)
+        {
+            var fieldInfo = AccessTools.Field(type, fieldName) ?? throw new ArgumentException($"Field '{fieldName}' not found in type '{type.FullName}'.");
+            return (T)fieldInfo.GetValue(null);
+        }
         public static void SetFieldValue(object obj, string fieldName, object value)
         {
             var fieldInfo = AccessTools.Field(obj.GetType(), fieldName) ?? throw new ArgumentException($"Field '{fieldName}' not found in type '{obj.GetType().FullName}'.");
@@ -30,8 +34,8 @@ namespace FPSCamera.Utils
         public static object InvokeMethod(string typeName, string methodName, object[] parameters, Type[] paramTypes = null, object obj = null)
         {
             var type = Type.GetType(typeName) ?? throw new ArgumentException($"Class '{typeName}' not found.");
-            var method = AccessTools.Method(type, methodName, paramTypes) ?? throw new ArgumentException($"Method '{methodName}' not found.");
-            return method.Invoke(obj, parameters);
+            var methodInfo = AccessTools.Method(type, methodName, paramTypes) ?? throw new ArgumentException($"Method '{methodName}' not found.");
+            return methodInfo.Invoke(obj, parameters);
         }
 
     }

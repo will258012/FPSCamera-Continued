@@ -1,5 +1,4 @@
 ﻿using ColossalFramework;
-using TransportLinesManager.ModShared;
 using UnityEngine;
 
 namespace FPSCamera.Utils
@@ -19,60 +18,43 @@ namespace FPSCamera.Utils
             TransportInfo.TransportType.Trolleybus,
             };
 
-        public static string GetStationName(ushort stopId, ushort lineId)
-        {
-            return ModSupport.FoundTLM ? GetStopNameByTLMImpt(stopId, lineId) : GetStopName(stopId);
-        }
-        private static string GetStopNameByTLMImpt(ushort stopId, ushort lineId)
-        {
-            var subService = TransportManager.instance.m_lines.m_buffer[lineId].Info.m_netSubService;
-            return TLMFacade.GetFullStationName(stopId, lineId, false, subService);
-        }
+        public static string GetStationName(ushort stopId, ushort lineId) => ModSupport.FoundTLM ? ModSupport.TLM_GetStopName(stopId, lineId) : GetStopName(stopId);
+
         private static string GetStopName(ushort stopId)
         {
             var id = new InstanceID() { NetNode = stopId };
             string savedName = InstanceManager.instance.GetName(id);
             if (!savedName.IsNullOrWhiteSpace())
-            {
                 return savedName;
-            }
 
-            var nm = Singleton<NetManager>.instance;
-            var nn = nm.m_nodes.m_buffer[stopId];
-            var pos = nn.m_position;
+            var netManager = NetManager.instance;
+            var node = netManager.m_nodes.m_buffer[stopId];
+            var pos = node.m_position;
             //building
             ushort buildingId = FindTransportBuilding(pos, 100f);
             savedName = BuildingManager.instance.GetBuildingName(buildingId, InstanceID.Empty);
             if (!savedName.IsNullOrWhiteSpace())
-            {
                 return savedName;
-            }
+
             //road
             savedName = $"{stopId} {GetStationRoadName(pos)}";
             if (!savedName.IsNullOrWhiteSpace())
-            {
                 return savedName;
-            }
+
             //park
             savedName = GetStationParkName(pos);
             if (!savedName.IsNullOrWhiteSpace())
-            {
                 return savedName;
-            }
+
             //district
             savedName = GetStationDistrictName(pos);
             if (!savedName.IsNullOrWhiteSpace())
-            {
                 return savedName;
-            }
+
             return $"<Somewhere>[{stopId}]";
         }
-        public static string GetLineCodeInTLM(ushort lineId)
-        {
-            if (!ModSupport.FoundTLM) return string.Empty;
-            return GetLineCodeInTLMImpl(lineId);
-        }
-        private static string GetLineCodeInTLMImpl(ushort lineId) => TLMFacade.GetLineStringId(lineId, false);
+        public static string GetLineCodeInTLM(ushort lineId) => !ModSupport.FoundTLM ? string.Empty : ModSupport.TLM_GetLineCode(lineId);
+
         private static string GetStationRoadName(Vector3 pos)
         {
             var segmentid = MapUtils.RayCastRoad(pos);
@@ -93,19 +75,17 @@ namespace FPSCamera.Utils
         }
         private static ushort FindTransportBuilding(Vector3 pos, float maxDistance)
         {
-            var bm = Singleton<BuildingManager>.instance;
-
             foreach (var tType in stationTransportType)
             {
-                ushort buildingid = bm.FindTransportBuilding(pos, maxDistance, tType);
+                ushort buildingId = BuildingManager.instance.FindTransportBuilding(pos, maxDistance, tType);
 
-                if (buildingid != 0)
+                if (buildingId != 0)
                 {
-                    if (bm.m_buildings.m_buffer[buildingid].m_parentBuilding != 0)
+                    if (BuildingManager.instance.m_buildings.m_buffer[buildingId].m_parentBuilding != 0)
                     {
-                        buildingid = Building.FindParentBuilding(buildingid);
+                        buildingId = Building.FindParentBuilding(buildingId);
                     }
-                    return buildingid;
+                    return buildingId;
                 }
             }
             return default;
