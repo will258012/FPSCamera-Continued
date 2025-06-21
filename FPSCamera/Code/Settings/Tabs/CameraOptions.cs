@@ -18,7 +18,6 @@ namespace FPSCamera.Settings.Tabs
         private static UICheckBox dof_CheckBox;
         private static UICheckBox invertRotateHorizontal_CheckBox;
         private static UICheckBox invertRotateVertical_CheckBox;
-        private static UISlider movementSpeed_Slider;
         private static UISlider speedUpFactor_Slider;
         private static UISlider rotateSensitivity_Slider;
         private static UISlider rotateKeyFactor_Slider;
@@ -29,11 +28,13 @@ namespace FPSCamera.Settings.Tabs
         private static UICheckBox pathsDetection_CheckBox;
         private static UICheckBox tracksDetection_CheckBox;
 
+        private static UISlider movementSpeed_Slider;
         private static UICheckBox showCursorFree_CheckBox;
         private static UIDropDown groundCliping_dropDown;
         private static UISlider groundLevelOffset_Slider;
         private static UISlider roadLevelOffset_Slider;
 
+        private static UISlider offsetMovementSpeed_Slider;
         private static UICheckBox showCursorFollow_CheckBox;
         private static UICheckBox stickToFrontVehicle_CheckBox;
         private static OffsetSliders FollowCamOffset;
@@ -53,6 +54,7 @@ namespace FPSCamera.Settings.Tabs
 
         private float currentY = GroupMargin;
         private UITabstrip tabStrip;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CameraOptions"/> class.
@@ -110,11 +112,6 @@ namespace FPSCamera.Settings.Tabs
             invertRotateVertical_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.InvertRotateVertical = isChecked;
             currentY += invertRotateVertical_CheckBox.height + Margin;
 
-
-            movementSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.MovementSpeed, new UISliders.SliderValueFormat(1, 0.5f, "N", "km/h"));
-            movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
-            currentY += movementSpeed_Slider.height + SliderMargin;
-
             speedUpFactor_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SPEEDUPFACTOR"), 1.25f, 10f, .25f, ModSettings.SpeedUpFactor);
             speedUpFactor_Slider.eventValueChanged += (_, value) => ModSettings.SpeedUpFactor = value;
             currentY += speedUpFactor_Slider.height + SliderMargin;
@@ -169,6 +166,10 @@ namespace FPSCamera.Settings.Tabs
             showCursorFree_CheckBox.isChecked = ModSettings.ShowCursorFree;
             showCursorFree_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowCursorFree = isChecked;
             currentY += showCursorFree_CheckBox.height + Margin;
+
+            movementSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.MovementSpeed, new UISliders.SliderValueFormat(1, 0.5f, "N", "km/h"));
+            movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
+            currentY += movementSpeed_Slider.height + SliderMargin;
 
             string[] groundClippingItems = new[]
             {
@@ -235,6 +236,10 @@ namespace FPSCamera.Settings.Tabs
             stickToFrontVehicle_CheckBox.isChecked = ModSettings.StickToFrontVehicle;
             stickToFrontVehicle_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.StickToFrontVehicle = isChecked;
             currentY += stickToFrontVehicle_CheckBox.height + Margin;
+
+            offsetMovementSpeed_Slider = UISliders.AddPlainSliderWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_OFFSETMOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.OffsetMovementSpeed, new UISliders.SliderValueFormat(1, 0.5f, "N", "km/h"));
+            offsetMovementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.OffsetMovementSpeed = value;
+            currentY += offsetMovementSpeed_Slider.height + SliderMargin;
 
             FollowCamOffset = OffsetSliders.AddOffsetSlidersWithValue(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_FOLLOWCAMOFFSET"), -20f, 20f, .1f, ModSettings.FollowCamOffset);
             FollowCamOffset.x_Slider.eventValueChanged += (_, value) => ModSettings.FollowCamOffset.x = value;

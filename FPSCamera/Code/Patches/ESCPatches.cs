@@ -6,7 +6,7 @@ using System.Reflection;
 namespace FPSCamera.Patches
 {
     [HarmonyPatch]
-    internal class EscHandler
+    internal class ESCPatches
     {
         private static readonly MethodBase[] TargetMethods = {
             AccessTools.Method(typeof(GameKeyShortcuts), "Escape"),

@@ -121,6 +121,10 @@ namespace FPSCamera.UI
             movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
             currentY += movementSpeed_Slider.height + SliderMargin;
 
+            var offsetMovementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_OFFSETMOVEMENTSPEED"), 0f, 60f, .5f, ModSettings.OffsetMovementSpeed, Panel.width - 70f);
+            offsetMovementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.OffsetMovementSpeed = value;
+            currentY += offsetMovementSpeed_Slider.height + SliderMargin;
+
             var fov_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_FIELDOFVIEW"), 10f, 75f, 1f, ModSettings.CamFieldOfView, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "°"), Panel.width - 70f);
             fov_Slider.eventValueChanged += (_, value) => ModSettings.CamFieldOfView = value;
             currentY += fov_Slider.height + SliderMargin;

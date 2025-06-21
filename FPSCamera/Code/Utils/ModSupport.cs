@@ -2,6 +2,7 @@
 using ColossalFramework.Plugins;
 using System;
 using System.Collections.Generic;
+using TransportLinesManager.ModShared;
 namespace FPSCamera.Utils
 {
     public class ModSupport
@@ -10,9 +11,10 @@ namespace FPSCamera.Utils
         public static bool FoundUUI { get; private set; }
         public static bool FoundTLM { get; private set; }
         public static bool FoundTrainDisplay { get; private set; }
+        public static bool FoundACME { get; private set; }
         public static ushort FollowVehicleID { get; internal set; }
         internal static bool FoundK45TLM = false;
-
+        internal static bool ACMEDisabling = false;
         internal static List<string> CheckModConflicts()
         {
             try
@@ -85,6 +87,10 @@ namespace FPSCamera.Utils
                                         }
                                     }
                                     break;
+                                case "ACME":
+                                    FoundACME = true;
+                                    Logging.KeyMessage("found ACME, version ", assembly.GetName().Version);
+                                    break;
                             }
                         }
                 }
@@ -94,6 +100,29 @@ namespace FPSCamera.Utils
             {
                 Logging.LogException(e, "Failed to search supported mods");
             }
+        }
+        internal static void ACME_DisableFPSMode()
+        {
+            if (AccessUtils.GetStaticFieldValue<bool>(Type.GetType("ACME.FPSMode, ACME"), "s_modeActive"))
+                AccessUtils.InvokeMethod("ACME.FPSMode, ACME", "ToggleMode", null);
+        }
+        internal static string TLM_GetStopName(ushort stopId, ushort lineId)
+        {
+            var subService = TransportManager.instance.m_lines.m_buffer[lineId].Info.m_netSubService;
+            return TLMFacade.GetFullStationName(stopId, lineId, false, subService);
+        }
+        internal static string TLM_GetLineCode(ushort lineId) => TLMFacade.GetLineStringId(lineId, false);
+        internal static void ToggleIt_ToggleUI(bool visible)
+        {
+            if (!visible)
+            {
+                TerrainManager.instance.RenderTopography =
+                NotificationManager.instance.NotificationsVisible =
+                GameAreaManager.instance.BordersVisible =
+                DistrictManager.instance.NamesVisible =
+                NetManager.instance.RoadNamesVisible = false;
+            }
+            else ToggleIt.Managers.ToggleManager.Instance.ApplyAll();
         }
     }
 }
