@@ -67,7 +67,7 @@
 "SETTINGS_ROADLEVELOFFSET_DETAIL","地面裁切選項的道路水平偏移",""
 "SETTINGS_TARGETSTOFOLLOW","要跟隨的物件：",""
 "SETTINGS_SHOWCURSORFOLLOW","跟隨/漫遊模式下始終顯示遊標",""
-"SETTINGS_STICKTOFRONTVEHICLE","永遠跟著前方車輛走",""
+"SETTINGS_STICKTOFRONTVEHICLE","始終跟隨車輛前端",""
 "SETTINGS_OFFSETMOVEMENTSPEED","偏移速度",""
 "SETTINGS_FOLLOWCAMOFFSET","跟隨模式通用攝影機偏移",""
 "SETTINGS_VEHICLEFIXEDOFFERT","車輛的攝影機固定偏移",""
@@ -121,7 +121,7 @@
 "SETTINGS_CAMNEARCLIPPLANE","攝影機近裁切平面",""
 "SETTINGS_FOVIEWSCROLLFACTOR","滾輪縮放的視野縮放因子",""
 "SETTINGS_FOVIEWSCROLLFACTOR_DETAIL","調整在第一人稱攝影機中，滾輪縮放的速度",""
-"SETTINGS_LODOPT","LOD optimization level (experimental)",""
+"SETTINGS_LODOPT","LOD優化程度",""
 "SETTINGS_LODOPT_DETAIL","在第一人稱攝影機啟用時：
 - [停用] 停用LOD優化
 - [低] 僅優化較遠處的市民、車輛、樹木及道路的LOD距離
@@ -178,7 +178,7 @@
 "INFO_TIME","時間：",""
 "INFO_NAME","名稱",""
 "INFO_STATUS","狀態",""
-"INFO_OFFSETSAVED","Saved offset and rotation for ""{0}""",""
+"INFO_OFFSETSAVED","已儲存 “{0}” 的種類設置",""
 "FOLLOWBTN_TOOLTIP","進入跟隨模式",""
 "WALKTHRUBTN_TEXT","進入漫遊模式",""
 "ALLSETTINGSBTN_TEXT","所有設定",""
