@@ -56,7 +56,7 @@
 -[Snap to ground] camera sticks to ground
 -[Above road] camera always above the closest road
 -[Snap to road] camera sticks to the closest road or ground",""
-"SETTINGS_GROUNDCLIPING_NONE","None",""
+"SETTINGS_GROUNDCLIPING_NONE","Nenhum",""
 "SETTINGS_GROUNDCLIPING_ABOVE_GROUND","Above ground",""
 "SETTINGS_GROUNDCLIPING_SNAP_TO_GROUND","Snap to ground",""
 "SETTINGS_GROUNDCLIPING_ABOVE_ROAD","Above road",""
