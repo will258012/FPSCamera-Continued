@@ -1,6 +1,6 @@
 ﻿"LANGUAGE","Português Brasileiro","Language name (in native language).  This means the NAME OF THE LANGUAGE BEING TRANSLATED INTO, and should NOT be a translation of the word 'English'"
-"DISABLED","Disabled",""
-"LOW","Low",""
+"DISABLED","Desativada",""
+"LOW","Baixo",""
 "MID","Medium",""
 "HIGH","High",""
 "K45_TLM_DETECTED","An older version of Transport Lines Manager by Klyte45 is detected. Consider updating to t1a2l's version for full feature support.",""
@@ -50,12 +50,12 @@
 "SETTINGS_DETECTIONS_DETAIL","Disable it if it not works well with some assets",""
 "SETTINGS_SHOWCURSORFREE","Show cursor in Free-Camera mode",""
 "SETTINGS_GROUNDCLIPING","Ground clipping option",""
-"SETTINGS_GROUNDCLIPING_DETAIL","For Free-Camera Mode:
--[None] free movement
--[Above ground] camera always above ground
--[Snap to ground] camera sticks to ground
--[Above road] camera always above the closest road
--[Snap to road] camera sticks to the closest road or ground",""
+"SETTINGS_GROUNDCLIPING_DETAIL","Para o Modo Câmera Livre:
+-[Nenhum] movimento livre
+-[Acima do solo] câmera sempre acima do solo
+-[Fixar ao solo] câmera gruda ao solo
+-[Acima da estrada] câmera sempre acima da estrada mais próxima
+-[Fixar à estrada] câmera gruda à estrada ou solo mais próximo",""
 "SETTINGS_GROUNDCLIPING_NONE","Nenhum",""
 "SETTINGS_GROUNDCLIPING_ABOVE_GROUND","Above ground",""
 "SETTINGS_GROUNDCLIPING_SNAP_TO_GROUND","Snap to ground",""
@@ -166,7 +166,7 @@ This number sets the distance to give up the transition.",""
 "INFO_VEHICLE_PUBLICTRANSIT_PASSENGER","Passenger",""
 "INFO_VEHICLE_PUBLICTRANSIT_NEXTSTATIION","Next station",""
 "INFO_VEHICLE_PUBLICTRANSIT_NEXTSTOP","Next Stop",""
-"INFO_VEHICLE_SERVICE","Service",""
+"INFO_VEHICLE_SERVICE","Serviço",""
 "INFO_DISTRICT","District",""
 "INFO_DLCDISTRICT_PARK","Park",""
 "INFO_DLCDISTRICT_INDUSTRY","Industry Zone",""
@@ -178,7 +178,7 @@ This number sets the distance to give up the transition.",""
 "INFO_TIME","Time: ",""
 "INFO_NAME","Name",""
 "INFO_STATUS","Status",""
-"INFO_OFFSETSAVED","Saved type setting for ""{0}""",""
+"INFO_OFFSETSAVED","Configuração do tipo salva para ""{0}""",""
 "FOLLOWBTN_TOOLTIP","Start Follow Mode",""
 "WALKTHRUBTN_TEXT","Start Walk-Through",""
 "ALLSETTINGSBTN_TEXT","All settings",""
