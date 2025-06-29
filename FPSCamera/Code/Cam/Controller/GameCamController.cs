@@ -75,7 +75,7 @@ namespace FPSCamera.Cam.Controller
         public void Initialize()
         {
             CameraController.enabled = false;
-            ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.SetTool<DefaultTool>();
+            ToolsModifierControl.SetTool<DefaultTool>();
             if (ModSettings.HideGameUI)
             {
                 savedRect = Camera.main.rect;//need to control Camera.main instead of MainCamera we got, fixed for Dynamic Resolution
