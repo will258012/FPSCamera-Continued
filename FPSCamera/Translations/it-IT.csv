@@ -29,7 +29,7 @@
 "SETTINGS_IMPORTSUCCESSED","Your settings has been successfully imported.",""
 "SETTINGS_OPENWIKI","Open Wiki",""
 "SETTINGS_HIDEUI","Hide Game's UI",""
-"SETTINGS_SETBACKCAMERA","Reset camera after disabling",""
+"SETTINGS_SETBACKCAMERA","Set camera back after exiting",""
 "SETTINGS_SETBACKCAMERA_DETAIL","When disabling the FPS camera, reset it to its original position",""
 "SETTINGS_SHOWINFOPANEL","Show info panel by default",""
 "SETTINGS_INFOPANELHEIGHTSCALE","Scaling factor of info panel's height",""
@@ -94,7 +94,7 @@
 "SETTINGS_KEYCURSORTOGGLE","Cursor visibility toggle",""
 "SETTINGS_KEYAUTOMOVE","Auto moving toggle in Free-Camera mode",""
 "SETTINGS_KEYAUTOMOVE_DETAIL","Camera moves forward automatically when it's toggled on.",""
-"SETTINGS_KEYSAVEFOFFSET","Save type setting",""
+"SETTINGS_KEYSAVEFOFFSET","Save type offset setting",""
 "SETTINGS_KEYSAVEFOFFSET_DETAIL","In Follow/Walk-Through mode, save the current camera offset and rotation settings
 as the type setting for the followed target",""
 "SETTINGS_KEYMOVEFORWARD","Move/Offset forward",""
