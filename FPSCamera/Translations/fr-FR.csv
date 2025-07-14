@@ -29,7 +29,7 @@
 "SETTINGS_IMPORTSUCCESSED","Your settings has been successfully imported.",""
 "SETTINGS_OPENWIKI","Open Wiki",""
 "SETTINGS_HIDEUI","Hide Game's UI",""
-"SETTINGS_SETBACKCAMERA","Set camera back after exiting",""
+"SETTINGS_SETBACKCAMERA","Reset camera after disabling",""
 "SETTINGS_SETBACKCAMERA_DETAIL","When disabling the FPS camera, reset it to its original position",""
 "SETTINGS_SHOWINFOPANEL","Show info panel by default",""
 "SETTINGS_INFOPANELHEIGHTSCALE","Scaling factor of info panel's height",""
