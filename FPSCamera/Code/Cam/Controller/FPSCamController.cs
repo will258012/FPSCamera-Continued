@@ -43,7 +43,7 @@ namespace FPSCamera.Cam.Controller
                         case WalkThruCam _:
                             Status = CamStatus.Enabled; break;
                         default:
-                            Status = CamStatus.PluginEnabled; break;
+                            Status = CamStatus.Enabled | CamStatus.PluginEnabled; break;
                     }
                 }
                 else
@@ -124,7 +124,13 @@ namespace FPSCamera.Cam.Controller
                 Logging.Error("Given InstanceID is empty");
                 return;
             }
-            instanceID = InstanceManager.GetLocation(instanceID);
+            if (instanceID.Type == InstanceType.Citizen)
+            {
+                var newInstanceID = InstanceManager.GetLocation(instanceID);
+                if (newInstanceID.Type != InstanceType.Vehicle)
+                    instanceID = newInstanceID;
+            }
+
             switch (instanceID.Type)
             {
                 case InstanceType.Vehicle:
@@ -182,7 +188,7 @@ namespace FPSCamera.Cam.Controller
         {
             try
             {
-                if (Status == CamStatus.Enabled || Status == CamStatus.PluginEnabled)
+                if (Status.IsFlagSet(CamStatus.Enabled))
                 {
                     if (!(FPSCam?.IsValid() ?? false))
                     {
@@ -233,7 +239,7 @@ namespace FPSCamera.Cam.Controller
         /// <returns>True if the camera was disabled, false otherwise.</returns>
         public bool OnEsc()
         {
-            if (Status == CamStatus.Enabled || Status == CamStatus.PluginEnabled)
+            if (Status.IsFlagSet(CamStatus.Enabled))
             {
                 FPSCam = null;
                 return true;
@@ -269,10 +275,10 @@ namespace FPSCamera.Cam.Controller
                         StartFollowing(GameCamController.Instance.CameraController.GetTarget());
                 }
             }
-            if (Status != CamStatus.Enabled) return;
-
-            if (ModSettings.KeyInfoPanelToggle.KeyTriggered())
+            if (Status.IsFlagSet(CamStatus.Enabled) && ModSettings.KeyInfoPanelToggle.KeyTriggered())
                 CamInfoPanel.Instance.UIEnabled = !CamInfoPanel.Instance.UIEnabled;
+
+            if (Status != CamStatus.Enabled) return;
 
             if (InputManager.MouseButton.Middle.MouseTriggered() ||
                 ModSettings.KeyCamReset.KeyTriggered())
@@ -519,6 +525,7 @@ namespace FPSCamera.Cam.Controller
             CameraTransform.rotation =
                 Quaternion.Slerp(CameraTransform.rotation, GameCamController.Instance.transitionEndPositioning.rotation, Time.deltaTime * ModSettings.TransSpeed);
         }
+        [Flags]
         public enum CamStatus
         {
             Disabled,
