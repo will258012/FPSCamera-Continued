@@ -4,7 +4,7 @@ using FPSCamera.Utils;
 using HarmonyLib;
 using static ACME.ACME.CameraPositions;
 using static FPSCamera.Utils.MathUtils;
-namespace FPSCamera.Code.Patches
+namespace FPSCamera.Patches
 {
     [HarmonyPatch]
     internal class ACMEPatches

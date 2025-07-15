@@ -11,10 +11,10 @@ namespace FPSCamera.Utils
         /// Retrieves geographical information about the current camera position.
         /// </summary>
         /// <returns>A dictionary containing geographical information.</returns>
-        public static Dictionary<string, string> GetGeoInfo(IFPSCam followCam)
+        public static Dictionary<string, string> GetGeoInfo(IFPSCam fpsCam)
         {
             var info = new Dictionary<string, string>();
-            var pos = followCam.GetPositioning().pos;
+            var pos = fpsCam.GetPositioning().pos;
             if (MapUtils.RayCastDistrict(pos) is InstanceID disID && disID.District != default)
             {
                 var name = DistrictManager.instance.GetDistrictName(disID.District);
