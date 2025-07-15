@@ -58,7 +58,11 @@ namespace FPSCamera.Game
         public static bool KeyPressed(KeyOnlyBinding key) => key.IsPressed();
 
         public enum MouseButton : int { Primary = 0, Secondary = 1, Middle = 2 }
-        public static void ToggleCursor(bool visibility) => Cursor.visible = visibility;
+        public static void ToggleCursor(bool visibility)
+        {
+            Cursor.visible = visibility;
+            Cursor.lockState = !visibility ? CursorLockMode.Locked : CursorLockMode.None;
+        }
     }
 }
 
