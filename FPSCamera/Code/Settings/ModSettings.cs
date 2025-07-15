@@ -98,7 +98,7 @@ namespace FPSCamera.Settings
             KeyCamToggle = new Keybinding(KeyCode.BackQuote, false, false, false);
             KeyWalkThruToggle = new Keybinding(KeyCode.BackQuote, true, false, false);
             KeyFollowToggle = new Keybinding(KeyCode.BackQuote, false, true, false);
-            KeyInfoPanelToggle = new KeyOnlyBinding(KeyCode.RightBracket);
+            KeyInfoPanelToggle = new Keybinding(KeyCode.I, true, false, false);
             KeySpeedUp = new KeyOnlyBinding(KeyCode.CapsLock);
             KeyCamReset = new KeyOnlyBinding(KeyCode.Minus);
             KeyCursorToggle = new KeyOnlyBinding(KeyCode.Tab);
@@ -398,9 +398,9 @@ namespace FPSCamera.Settings
         internal static Keybinding KeyFollowToggle = new Keybinding(KeyCode.BackQuote, false, true, false);
 
         [XmlElement("KeyInfoPanelToggle")]
-        public KeyOnlyBinding XMLKeyInfoPanelToggle { get => KeyInfoPanelToggle; set => KeyInfoPanelToggle = value; }
+        public Keybinding XMLKeyInfoPanelToggle { get => KeyInfoPanelToggle; set => KeyInfoPanelToggle = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyInfoPanelToggle = new KeyOnlyBinding(KeyCode.RightBracket);
+        internal static Keybinding KeyInfoPanelToggle = new Keybinding(KeyCode.I, true, false, false);
 
         [XmlElement("KeySpeedUp")]
         public KeyOnlyBinding XMLKeySpeedUp { get => KeySpeedUp; set => KeySpeedUp = value; }
