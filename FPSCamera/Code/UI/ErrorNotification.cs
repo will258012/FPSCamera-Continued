@@ -1,5 +1,6 @@
 ﻿using AlgernonCommons.Notifications;
 using AlgernonCommons.Translation;
+using ColossalFramework;
 using ColossalFramework.UI;
 using UnityEngine;
 
@@ -7,11 +8,13 @@ namespace FPSCamera.UI
 {
     public class ErrorNotification : ListNotification
     {
-
+        /// <summary>
+        /// Gets the current instance of <see cref="ErrorNotification"/>.
+        /// </summary>
+        public static ErrorNotification Instance { get; private set; }
         /// <summary>
         /// Gets the "Copy" button instance.
         /// </summary>
-        /// 
         public UIButton CopyButton { get; set; }
 
         /// <summary>
@@ -28,6 +31,7 @@ namespace FPSCamera.UI
         /// </summary>
         protected override int NumButtons => 3;
         private string errorMessage = string.Empty;
+        private static object lockObj = new object();
         /// <summary>
         /// Adds buttons to the notification panel.
         /// </summary>
@@ -35,7 +39,7 @@ namespace FPSCamera.UI
         {
             base.AddButtons();
             CopyButton = AddButton(2, NumButtons, Translations.Translate("ERROR_COPY"),
-                () => GUIUtility.systemCopyBuffer = errorMessage);
+                () => Clipboard.text = errorMessage);
             SupportButton = AddButton(3, NumButtons, Translations.Translate("ERROR_SUPPORT"),
                 () => Application.OpenURL($"https://steamcommunity.com/sharedfiles/filedetails/?id={WorkshopId}"));
         }
@@ -47,24 +51,29 @@ namespace FPSCamera.UI
         /// <param name="message">Additional custom messages to display before the exception details.</param>
         public static void ShowNotification(string title, ulong workshopId, string message)
         {
-            try
+            lock (lockObj)
             {
-                var notification = ShowNotification<ErrorNotification>();
-                notification.Title = title;
-                notification.WorkshopId = workshopId;
-                notification.AddParas(Translations.Translate("ERROR"));
-                notification.AddSpacer();
-                notification.AddParas(message);
-                notification.errorMessage = message;
-            }
-            catch
-            {
-                // Fallback to vanilla exception panel if AlgernonCommons' notification failed
-                UIView.library.ShowModal<ExceptionPanel>("ExceptionPanel").SetMessage(
-                    title,
-                    $"{Translations.Translate("ERROR")}\n{message}",
-                    true
-                );
+
+                try
+                {
+                    if (Instance != null) return;
+                    Instance = ShowNotification<ErrorNotification>();
+                    Instance.Title = title;
+                    Instance.WorkshopId = workshopId;
+                    Instance.AddParas(Translations.Translate("ERROR"));
+                    Instance.AddSpacer();
+                    Instance.AddParas(message);
+                    Instance.errorMessage = message;
+                }
+                catch
+                {
+                    // Fallback to vanilla exception panel if AlgernonCommons' notification failed
+                    UIView.library.ShowModal<ExceptionPanel>("ExceptionPanel").SetMessage(
+                        title,
+                        $"{Translations.Translate("ERROR")}\n{message}",
+                        true
+                    );
+                }
             }
         }
         internal static void ShowNotification(string message) => ShowNotification(Mod.Instance.Name, 3198388677, message);
