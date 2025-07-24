@@ -45,6 +45,7 @@ namespace FPSCamera.Cam.Controller
                         default:
                             Status = CamStatus.Enabled | CamStatus.PluginEnabled; break;
                     }
+                    EventModeSwitched.Invoke(fpsCam.Name);
                 }
                 else
                     DisableCam();
@@ -65,6 +66,16 @@ namespace FPSCamera.Cam.Controller
         /// Invoked after FPS Camera is disabled.
         /// </summary>
         public static Action OnCameraDisabled { get; set; }
+        /// <summary>
+        /// Camera mode switching event handler delegate.
+        /// </summary>
+        /// <param name="exceptionMessage">Exception message.</param>
+        public delegate void ModeSwitchingEventHandler(string modeName);
+
+        /// <summary>
+        /// Camera mode switched event.
+        /// </summary>
+        public static event ModeSwitchingEventHandler EventModeSwitched;
         /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
@@ -530,9 +541,9 @@ namespace FPSCamera.Cam.Controller
         {
             Disabled,
             Enabled,
-            PluginEnabled,
-            Transitioning,
-            Disabling
+            PluginEnabled = 2,
+            Transitioning = 4,
+            Disabling = 8
         }
         private static Transform CameraTransform => GameCamController.Instance.MainCamera.transform;
         private bool isScrollTransitioning = false;

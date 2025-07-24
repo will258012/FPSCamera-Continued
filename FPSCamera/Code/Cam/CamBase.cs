@@ -4,6 +4,7 @@ namespace FPSCamera.Cam
 {
     public interface IFPSCam
     {
+        string Name { get; }
         float GetSpeed();
         Positioning GetPositioning();
         bool IsValid();

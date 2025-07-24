@@ -5,7 +5,6 @@ using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace FPSCamera.UI
@@ -42,6 +41,7 @@ namespace FPSCamera.UI
             infoFieldTexture.Apply();
             FPSCamController.OnCameraEnabled += SetEnable;
             FPSCamController.OnCameraDisabled += SetDisable;
+            FPSCamController.EventModeSwitched += OnModeSwitched;
             enabled = UIEnabled = false;
         }
 
@@ -91,7 +91,9 @@ namespace FPSCamera.UI
         {
             FPSCamController.OnCameraEnabled -= SetEnable;
             FPSCamController.OnCameraDisabled -= SetDisable;
+            FPSCamController.EventModeSwitched -= OnModeSwitched;
         }
+        private void OnModeSwitched(string modeName) => SetFooterMessage(modeName, 2f);
         /// <summary>
         /// Display a temporary message at the info panel's footer.
         /// </summary>
@@ -105,8 +107,6 @@ namespace FPSCamera.UI
 
         private void UpdateStatus()
         {
-            leftInfo.Clear();
-
             leftInfo = InfoUtils.GetGeoInfo(Cam);
 
             if (Cam is IFollowCam followcam)
@@ -129,7 +129,6 @@ namespace FPSCamera.UI
             {
                 rightInfo = followCam.GetInfo();
             }
-            else rightInfo.Clear();
         }
         private void UpdateSpeed()
             => mid = string.Format("{0,5:F1} {1}",
@@ -138,7 +137,35 @@ namespace FPSCamera.UI
 
         private void OnGUI()
         {
-            if (!UIEnabled) return;
+            if (UIEnabled) DrawPanel();
+            else if (tempFooterElapsedTime > elapsedTime) DrawMinimalMessage();
+        }
+
+        private void DrawMinimalMessage()
+        {
+            if (string.IsNullOrEmpty(tempFooter)) return;
+
+            var style = new GUIStyle
+            {
+                fontSize = (int)(16f * ModSettings.InfoPanelHeightScale),
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = new Color(1f, 1f, 1f, 0.8f) }
+            };
+
+            var textSize = style.CalcSize(new GUIContent(tempFooter));
+            float textWidth = textSize.x + 20f;
+            float textHeight = 30f * ModSettings.InfoPanelHeightScale;
+
+            float centerX = (Screen.width - textWidth) / 2f;
+            float posY = 10f;
+            var rect = new Rect(centerX, posY, textWidth, textHeight);
+
+            GUI.Box(rect, panelTexture);
+            GUI.Label(rect, tempFooter, style);
+        }
+
+        private void DrawPanel()
+        {
             var width = (float)Screen.width;
             var height = (Screen.height * heightRatio).Clamp(100f, 800f)
                                                        * ModSettings.InfoPanelHeightScale;
@@ -147,9 +174,9 @@ namespace FPSCamera.UI
 
             var style = new GUIStyle
             {
-                fontSize = (int)(height * fontHeightRatio)
+                fontSize = (int)(height * fontHeightRatio),
+                normal = { textColor = new Color(1f, 1f, 1f, .8f) }
             };
-            style.normal.textColor = new Color(1f, 1f, 1f, .8f);
 
             var margin = (width * marginWidthRatio).Clamp(0f, height * marginHeightRatio);
             var infoMargin = margin * infoMarginRatio;
@@ -164,12 +191,12 @@ namespace FPSCamera.UI
             var columnRect = rect; columnRect.width = fieldWidth;
             DrawInfoFields(leftInfo, style, columnRect, infoMargin);
             columnRect.x += fieldWidth + margin; columnRect.width = textWidth;
-            DrawListInRows(leftInfo.Select(kvp => kvp.Value), style, columnRect, infoMargin);
+            DrawListInRows(leftInfo.Values, style, columnRect, infoMargin);
 
             rect.x += blockWidth * 3f;
             style.alignment = TextAnchor.MiddleRight;
             columnRect = rect; columnRect.width = textWidth;
-            DrawListInRows(rightInfo.Select(kvp => kvp.Value), style, columnRect, infoMargin);
+            DrawListInRows(rightInfo.Values, style, columnRect, infoMargin);
             columnRect.x += textWidth + margin; columnRect.width = fieldWidth;
             DrawInfoFields(rightInfo, style, columnRect, infoMargin);
 
@@ -193,7 +220,7 @@ namespace FPSCamera.UI
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = (int)(oFontSize * fieldFontSizeRatio);
 
-            DrawListInRows(info.Select(kvp => kvp.Key), style, rect, margin);
+            DrawListInRows(info.Keys, style, rect, margin);
 
             style.normal.background = null;
             style.alignment = oAlign; style.fontSize = oFontSize;

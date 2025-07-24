@@ -1,4 +1,5 @@
 ﻿using AlgernonCommons;
+using AlgernonCommons.Translation;
 using ColossalFramework;
 using ColossalFramework.UI;
 using FPSCamera.Settings;
@@ -14,6 +15,7 @@ namespace FPSCamera.Cam
         public IFollowCam CurrentCam { get; private set; } = null;
         public uint FollowID => CurrentCam?.FollowID ?? default;
         public InstanceID FollowInstance => CurrentCam?.FollowInstance ?? default;
+        public string Name => Translations.Translate("SETTINGS_KEYWALKTHRUTOGGLE");
         public float GetSpeed() => CurrentCam?.GetSpeed() ?? default;
         public string GetFollowName() => CurrentCam?.GetFollowName();
         public string GetPrefabName() => CurrentCam?.GetPrefabName();

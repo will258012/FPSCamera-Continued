@@ -32,6 +32,7 @@ namespace FPSCamera.Cam
             }
             Logging.KeyMessage("Citizen cam started");
         }
+        public string Name => Translations.Translate("INFO_FOLLOW");
         public uint FollowID { get; private set; }
         public ushort CitizenInstanceID { get; private set; }
         public InstanceID FollowInstance { get; private set; }

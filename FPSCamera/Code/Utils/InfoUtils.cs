@@ -15,13 +15,16 @@ namespace FPSCamera.Utils
         {
             var info = new Dictionary<string, string>();
             var pos = fpsCam.GetPositioning().pos;
-            if (MapUtils.RayCastDistrict(pos) is InstanceID disID && disID.District != default)
+            var districtID = MapUtils.RayCastDistrict(pos);
+            var parkID = MapUtils.RayCastPark(pos);
+            var segID = MapUtils.RayCastRoad(pos);
+            if (!districtID.IsEmpty)
             {
-                var name = DistrictManager.instance.GetDistrictName(disID.District);
+                var name = DistrictManager.instance.GetDistrictName(districtID.District);
                 if (!string.IsNullOrEmpty(name))
                     info[Translations.Translate("INFO_DISTRICT")] = name;
             }
-            if (MapUtils.RayCastPark(pos) is InstanceID parkID && parkID.Park != default)
+            if (!parkID.IsEmpty)
             {
                 var name = DistrictManager.instance.GetParkName(parkID.Park);
                 if (!string.IsNullOrEmpty(name))
@@ -52,7 +55,7 @@ namespace FPSCamera.Utils
                 }
 
             }
-            if (MapUtils.RayCastRoad(pos) is InstanceID segID && segID.NetSegment != default)
+            if (!segID.IsEmpty)
             {
                 var name = NetManager.instance.GetSegmentName(segID.NetSegment);
                 if (!string.IsNullOrEmpty(name))

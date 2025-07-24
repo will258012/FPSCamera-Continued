@@ -1,4 +1,5 @@
-﻿using FPSCamera.Cam.Controller;
+﻿using AlgernonCommons.Translation;
+using FPSCamera.Cam.Controller;
 using FPSCamera.Utils;
 using UnityEngine;
 using static FPSCamera.Utils.MathUtils;
@@ -15,6 +16,7 @@ namespace FPSCamera.Cam
             GameCamController.Instance.MainCamera.transform.rotation);
         internal void UpdateSpeed(Vector3 a, Vector3 b) => speed = a.DistanceTo(b) / Time.deltaTime;
         public bool AutoMove { get; set; }
+        public string Name => Translations.Translate("SETTINGS_KEYCAMTOGGLE");
         public void ToggleAutoMove() => AutoMove = !AutoMove;
         public float GetSpeed() => speed;
         public bool IsValid() => true;

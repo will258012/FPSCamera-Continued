@@ -33,6 +33,7 @@ namespace FPSCamera.Cam
             SyncCamOffset();
             if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = id;
         }
+        public string Name => Translations.Translate("INFO_FOLLOW");
         public uint FollowID { get; private set; }
         public InstanceID FollowInstance { get; private set; }
         public Dictionary<string, string> GetInfo()
