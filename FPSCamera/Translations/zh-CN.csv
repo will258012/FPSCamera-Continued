@@ -178,6 +178,7 @@
 "INFO_TIME","时间：",""
 "INFO_NAME","名称",""
 "INFO_STATUS","状态",""
+"INFO_FOLLOW","跟随模式",""
 "INFO_OFFSETSAVED","已保存 “{0}” 的种类设置",""
 "FOLLOWBTN_TOOLTIP","进入跟随模式",""
 "WALKTHRUBTN_TEXT","进入漫游模式",""
