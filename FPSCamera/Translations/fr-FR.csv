@@ -94,7 +94,7 @@
 "SETTINGS_KEYCURSORTOGGLE","Cursor visibility toggle",""
 "SETTINGS_KEYAUTOMOVE","Auto moving toggle in Free-Camera mode",""
 "SETTINGS_KEYAUTOMOVE_DETAIL","Camera moves forward automatically when it's toggled on.",""
-"SETTINGS_KEYSAVEFOFFSET","Save type offset setting",""
+"SETTINGS_KEYSAVEFOFFSET","Save type setting",""
 "SETTINGS_KEYSAVEFOFFSET_DETAIL","In Follow/Walk-Through mode, save the current camera offset and rotation settings
 as the type setting for the followed target",""
 "SETTINGS_KEYMOVEFORWARD","Move/Offset forward",""
