@@ -1,11 +1,17 @@
-# Developing branch
-# TEST ONLY, NOT VERY STABLE
+# Cities: Skylines
+# First Person Camera - Continued
 
-<img src="images/Testing/banner.png" width="750px"/>
+# English / [中文](README_zh-cn.md)
+<img src="images/banner.png" width="750px"/>
 
-## If you are willing to help test the mod,please UNSUBSCRIBE the [stable version](https://steamcommunity.com/sharedfiles/filedetails/?id=3198388677) before testing.
+## Please unsubscribe [the original mod](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667) before downloading!
+## Also, please install the prerequisite [Harmony](https://github.com/boformer/CitiesHarmony/releases).
 
-- Welcome to create a [pull request](https://github.com/will258012/CitiesSkylines-FPSCamera-Continued/pulls)!
+> This is an updated version for [First Person Camera v2.2.0 by Asu4ni](https://steamcommunity.com/sharedfiles/filedetails/?id=2764243667).
+
+> If you are a new user, it's recommend to visit the [wiki](https://github.com/will258012/FPSCamera-Continued/wiki) to learn more about the mod's features and how to use it.
+## Help with translate!
+[![Crowdin](https://badges.crowdin.net/CSL_FPSCamera_Continued/localized.svg)](https://crowdin.com/project/CSL_FPSCamera_Continued)
 
 ---
-> The mod can also be downloaded on [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3281544449).
+> For more information, please visit [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3198388677). The mod can also be downloaded there.
