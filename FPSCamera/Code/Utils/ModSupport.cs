@@ -2,6 +2,7 @@
 using ColossalFramework.Plugins;
 using System;
 using System.Collections.Generic;
+using ToggleIt.Helpers;
 using TransportLinesManager.ModShared;
 namespace FPSCamera.Utils
 {
@@ -53,7 +54,7 @@ namespace FPSCamera.Utils
         {
             try
             {
-                Logging.Message("ModSupport: Start search for supported enabled mods");
+                Logging.Message("ModSupport: Start searching for supported enabled mods");
                 foreach (var plugin in PluginManager.instance.GetPluginsInfo())
                 {
                     if (plugin.isEnabled)
@@ -116,11 +117,11 @@ namespace FPSCamera.Utils
         {
             if (!visible)
             {
-                TerrainManager.instance.RenderTopography =
-                NotificationManager.instance.NotificationsVisible =
-                GameAreaManager.instance.BordersVisible =
-                DistrictManager.instance.NamesVisible =
-                NetManager.instance.RoadNamesVisible = false;
+                ToggleHelper.UpdateRoadNames(false);
+                ToggleHelper.UpdateBuildings(true);
+                ToggleHelper.UpdateContourLines(false);
+                ToggleHelper.UpdateZoning(false);
+                ToggleHelper.UpdateDistrictZones(false);
             }
             else ToggleIt.Managers.ToggleManager.Instance.ApplyAll();
         }

@@ -24,20 +24,16 @@ namespace FPSCamera.Game
         {
             try
             {
-                if (ModSupport.FoundToggleIt)
-                {
-                    ModSupport.ToggleIt_ToggleUI(visible);
-                }
-                else
-                {
-                    NotificationManager.instance.NotificationsVisible = visible;
-                    GameAreaManager.instance.BordersVisible = visible;
-                    DistrictManager.instance.NamesVisible = visible;
-                    NetManager.instance.RoadNamesVisible = visible;
-                }
+                NotificationManager.instance.NotificationsVisible = visible;
+                GameAreaManager.instance.BordersVisible = visible;
+                DistrictManager.instance.NamesVisible = visible;
+                NetManager.instance.RoadNamesVisible = visible;
                 GuideManager.instance.TutorialDisabled = !visible;
                 DisasterManager.instance.MarkersVisible = visible;
                 PropManager.instance.MarkersVisible = visible;
+
+                if (ModSupport.FoundToggleIt)
+                    ModSupport.ToggleIt_ToggleUI(visible);
 
                 UICamera.enabled = visible;
                 if (!visible)
