@@ -83,6 +83,7 @@ SETTINGS_OPENWIKI,Open Wiki
 "SETTINGS_SELECTPUBLICTRANSIT","Public transit vehicles",""
 "SETTINGS_SELECTSERVICE","Service vehicles",""
 "SETTINGS_SELECTCARGO","Cargo vehicles",""
+"SETTINGS_SELECTOUTSIDE","Targets outside the border",""
 "SETTINGS_KEYCAMTOGGLE","Free-Camera mode",""
 "SETTINGS_KEYWALKTHRUTOGGLE","Walk-Through mode",""
 "SETTINGS_KEYTOGGLE_DETAIL","Switch to this mode when pressed. If already active, will disable the FPS Camera",""
