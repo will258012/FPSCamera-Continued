@@ -3,6 +3,7 @@ using AlgernonCommons.Translation;
 using ColossalFramework;
 using ColossalFramework.UI;
 using FPSCamera.Settings;
+using FPSCamera.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -62,10 +63,17 @@ namespace FPSCamera.Cam
                 Logging.Error("WalkThru selection: unknown vehicle type:" + v);
                 return false;
 
-            }).Concat(GetCitizenInstances((c) =>
+            },
+            (v) => {
+                return MapUtils.IsInsideBorder(v.GetLastFramePosition()) || ModSettings.SelectOutside;
+            }
+            ).Concat(GetCitizenInstances((c) =>
                     {
                         if (c.m_flags.IsFlagSet(CitizenInstance.Flags.HangAround))
                             return false;
+
+                        if (!MapUtils.IsInsideBorder(c.GetLastFramePosition()))
+                            return ModSettings.SelectOutside;
 
                         var vehicleId = CitizenManager.instance.m_citizens.m_buffer[c.m_citizen].m_vehicle;
                         if (vehicleId != default)
@@ -107,17 +115,20 @@ namespace FPSCamera.Cam
         /// <summary>
         /// Get a <see cref="IEnumerable{InstanceID}"/> list of valid vehicles.
         /// </summary>
-        private static IEnumerable<InstanceID> GetVehicles(System.Func<VehicleInfo.VehicleCategory, bool> filter) => Enumerable.Range(1, VehicleManager.instance.m_vehicles.m_buffer.Length - 1)
+        private static IEnumerable<InstanceID> GetVehicles(System.Func<VehicleInfo.VehicleCategory, bool> categoryFilter, System.Func<Vehicle, bool> vehicleFilter) 
+            => Enumerable.Range(1, VehicleManager.instance.m_vehicles.m_buffer.Length - 1)
                     .Select(i => new InstanceID() { Vehicle = (ushort)i })
                     .Where(v =>
                     VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].Info != null &&
                     VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].Info.vehicleCategory != VehicleInfo.VehicleCategory.None &&
                     VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].m_flags.IsFlagSet(Vehicle.Flags.Created) &&
-                    filter(VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].Info.vehicleCategory));
+                    categoryFilter(VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle].Info.vehicleCategory)
+                    && vehicleFilter(VehicleManager.instance.m_vehicles.m_buffer[v.Vehicle]));
         /// <summary>
         /// Get a <see cref="IEnumerable{InstanceID}"/> list of valid citizen instances.
         /// </summary>
-        private static IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance, bool> filter) => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
+        private static IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance, bool> filter) 
+            => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
                 .Select(i => new InstanceID() { CitizenInstance = (ushort)i })
                 .Where(c =>
                 CitizenManager.instance.m_instances.m_buffer[c.CitizenInstance].m_flags.IsFlagSet(CitizenInstance.Flags.Created) &&

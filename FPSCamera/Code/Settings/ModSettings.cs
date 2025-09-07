@@ -355,6 +355,11 @@ namespace FPSCamera.Settings
         public bool XMLSelectCargo { get => SelectCargo; set => SelectCargo = value; }
         [XmlIgnore]
         internal static bool SelectCargo = true;
+
+        [XmlElement("SelectOutside")]
+        public bool XMLSelectOutside { get => SelectOutside; set => SelectOutside = value; }
+        [XmlIgnore]
+        internal static bool SelectOutside = false;
         #endregion
         #region Smooth Transition Options
         [XmlElement("SmoothTransition")]

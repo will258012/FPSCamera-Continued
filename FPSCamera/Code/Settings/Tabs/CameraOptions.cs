@@ -51,6 +51,7 @@ namespace FPSCamera.Settings.Tabs
         private static UICheckBox selectPublicTransit_CheckBox;
         private static UICheckBox selectService_CheckBox;
         private static UICheckBox selectCargo_CheckBox;
+        private static UICheckBox selectOutside_CheckBox;
 
         private float currentY = GroupMargin;
         private UITabstrip tabStrip;
@@ -332,6 +333,10 @@ namespace FPSCamera.Settings.Tabs
             selectCargo_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.SelectCargo = isChecked;
             currentY += selectCargo_CheckBox.height + Margin;
 
+            selectOutside_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SELECTOUTSIDE"));
+            selectOutside_CheckBox.isChecked = ModSettings.SelectOutside;
+            selectOutside_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.SelectOutside = isChecked;
+            currentY += selectOutside_CheckBox.height + Margin;
             #endregion
         }
     }

@@ -1,4 +1,5 @@
-﻿using FPSCamera.Settings;
+﻿using ColossalFramework;
+using FPSCamera.Settings;
 using UnityEngine;
 
 namespace FPSCamera.Utils
@@ -93,7 +94,11 @@ namespace FPSCamera.Utils
             return RayCastTool.RayCast(input, out var result, 5f) ?
                    new InstanceID() { Park = result.m_park } : default;
         }
-
+        public static bool IsInsideBorder(Vector3 position)
+        {
+            GameAreaManager.instance.GetTileXZ(position, out var x, out var z);
+            return GameAreaManager.instance.IsUnlocked(x, z);
+        }
         public class RayCastTool : ToolBase
         {
             /// <summary>
