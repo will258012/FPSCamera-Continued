@@ -1,4 +1,5 @@
 ﻿using AlgernonCommons;
+using ColossalFramework.UI;
 using FPSCamera.Utils;
 using System.Collections;
 using System.Linq;
@@ -42,6 +43,7 @@ namespace FPSCamera.Game
             catch (System.Exception e)
             {
                 Logging.LogException(e, "Failed to toggle UI");
+                UIView.Show(visible);
             }
             yield break;
         }
