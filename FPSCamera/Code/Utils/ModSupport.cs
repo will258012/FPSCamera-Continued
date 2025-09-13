@@ -15,7 +15,6 @@ namespace FPSCamera.Utils
         public static bool FoundACME { get; private set; }
         public static ushort FollowVehicleID { get; internal set; }
         internal static bool FoundK45TLM = false;
-        internal static bool ACMEDisabling = false;
         internal static List<string> CheckModConflicts()
         {
             try
@@ -104,8 +103,9 @@ namespace FPSCamera.Utils
         }
         internal static void ACME_DisableFPSMode()
         {
-            if (AccessUtils.GetStaticFieldValue<bool>(Type.GetType("ACME.FPSMode, ACME"), "s_modeActive"))
-                AccessUtils.InvokeMethod("ACME.FPSMode, ACME", "ToggleMode", null);
+            var traverse = HarmonyLib.Traverse.CreateWithType("ACME.FPSMode, ACME");
+            if (traverse.Field("s_modeActive").GetValue<bool>())
+                traverse.Method("ToggleMode").GetValue();
         }
         internal static string TLM_GetStopName(ushort stopId, ushort lineId)
         {
