@@ -1,4 +1,5 @@
 ﻿using AlgernonCommons;
+using ColossalFramework.UI;
 using FPSCamera.Utils;
 using System.Collections;
 using System.Linq;
@@ -24,20 +25,16 @@ namespace FPSCamera.Game
         {
             try
             {
-                if (ModSupport.FoundToggleIt)
-                {
-                    ModSupport.ToggleIt_ToggleUI(visible);
-                }
-                else
-                {
-                    NotificationManager.instance.NotificationsVisible = visible;
-                    GameAreaManager.instance.BordersVisible = visible;
-                    DistrictManager.instance.NamesVisible = visible;
-                    NetManager.instance.RoadNamesVisible = visible;
-                }
+                NotificationManager.instance.NotificationsVisible = visible;
+                GameAreaManager.instance.BordersVisible = visible;
+                DistrictManager.instance.NamesVisible = visible;
+                NetManager.instance.RoadNamesVisible = visible;
                 GuideManager.instance.TutorialDisabled = !visible;
                 DisasterManager.instance.MarkersVisible = visible;
                 PropManager.instance.MarkersVisible = visible;
+
+                if (ModSupport.FoundToggleIt)
+                    ModSupport.ToggleIt_ToggleUI(visible);
 
                 UICamera.enabled = visible;
                 if (!visible)
@@ -46,6 +43,7 @@ namespace FPSCamera.Game
             catch (System.Exception e)
             {
                 Logging.LogException(e, "Failed to toggle UI");
+                UIView.Show(visible);
             }
             yield break;
         }

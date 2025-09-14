@@ -99,7 +99,7 @@ namespace FPSCamera.Utils
 
                 case AmbulanceAI _:
                 case AmbulanceCopterAI _:
-                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_MEDICAL")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_MEDICAL"), true); break;
                 case DisasterResponseVehicleAI _:
                 case DisasterResponseCopterAI _:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_DISASTERRESPONSE")); break;
@@ -108,7 +108,7 @@ namespace FPSCamera.Utils
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_FIREFIGHTING")); break;
                 case PoliceCopterAI _:
                 case PoliceCarAI _:
-                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_POLICE")); break;
+                    ServiceInfo(Translations.Translate("VEHICLE_AITYPE_POLICE"), true); break;
                 case GarbageTruckAI _:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_GARBAGE")); break;
                 case HearseAI _:

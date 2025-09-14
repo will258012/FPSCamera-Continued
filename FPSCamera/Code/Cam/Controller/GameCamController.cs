@@ -43,7 +43,7 @@ namespace FPSCamera.Cam.Controller
             get
             {
                 if (_mainCamera == null)
-                    _mainCamera = AccessUtils.GetFieldValue<Camera>(CameraController, "m_camera");
+                    _mainCamera = RenderManager.instance.CurrentCameraInfo.m_camera;
                 return _mainCamera;
             }
         }
@@ -62,6 +62,7 @@ namespace FPSCamera.Cam.Controller
         /// Checks Tilt Shift status.
         /// </summary>
         public bool IsTiltEffectEnabled => !CameraController.isTiltShiftDisabled;
+
         /// <summary>
         /// Gets a component from the CameraController.
         /// </summary>
@@ -116,8 +117,8 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.HideGameUI)
                 Camera.main.rect = savedRect;
 
-            if (!ModSupport.ACMEDisabling)
-                if (ModSettings.SetBackCamera && CameraController.GetTarget().IsEmpty)
+            if (FPSCamController.Instance.OverrideSetBackCamera != FPSCamController.OverrideSetBack.ACME)
+                if (ModSettings.SetBackCamera && FPSCamController.Instance.OverrideSetBackCamera != FPSCamController.OverrideSetBack.False)
                 {
                     savedControllerPositioning.Load();
                     MainCamera.transform.position = transitionEndPositioning.pos;
@@ -126,11 +127,10 @@ namespace FPSCamera.Cam.Controller
                 else
                     Positioning.MainCameraPositioning.ToControllerPositioning().Load();
 
+            FPSCamController.Instance.OverrideSetBackCamera = FPSCamController.OverrideSetBack.None;
             if (ModSupport.FoundACME)
-            {
-                ModSupport.ACMEDisabling = false;
                 ModSupport.ACME_DisableFPSMode();
-            }
+
             transitionEndPositioning = default;
             CameraController.enabled = true;
         }

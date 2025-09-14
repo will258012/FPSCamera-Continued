@@ -32,7 +32,12 @@ namespace FPSCamera
         public override void OnEnabled()
         {
             base.OnEnabled();
-            Logging.EventExceptionOccured += (message) => ErrorNotification.ShowNotification(message);
+            Logging.EventExceptionOccured += ErrorNotification.ShowNotification;
+        }
+        public override void OnDisabled()
+        {
+            base.OnDisabled();
+            Logging.EventExceptionOccured -= ErrorNotification.ShowNotification;
         }
     }
 }

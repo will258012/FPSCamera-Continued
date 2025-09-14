@@ -66,7 +66,7 @@ namespace FPSCamera.Patches
                     height = savedPosition.Height,
                 }.ToPositioning();
                 GameCamController.Instance.transitionEndPositioning = positioning;
-                ModSupport.ACMEDisabling = true;
+                FPSCamController.Instance.OverrideSetBackCamera = FPSCamController.OverrideSetBack.ACME;
                 FPSCamController.Instance.FPSCam = null;
             }
         }

@@ -69,13 +69,17 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Camera mode switching event handler delegate.
         /// </summary>
-        /// <param name="exceptionMessage">Exception message.</param>
         public delegate void ModeSwitchingEventHandler(string modeName);
 
         /// <summary>
         /// Camera mode switched event.
         /// </summary>
         public static event ModeSwitchingEventHandler EventModeSwitched;
+        /// <summary>
+        /// Sets if the FPS Camera should ignore the <see cref="ModSettings.SetBackCamera"/> setting when disabled.
+        /// Useful for compatibility issues, auto set to <see cref="OverrideSetBack.None"/> after disabled.
+        /// </summary>
+        public OverrideSetBack OverrideSetBackCamera { get; set; } = OverrideSetBack.None;
         /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
@@ -108,8 +112,11 @@ namespace FPSCamera.Cam.Controller
                 StartCoroutine(LodManager.ToggleLODOpt(false));
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(false));
+            
+            if(!GameCamController.Instance.CameraController.GetTarget().IsEmpty)
+                OverrideSetBackCamera = OverrideSetBack.False; 
 
-            if (ModSettings.SmoothTransition && (ModSettings.SetBackCamera || ModSupport.ACMEDisabling) && GameCamController.Instance.CameraController.GetTarget().IsEmpty)
+            if (ModSettings.SmoothTransition && (ModSettings.SetBackCamera || OverrideSetBackCamera == OverrideSetBack.ACME) && OverrideSetBackCamera != OverrideSetBack.False)
                 StartTransitioningOnDisabling();
             else AfterTransition();
 
@@ -544,6 +551,12 @@ namespace FPSCamera.Cam.Controller
             PluginEnabled = 2,
             Transitioning = 4,
             Disabling = 8
+        }
+        public enum OverrideSetBack
+        {
+            None,
+            False,
+            ACME
         }
         private static Transform CameraTransform => GameCamController.Instance.MainCamera.transform;
         private bool isScrollTransitioning = false;

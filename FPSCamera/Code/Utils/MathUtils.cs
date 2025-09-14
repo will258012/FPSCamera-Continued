@@ -47,8 +47,12 @@ namespace FPSCamera.Utils
                 newSize = newSize.Clamp(controller.m_minDistance, controller.m_maxDistance);
 
                 // Calculate targetAngle if necessary.
-                if (!ToolManager.instance.m_properties.m_mode.IsFlagSet(ItemClass.Availability.ThemeEditor)
-                    && !controller.m_unlimitedCamera)//This value would be set to true if there's another camera mod, such as ACME.
+                var shouldCalculate =
+                    !(ToolManager.instance.m_properties.m_mode.IsFlagSet(ItemClass.Availability.ThemeEditor)
+                    || controller.m_unlimitedCamera //This value would be set to true if there's another camera mod, such as ACME.
+                    || AccessUtils.GetFieldValue<bool>(controller, "m_cachedFreeCamera")
+                    );
+                if (shouldCalculate)
                     controllerPositioning.angle = ControllerPositioning.CalculateTargetAngle(controllerPositioning.angle, newSize);
 
                 var newPos = pos;
@@ -82,28 +86,35 @@ namespace FPSCamera.Utils
             public float height;
             private static CameraController Controller => GameCamController.Instance.CameraController;
             public static ControllerPositioning Save()
+            => new ControllerPositioning
             {
-                var controller = GameCamController.Instance.CameraController;
-                return new ControllerPositioning
-                {
-                    pos = controller.m_targetPosition,
-                    angle = controller.m_targetAngle,
-                    size = controller.m_targetSize,
-                    height = controller.m_targetHeight,
-                };
-            }
+                pos = Controller.m_targetPosition,
+                angle = Controller.m_targetAngle,
+                size = Controller.m_targetSize,
+                height = Controller.m_targetHeight,
+            };
             public void Load()
             {
+                var traverse = HarmonyLib.Traverse.Create(Controller);
+
                 Controller.m_targetPosition = Controller.m_currentPosition = pos;
                 Controller.m_targetAngle = angle;
-                Controller.m_currentAngle = GameCamController.Instance.CameraController.m_unlimitedCamera ? angle : CalculateCurrentAngle(angle, size);
+
+                var shouldCalculate = 
+                    !(ToolManager.instance.m_properties.m_mode.IsFlagSet(ItemClass.Availability.ThemeEditor)
+                    || Controller.m_unlimitedCamera
+                    || traverse.Field("m_cachedFreeCamera").GetValue<bool>()
+                    );
+
+                Controller.m_currentAngle = shouldCalculate ? CalculateCurrentAngle(angle, size) : angle;
                 Controller.m_targetSize = Controller.m_currentSize = size;
                 Controller.m_targetHeight = Controller.m_currentHeight = height;
 
-                AccessUtils.SetFieldValue(Controller, "m_cachedPosition", pos);
-                AccessUtils.SetFieldValue(Controller, "m_cachedAngle", angle);
-                AccessUtils.SetFieldValue(Controller, "m_cachedSize", size);
-                AccessUtils.SetFieldValue(Controller, "m_cachedHeight", height);
+
+                traverse.Field("m_cachedPosition").SetValue(pos);
+                traverse.Field("m_cachedAngle").SetValue(angle);
+                traverse.Field("m_cachedSize").SetValue(size);
+                traverse.Field("m_cachedHeight").SetValue(height);
             }
             /// <summary>
             /// Convert to <see cref="Positioning"/> using by FPC (Local Rotation). (No distortion)
@@ -143,7 +154,6 @@ namespace FPSCamera.Utils
             // Clamp yaw and pitch from 0~360 degrees to -180~180 degrees.
             for (int i = 0; i < 2; i++)
                 eulerAngles[i] = Mathf.Repeat(eulerAngles[i] + 180f, 360f) - 180f;
-
             // Clamp pitch to the range of -90~90 degrees.
             eulerAngles.y = Mathf.Clamp(eulerAngles.y, -90f, 90f);
             return eulerAngles;

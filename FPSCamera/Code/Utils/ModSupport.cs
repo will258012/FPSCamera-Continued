@@ -2,6 +2,7 @@
 using ColossalFramework.Plugins;
 using System;
 using System.Collections.Generic;
+using ToggleIt.Helpers;
 using TransportLinesManager.ModShared;
 namespace FPSCamera.Utils
 {
@@ -14,7 +15,6 @@ namespace FPSCamera.Utils
         public static bool FoundACME { get; private set; }
         public static ushort FollowVehicleID { get; internal set; }
         internal static bool FoundK45TLM = false;
-        internal static bool ACMEDisabling = false;
         internal static List<string> CheckModConflicts()
         {
             try
@@ -53,7 +53,7 @@ namespace FPSCamera.Utils
         {
             try
             {
-                Logging.Message("ModSupport: Start search for supported enabled mods");
+                Logging.Message("ModSupport: Start searching for supported enabled mods");
                 foreach (var plugin in PluginManager.instance.GetPluginsInfo())
                 {
                     if (plugin.isEnabled)
@@ -103,8 +103,9 @@ namespace FPSCamera.Utils
         }
         internal static void ACME_DisableFPSMode()
         {
-            if (AccessUtils.GetStaticFieldValue<bool>(Type.GetType("ACME.FPSMode, ACME"), "s_modeActive"))
-                AccessUtils.InvokeMethod("ACME.FPSMode, ACME", "ToggleMode", null);
+            var traverse = HarmonyLib.Traverse.CreateWithType("ACME.FPSMode, ACME");
+            if (traverse.Field("s_modeActive").GetValue<bool>())
+                traverse.Method("ToggleMode").GetValue();
         }
         internal static string TLM_GetStopName(ushort stopId, ushort lineId)
         {
@@ -116,11 +117,11 @@ namespace FPSCamera.Utils
         {
             if (!visible)
             {
-                TerrainManager.instance.RenderTopography =
-                NotificationManager.instance.NotificationsVisible =
-                GameAreaManager.instance.BordersVisible =
-                DistrictManager.instance.NamesVisible =
-                NetManager.instance.RoadNamesVisible = false;
+                ToggleHelper.UpdateRoadNames(false);
+                ToggleHelper.UpdateBuildings(true);
+                ToggleHelper.UpdateContourLines(false);
+                ToggleHelper.UpdateZoning(false);
+                ToggleHelper.UpdateDistrictZones(false);
             }
             else ToggleIt.Managers.ToggleManager.Instance.ApplyAll();
         }
