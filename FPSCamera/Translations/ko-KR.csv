@@ -83,6 +83,7 @@
 "SETTINGS_SELECTPUBLICTRANSIT","대중교통 차량",""
 "SETTINGS_SELECTSERVICE","서비스 차량",""
 "SETTINGS_SELECTCARGO","화물 차량",""
+"SETTINGS_SELECTOUTSIDE","Targets outside the border",""
 "SETTINGS_KEYCAMTOGGLE","Free-Camera mode",""
 "SETTINGS_KEYWALKTHRUTOGGLE","도보 모드",""
 "SETTINGS_KEYTOGGLE_DETAIL","Switch to this mode when pressed. If already active, will disable the FPS Camera",""

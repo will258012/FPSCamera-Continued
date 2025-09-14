@@ -83,6 +83,7 @@
 "SETTINGS_SELECTPUBLICTRANSIT","Veículos de trânsito públicos",""
 "SETTINGS_SELECTSERVICE","Veículos de serviço",""
 "SETTINGS_SELECTCARGO","Veículos de carga",""
+"SETTINGS_SELECTOUTSIDE","Targets outside the border",""
 "SETTINGS_KEYCAMTOGGLE","Modo Câmera Livre",""
 "SETTINGS_KEYWALKTHRUTOGGLE","Modo de caminhada",""
 "SETTINGS_KEYTOGGLE_DETAIL","Alternar para este modo quando pressionado. Se já estiver ativo, desativará a Câmera de FPS",""
