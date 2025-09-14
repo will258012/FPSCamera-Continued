@@ -31,7 +31,7 @@ namespace FPSCamera.UI
         /// </summary>
         protected override int NumButtons => 3;
         private string errorMessage = string.Empty;
-        private static object lockObj = new object();
+        private static readonly object lockObj = new object();
         /// <summary>
         /// Adds buttons to the notification panel.
         /// </summary>
