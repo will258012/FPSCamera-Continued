@@ -117,11 +117,11 @@ namespace FPSCamera.UI
             dof_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.Dof = isChecked;
             currentY += dof_CheckBox.height + Margin;
 
-            var movementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 0f, 60f, .5f, ModSettings.MovementSpeed, Panel.width - 70f);
+            var movementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.MovementSpeed, Panel.width - 70f);
             movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
             currentY += movementSpeed_Slider.height + SliderMargin;
 
-            var offsetMovementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_OFFSETMOVEMENTSPEED"), 0f, 60f, .5f, ModSettings.OffsetMovementSpeed, Panel.width - 70f);
+            var offsetMovementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_OFFSETMOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.OffsetMovementSpeed, Panel.width - 70f);
             offsetMovementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.OffsetMovementSpeed = value;
             currentY += offsetMovementSpeed_Slider.height + SliderMargin;
 
@@ -129,14 +129,14 @@ namespace FPSCamera.UI
             fov_Slider.eventValueChanged += (_, value) => ModSettings.CamFieldOfView = value;
             currentY += fov_Slider.height + SliderMargin;
 
-            string[] groundClippingItems = new[]
-            {
+            string[] groundClippingItems =
+            [
                 Translations.Translate("SETTINGS_GROUNDCLIPING_NONE"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_ABOVE_GROUND"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_GROUND"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_ABOVE_ROAD"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_ROAD")
-            };
+            ];
 
             var groundClipping_dropDown = UIDropDowns.AddPlainDropDown(Panel, Margin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClippingItems, (int)ModSettings.GroundClipping, 150f);
             groundClipping_dropDown.tooltip = string.Format(Translations.Translate("SETTINGS_GROUNDCLIPING_DETAIL"), "\n");
@@ -172,7 +172,11 @@ namespace FPSCamera.UI
                 };
                 currentY += walkThruBtn.height + Margin;
                 var allSettingsBtn = UIButtons.AddButton(Panel, UILayout.PositionUnder(walkThruBtn), Translations.Translate("ALLSETTINGSBTN_TEXT"));
-                allSettingsBtn.eventClick += (_, e) => OpenSettingsPanel();
+                allSettingsBtn.eventClick += (_, e) =>
+                {
+                    OpenSettingsPanel();
+                    OnEsc();
+                };
                 Panel.height = currentY + walkThruBtn.height + Margin;
             }
             else
@@ -217,12 +221,13 @@ namespace FPSCamera.UI
             var panel = UIView.library.ShowModal<OptionsMainPanel>("OptionsPanel");
             panel.SelectMod(modName);
         }
-        internal static void OpenSettingsPanel() => OpenSettingsPanel(Mod.Instance.Name);
+        private static void OpenSettingsPanel() => OpenSettingsPanel(Mod.Instance.Name);
         private void OnChangedVisibility(UIComponent component, bool value)
         {
             if (isAnimating) return;
             if (!value)
             {
+                ModSettings.Save();
                 if (ModSettings.Fade)
                 {
                     isAnimating = true;
@@ -230,12 +235,10 @@ namespace FPSCamera.UI
                     {
                         Panel.isVisible = false;
                         isAnimating = false;
-                        ModSettings.Save();
                     });
                 }
                 else
                 {
-                    ModSettings.Save();
                     Panel.opacity = 0f;
                 }
             }
