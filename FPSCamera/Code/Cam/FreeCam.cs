@@ -12,7 +12,7 @@ namespace FPSCamera.Cam
     public class FreeCam : IFPSCam
     {
         public Positioning GetPositioning() =>
-            new Positioning(GameCamController.Instance.MainCamera.transform.position,
+            new(GameCamController.Instance.MainCamera.transform.position,
             GameCamController.Instance.MainCamera.transform.rotation);
         internal void UpdateSpeed(Vector3 a, Vector3 b) => speed = a.DistanceTo(b) / Time.deltaTime;
         public bool AutoMove { get; set; }

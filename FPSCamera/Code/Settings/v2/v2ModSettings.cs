@@ -10,6 +10,7 @@ namespace FPSCamera.Settings.v2
     [XmlRoot("Config")]
     public class v2ModSettings : SettingsXMLBase
     {
+#pragma warning disable CA1822
         [XmlIgnore]
         internal static readonly string SettingsFileName = Path.Combine(DataLocation.executableDirectory, "FPSCameraConfig.xml");
 
@@ -18,7 +19,7 @@ namespace FPSCamera.Settings.v2
             using (var reader = new StreamReader(SettingsFileName))
             {
                 var xmlSerializer = new XmlSerializer(typeof(v2ModSettings));
-                if (!(xmlSerializer.Deserialize(reader) is v2ModSettings xmlFile))
+                if (xmlSerializer.Deserialize(reader) is not v2ModSettings xmlFile)
                 {
                     throw new FileLoadException("couldn't deserialize XML file ", SettingsFileName);
                 }
@@ -81,10 +82,7 @@ namespace FPSCamera.Settings.v2
         public string GroundClippingOption
         {
             get => ModSettings.GroundClipping.ToString();
-            set
-            {
-                ModSettings.GroundClipping = (ModSettings.GroundClippings)Enum.Parse(typeof(ModSettings.GroundClippings), value);
-            }
+            set => ModSettings.GroundClipping = (ModSettings.GroundClippings)Enum.Parse(typeof(ModSettings.GroundClippings), value);
         }
 
         [XmlElement("GroundLevelOffset")]

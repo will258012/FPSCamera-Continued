@@ -4,7 +4,6 @@ using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
 using ColossalFramework.UI;
 using FPSCamera.Settings.v2;
-using FPSCamera.UI;
 using FPSCamera.Utils;
 using System;
 using System.Linq;
@@ -64,7 +63,6 @@ namespace FPSCamera.Settings.Tabs
             {
                 Translations.Index = index;
                 OptionsPanelManager<OptionsPanel>.LocaleChanged();
-                MainPanel.Instance?.LocaleChanged();
             };
             language_DropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += language_DropDown.parent.height + LeftMargin;
@@ -139,13 +137,13 @@ namespace FPSCamera.Settings.Tabs
             UISpacers.AddTitleSpacer(scrollPanel, LeftMargin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_OPT"));
             currentY += TitleMargin;
 
-            string[] LodOpt_Items = new[]
-            {
+            string[] LodOpt_Items =
+            [
                 Translations.Translate("DISABLED"),
                 Translations.Translate("LOW"),
                 Translations.Translate("MID"),
                 Translations.Translate("HIGH")
-            };
+            ];
 
             LodOpt_DropDown = UIDropDowns.AddPlainDropDown(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_LODOPT"), LodOpt_Items, ModSettings.LodOpt, 300);
             LodOpt_DropDown.tooltip = Translations.Translate("SETTINGS_LODOPT_DETAIL");
@@ -177,9 +175,7 @@ namespace FPSCamera.Settings.Tabs
                     try
                     {
                         v2ModSettings.Load();
-                        ModSettings.Save();
                         OptionsPanelManager<OptionsPanel>.LocaleChanged();
-                        MainPanel.Instance?.LocaleChanged();
 
                         OffsetsSettings.Load();
                         v2OffsetsSettings.Load();
@@ -204,9 +200,7 @@ namespace FPSCamera.Settings.Tabs
         internal static void ResetModSettings()
         {
             ModSettings.ResetToDefaults();
-            ModSettings.Save();
             OptionsPanelManager<OptionsPanel>.LocaleChanged();
-            MainPanel.Instance?.LocaleChanged();
         }
         internal static void ResetOffsetSettings()
         {

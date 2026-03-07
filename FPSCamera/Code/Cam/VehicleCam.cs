@@ -29,7 +29,7 @@ namespace FPSCamera.Cam
         {
             if (id == FollowID) return;
             FollowID = id;
-            FollowInstance = new InstanceID() { Vehicle = id };
+            FollowInstance = new() { Vehicle = id };
             SyncCamOffset();
             if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = id;
         }

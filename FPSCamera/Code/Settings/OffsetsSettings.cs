@@ -13,6 +13,7 @@ namespace FPSCamera.Settings
     [XmlRoot("FPSCameraOffsets")]
     public sealed class OffsetsSettings : SettingsXMLBase, IXmlSerializable
     {
+#pragma warning disable CA1822
         /// <summary>
         /// Settings file name
         /// </summary>
@@ -35,7 +36,7 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static Dictionary<string, Positioning> Offsets = DefaultOffsets;
         [XmlIgnore]
-        private static Dictionary<string, Positioning> DefaultOffsets => new Dictionary<string, Positioning>
+        private static Dictionary<string, Positioning> DefaultOffsets => new()
         {
             ["Bus"] = new Positioning(new Vector3(0f, .2f, 2.1f)),
             ["Biofuel Bus 01"] = new Positioning(new Vector3(0f, .2f, 2.1f)),

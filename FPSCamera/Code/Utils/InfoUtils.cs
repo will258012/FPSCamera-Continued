@@ -70,69 +70,71 @@ namespace FPSCamera.Utils
             var ai = vehicle.Info.m_vehicleAI;
             switch (ai)
             {
-                case BusAI _: TransitInfo(Translations.Translate("VEHICLE_AITYPE_BUS")); break;
-                case TramAI _:
+                case BusAI:
+                    TransitInfo(Translations.Translate("VEHICLE_AITYPE_BUS")); break;
+                case TramAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_TRAM")); break;
-                case MetroTrainAI _:
+                case MetroTrainAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_METRO")); break;
-                case PassengerTrainAI _:
+                case PassengerTrainAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_TRAIN")); break;
-                case PassengerPlaneAI _:
+                case PassengerPlaneAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_FLIGHT")); break;
-                case PassengerBlimpAI _:
+                case PassengerBlimpAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_BLIMP")); break;
-                case CableCarAI _:
+                case CableCarAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_GONDOLA")); break;
-                case TrolleybusAI _:
+                case TrolleybusAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_TROLLEYBUS")); break;
-                case PassengerFerryAI _:
+                case PassengerFerryAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_FERRY")); break;
-                case PassengerShipAI _:
+                case PassengerShipAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_SHIP")); break;
-                case PassengerHelicopterAI _:
+                case PassengerHelicopterAI:
                     TransitInfo(Translations.Translate("VEHICLE_AITYPE_HELICOPTER")); break;
 
-                case CargoTruckAI _:
-                case CargoTrainAI _:
-                case CargoShipAI _:
-                case CargoPlaneAI _: CargoInfo(); break;
+                case CargoTruckAI:
+                case CargoTrainAI:
+                case CargoShipAI:
+                case CargoPlaneAI:
+                    CargoInfo(); break;
 
-                case AmbulanceAI _:
-                case AmbulanceCopterAI _:
+                case AmbulanceAI:
+                case AmbulanceCopterAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_MEDICAL"), true); break;
-                case DisasterResponseVehicleAI _:
-                case DisasterResponseCopterAI _:
+                case DisasterResponseVehicleAI:
+                case DisasterResponseCopterAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_DISASTERRESPONSE")); break;
-                case FireCopterAI _:
-                case FireTruckAI _:
+                case FireCopterAI:
+                case FireTruckAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_FIREFIGHTING")); break;
-                case PoliceCopterAI _:
-                case PoliceCarAI _:
+                case PoliceCopterAI:
+                case PoliceCarAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_POLICE"), true); break;
-                case GarbageTruckAI _:
+                case GarbageTruckAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_GARBAGE")); break;
-                case HearseAI _:
+                case HearseAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_DEATHCARE")); break;
-                case PostVanAI _:
+                case PostVanAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_POSTAL")); break;
-                case SnowTruckAI _:
+                case SnowTruckAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_SNOWPLOWING")); break;
-                case WaterTruckAI _:
+                case WaterTruckAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_WATERPUMPING")); break;
-                case BankVanAI _:
+                case BankVanAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_BANK")); break;
-                case TaxiAI _:
+                case TaxiAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_TAXI"), true); break;
-                case MaintenanceTruckAI _:
-                case ParkMaintenanceVehicleAI _:
+                case MaintenanceTruckAI:
+                case ParkMaintenanceVehicleAI:
                     ServiceInfo(Translations.Translate("VEHICLE_AITYPE_MAINTENANCE"), true); break;
 
-                case PrivatePlaneAI _:
-                case PassengerCarAI _:
-                case BicycleAI _:
-                case BalloonAI _:
-                case FishingBoatAI _:
-                case RocketAI _:
+                case PrivatePlaneAI:
+                case PassengerCarAI:
+                case BicycleAI:
+                case BalloonAI:
+                case FishingBoatAI:
+                case RocketAI:
                     return;//These have no more info
 
                 default:

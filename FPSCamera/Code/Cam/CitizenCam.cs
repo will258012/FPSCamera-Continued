@@ -27,7 +27,7 @@ namespace FPSCamera.Cam
             {
                 CitizenInstanceID = id.CitizenInstance;
                 var citizenId = CitizenManager.instance.m_instances.m_buffer[id.CitizenInstance].m_citizen;
-                FollowInstance = new InstanceID() { Citizen = citizenId };
+                FollowInstance = new() { Citizen = citizenId };
                 FollowID = citizenId;
             }
             Logging.KeyMessage("Citizen cam started");

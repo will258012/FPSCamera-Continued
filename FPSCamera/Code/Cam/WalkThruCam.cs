@@ -64,7 +64,8 @@ namespace FPSCamera.Cam
                 return false;
 
             },
-            (v) => {
+            (v) =>
+            {
                 return MapUtils.IsInsideBorder(v.GetLastFramePosition()) || ModSettings.SelectOutside;
             }
             ).Concat(GetCitizenInstances((c) =>
@@ -115,7 +116,7 @@ namespace FPSCamera.Cam
         /// <summary>
         /// Get a <see cref="IEnumerable{InstanceID}"/> list of valid vehicles.
         /// </summary>
-        private static IEnumerable<InstanceID> GetVehicles(System.Func<VehicleInfo.VehicleCategory, bool> categoryFilter, System.Func<Vehicle, bool> vehicleFilter) 
+        private static IEnumerable<InstanceID> GetVehicles(System.Func<VehicleInfo.VehicleCategory, bool> categoryFilter, System.Func<Vehicle, bool> vehicleFilter)
             => Enumerable.Range(1, VehicleManager.instance.m_vehicles.m_buffer.Length - 1)
                     .Select(i => new InstanceID() { Vehicle = (ushort)i })
                     .Where(v =>
@@ -127,7 +128,7 @@ namespace FPSCamera.Cam
         /// <summary>
         /// Get a <see cref="IEnumerable{InstanceID}"/> list of valid citizen instances.
         /// </summary>
-        private static IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance, bool> filter) 
+        private static IEnumerable<InstanceID> GetCitizenInstances(System.Func<CitizenInstance, bool> filter)
             => Enumerable.Range(1, CitizenManager.instance.m_instances.m_buffer.Length - 1)
                 .Select(i => new InstanceID() { CitizenInstance = (ushort)i })
                 .Where(c =>

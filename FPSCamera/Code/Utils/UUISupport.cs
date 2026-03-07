@@ -92,7 +92,7 @@ namespace FPSCamera.Utils
             /// </summary>
             public Keybinding Keybinding
             {
-                get => new Keybinding(Key, Control, Shift, Alt);
+                get => new(Key, Control, Shift, Alt);
                 set => this.value = value.Encode();
             }
             public override void OnConflictResolved() => ModSettings.Save();

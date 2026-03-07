@@ -27,7 +27,7 @@ namespace FPSCamera.Utils
                 this.pos = pos;
                 rotation = Quaternion.identity;
             }
-            public static Positioning MainCameraPositioning => new Positioning(GameCamController.Instance.MainCamera.transform.position, GameCamController.Instance.MainCamera.transform.rotation);
+            public static Positioning MainCameraPositioning => new(GameCamController.Instance.MainCamera.transform.position, GameCamController.Instance.MainCamera.transform.rotation);
             /// <summary>
             /// Convert to <see cref="ControllerPositioning"/> using by <see cref="CameraController"/> (Orbit Rotation). (May introduce distortion)
             /// </summary>
@@ -86,7 +86,7 @@ namespace FPSCamera.Utils
             public float height;
             private static CameraController Controller => GameCamController.Instance.CameraController;
             public static ControllerPositioning Save()
-            => new ControllerPositioning
+            => new()
             {
                 pos = Controller.m_targetPosition,
                 angle = Controller.m_targetAngle,
@@ -100,7 +100,7 @@ namespace FPSCamera.Utils
                 Controller.m_targetPosition = Controller.m_currentPosition = pos;
                 Controller.m_targetAngle = angle;
 
-                var shouldCalculate = 
+                var shouldCalculate =
                     !(ToolManager.instance.m_properties.m_mode.IsFlagSet(ItemClass.Availability.ThemeEditor)
                     || Controller.m_unlimitedCamera
                     || traverse.Field("m_cachedFreeCamera").GetValue<bool>()
@@ -132,9 +132,9 @@ namespace FPSCamera.Utils
             }
             public void CalculateControllerAngle(Quaternion quaternion) => angle = new Vector2(quaternion.eulerAngles.y, quaternion.eulerAngles.x).ClampEulerAngles();
             public Quaternion FromControllerAngle() => Quaternion.AngleAxis(angle.x, Vector3.up) * Quaternion.AngleAxis(angle.y, Vector3.right);
-            public static Vector2 CalculateCurrentAngle(Vector2 targetAngle, float size) => new Vector2(targetAngle.x,
+            public static Vector2 CalculateCurrentAngle(Vector2 targetAngle, float size) => new(targetAngle.x,
                 90f - (90f - targetAngle.y) * (Controller.m_maxTiltDistance * 0.5f / (Controller.m_maxTiltDistance * 0.5f + size)));
-            public static Vector2 CalculateTargetAngle(Vector2 currentAngle, float size) => new Vector2(currentAngle.x,
+            public static Vector2 CalculateTargetAngle(Vector2 currentAngle, float size) => new(currentAngle.x,
                 -((180f * size - currentAngle.y * Controller.m_maxTiltDistance - 2f * currentAngle.y * size) / Controller.m_maxTiltDistance));
             public override string ToString() => $"Position: {pos}, Angle: {angle}, Size: {size}, Height: {height}";
         }
@@ -162,7 +162,7 @@ namespace FPSCamera.Utils
         public static float Clamp(this float value, float min, float max) => Mathf.Clamp(value, min, max);
         public static float DistanceTo(this Vector3 pos, Vector3 target) => Vector3.Distance(pos, target);
 
-        private static readonly System.Random _random = new System.Random();
+        private static readonly System.Random _random = new();
         public static T GetRandomOne<T>(this IEnumerable<T> list) => list.Any() ? list.ElementAt(_random.Next(list.Count())) : default;
     }
 }

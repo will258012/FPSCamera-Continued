@@ -9,7 +9,7 @@ namespace FPSCamera.Patches
     [HarmonyPatch]
     internal class ACMEPatches
     {
-        private static readonly ACME.ACME.ModSettings ACMESettings = new ACME.ACME.ModSettings();
+        private static readonly ACME.ACME.ModSettings ACMESettings = new();
 
         [HarmonyPatch(typeof(ACME.ACME.CameraPositions), "SavePosition")]
         [HarmonyPostfix]

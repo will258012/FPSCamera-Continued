@@ -31,7 +31,7 @@ namespace FPSCamera.UI
             Instance = this;
             elapsedTime = 0f; lastBufferStrUpdateTime = tempFooterElapsedTime = -1f;
             mid = footer = "";
-            leftInfo = rightInfo = new Dictionary<string, string>();
+            leftInfo = rightInfo = [];
 
             panelTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             panelTexture.SetPixel(0, 0, new Color32(45, 40, 105, 200));

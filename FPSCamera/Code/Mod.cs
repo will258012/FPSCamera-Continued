@@ -15,20 +15,19 @@ namespace FPSCamera
         public string Description => Translations.Translate("MODDESCRIPTION");
         public override void SaveSettings() => ModSettings.Save();
         public override void LoadSettings() => ModSettings.Load();
-        public override WhatsNewMessage[] WhatsNewMessages => new WhatsNewMessage[]
-        {
-            new WhatsNewMessage
-            {
+        public override WhatsNewMessage[] WhatsNewMessages =>
+        [
+            new() {
                 Version = AssemblyUtils.CurrentVersion,
                 MessagesAreKeys = true,
-                Messages = new string[]
-                {
+                Messages =
+                [
                     "WHATSNEW_L1",
                     "WHATSNEW_L2",
                     "WHATSNEW_L3"
-                }
+                ]
             }
-        };
+        ];
         public override void OnEnabled()
         {
             base.OnEnabled();
