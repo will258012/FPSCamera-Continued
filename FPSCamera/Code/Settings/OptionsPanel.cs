@@ -16,5 +16,14 @@ namespace FPSCamera.Settings
             tabStrip.selectedIndex = -1;
             tabStrip.selectedIndex = 0;
         }
+        protected override void OnVisibilityChanged()
+        {
+            if (!isVisible)
+            {
+                UI.MainPanel.Instance?.LocaleChanged();
+            }
+
+            base.OnVisibilityChanged();
+        }
     }
 }
