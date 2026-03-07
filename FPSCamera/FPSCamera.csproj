@@ -10,6 +10,7 @@
     </AssemblySearchPaths>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <Deterministic>True</Deterministic>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Code\Patches\ACMEPatches.cs" />
