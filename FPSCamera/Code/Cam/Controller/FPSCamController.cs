@@ -26,33 +26,27 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public IFPSCam FPSCam
         {
-            get => fpsCam;
+            get;
             set
             {
-                fpsCam?.DisableCam();
-                fpsCam = value;
-                if (fpsCam != null)
+                field?.DisableCam();
+                field = value;
+                if (field != null)
                 {
                     if (Status == CamStatus.Disabled)
                         EnableCam();
-                    switch (fpsCam)
+                    Status = (field) switch
                     {
-                        case VehicleCam _:
-                        case FreeCam _:
-                        case CitizenCam _:
-                        case WalkThruCam _:
-                            Status = CamStatus.Enabled; break;
-                        default:
-                            Status = CamStatus.Enabled | CamStatus.PluginEnabled; break;
-                    }
-                    EventModeSwitched.Invoke(fpsCam.Name);
+                        VehicleCam or FreeCam or CitizenCam or WalkThruCam => CamStatus.Enabled,
+                        _ => CamStatus.Enabled | CamStatus.PluginEnabled,
+                    };
+                    EventModeSwitched.Invoke(field.Name);
                 }
                 else
                     DisableCam();
             }
         }
 
-        private IFPSCam fpsCam = null;
         /// <summary>
         /// Gets the current status of the camera.
         /// Useful for status determination.
@@ -91,12 +85,17 @@ namespace FPSCamera.Cam.Controller
         private void EnableCam()
         {
             OffsetsSettings.Load();
+
+            StopAllCoroutines();
             if (ModSettings.HideGameUI)
                 StartCoroutine(UIManager.ToggleUI(false));
             if (ModSettings.LodOpt != 0)
                 StartCoroutine(LodManager.ToggleLODOpt(true));
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(true));
+            if (ModSettings.SmoothTransition)
+                targetFoV = ModSettings.CamFieldOfView;
+
             GameCamController.Instance.Initialize();
             OnCameraEnabled?.Invoke();
         }
@@ -108,13 +107,15 @@ namespace FPSCamera.Cam.Controller
         {
             Logging.KeyMessage("Disabling FPS Camera");
             Status = CamStatus.Disabling;
+
+            StopAllCoroutines();
             if (ModSettings.LodOpt != 0)
                 StartCoroutine(LodManager.ToggleLODOpt(false));
             if (ModSettings.ShadowsOpt)
                 StartCoroutine(ShadowsManager.ToggleShadowsOpt(false));
-            
-            if(!GameCamController.Instance.CameraController.GetTarget().IsEmpty)
-                OverrideSetBackCamera = OverrideSetBack.False; 
+
+            if (!GameCamController.Instance.CameraController.GetTarget().IsEmpty)
+                OverrideSetBackCamera = OverrideSetBack.False;
 
             if (ModSettings.SmoothTransition && (ModSettings.SetBackCamera || OverrideSetBackCamera == OverrideSetBack.ACME) && OverrideSetBackCamera != OverrideSetBack.False)
                 StartTransitioningOnDisabling();
@@ -190,13 +191,17 @@ namespace FPSCamera.Cam.Controller
         public void StartTransitioningOnDisabling()
         {
             transitionTimer = 0f;
-            targetFoV = ModSettings.CamFieldOfView;
             float dist = CameraTransform.position.DistanceTo(GameCamController.Instance.transitionEndPositioning.pos);
             if (dist <= 2f || dist > ModSettings.MaxTransDistance)
             {
                 AfterTransition();
                 return;
             }
+
+            targetFoV = ModSettings.CamFieldOfView;
+            if (GameCamController.Instance.MainCamera.fieldOfView != targetFoV)
+                isScrollTransitioning = true;
+            
             Status = CamStatus.Transitioning;
         }
         /// <summary>
@@ -235,6 +240,7 @@ namespace FPSCamera.Cam.Controller
                 if (Status == CamStatus.Transitioning)
                 {
                     UpdateTransitionPos();
+                    UpdateScrollTransition();
                 }
                 else if (Status == CamStatus.Enabled)
                 {
@@ -274,12 +280,12 @@ namespace FPSCamera.Cam.Controller
             {
                 if (ModSettings.KeyCamToggle.KeyTriggered())
                 {
-                    if (!(FPSCam is FreeCam)) StartFreeCam();
+                    if (FPSCam is not FreeCam) StartFreeCam();
                     else FPSCam = null;
                 }
                 if (ModSettings.KeyWalkThruToggle.KeyTriggered())
                 {
-                    if (!(FPSCam is WalkThruCam)) StartWalkThruCam();
+                    if (FPSCam is not WalkThruCam) StartWalkThruCam();
                     else FPSCam = null;
                 }
                 if (ModSettings.KeyFollowToggle.KeyTriggered())
@@ -347,11 +353,10 @@ namespace FPSCamera.Cam.Controller
                 if (yawDegree == 0f && pitchDegree == 0f && !cursorVisible)
                 {
                     // mouse rotation
-                    const float mouseFactor = .2f;
                     yawDegree = InputManager.MouseMoveHori * ModSettings.RotateSensitivity *
-                                (ModSettings.InvertRotateHorizontal ? -1f : 1f) * mouseFactor;
+                                (ModSettings.InvertRotateHorizontal ? -1f : 1f) * MouseFactor;
                     pitchDegree = InputManager.MouseMoveVert * ModSettings.RotateSensitivity *
-                                  (ModSettings.InvertRotateVertical ? 1f : -1f) * mouseFactor;
+                                  (ModSettings.InvertRotateVertical ? 1f : -1f) * MouseFactor;
                 }
             }
             var yawRotation = Quaternion.Euler(0f, yawDegree, 0f);
@@ -369,32 +374,33 @@ namespace FPSCamera.Cam.Controller
             var scroll = InputManager.MouseScroll;
             if (ModSettings.SmoothTransition)
             {
-                var nowFoV = GameCamController.Instance.MainCamera.fieldOfView;
-                if (scroll > 0f && nowFoV > 10f)
-                    targetFoV = nowFoV / ModSettings.FoViewScrollfactor;
-                else if (scroll < 0f && nowFoV < 75f)
-                    targetFoV = nowFoV * ModSettings.FoViewScrollfactor;
-                isScrollTransitioning = true;
+                var currentFoV = GameCamController.Instance.MainCamera.fieldOfView;
+                if (scroll > 0f && currentFoV > MinFoV)
+                {
+                    targetFoV = currentFoV / ModSettings.FoViewScrollfactor;
+                    isScrollTransitioning = true;
+                }
+                else if (scroll < 0f && currentFoV < MaxFoV)
+                {
+                    targetFoV = currentFoV * ModSettings.FoViewScrollfactor;
+                    isScrollTransitioning = true;
+                }
+                else if (!isScrollTransitioning && currentFoV != targetFoV)
+                    isScrollTransitioning = true;
+
+                UpdateScrollTransition();
             }
             else
             {
                 var FoV = GameCamController.Instance.MainCamera.fieldOfView;
 
-                if (scroll > 0f && FoV > 10f)
+                if (scroll > 0f && FoV > MinFoV)
                     GameCamController.Instance.MainCamera.fieldOfView = FoV / ModSettings.FoViewScrollfactor;
-                else if (scroll < 0f && FoV < 75f)
+                else if (scroll < 0f && FoV < MaxFoV)
                     GameCamController.Instance.MainCamera.fieldOfView = FoV * ModSettings.FoViewScrollfactor;
             }
-            if (isScrollTransitioning)
-            {
-                if (GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(targetFoV))
-                {
-                    GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
-                    isScrollTransitioning = false;
-                }
-                GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(GameCamController.Instance.MainCamera.fieldOfView, targetFoV, Time.deltaTime * ModSettings.TransSpeed);
-            }
         }
+
         /// <summary>
         /// Saves the given camera offset.
         /// </summary>
@@ -543,6 +549,22 @@ namespace FPSCamera.Cam.Controller
             CameraTransform.rotation =
                 Quaternion.Slerp(CameraTransform.rotation, GameCamController.Instance.transitionEndPositioning.rotation, Time.deltaTime * ModSettings.TransSpeed);
         }
+        /// <summary>
+        /// Updates the camera's FOV during a scroll transition to smoothly adjust to the target FOV.
+        /// </summary>
+        private void UpdateScrollTransition()
+        {
+            if (isScrollTransitioning)
+            {
+                if (GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(targetFoV, .1f))
+                {
+                    GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
+                    isScrollTransitioning = false;
+                }
+                GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(GameCamController.Instance.MainCamera.fieldOfView, targetFoV, Time.deltaTime * ModSettings.TransSpeed);
+            }
+        }
+
         [Flags]
         public enum CamStatus
         {
@@ -563,8 +585,11 @@ namespace FPSCamera.Cam.Controller
         private Positioning offset = default;
         private Vector3 offsetFromSetting = default;
         private float targetFoV = ModSettings.CamFieldOfView;
-
         private float transitionTimer = 0f;
+
         private const float MaxTransitioningTime = 5f;
+        private const float MinFoV = 10f;
+        private const float MaxFoV = 75f;
+        private const float MouseFactor = .2f;
     }
 }
