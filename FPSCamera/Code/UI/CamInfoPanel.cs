@@ -93,7 +93,12 @@ namespace FPSCamera.UI
             FPSCamController.OnCameraDisabled -= SetDisable;
             FPSCamController.EventModeSwitched -= OnModeSwitched;
         }
-        private void OnModeSwitched(string modeName) => SetFooterMessage(modeName, 2f);
+        private void OnModeSwitched(string modeName)
+        {
+            SetFooterMessage(modeName, 2f);
+            leftInfo.Clear();
+            rightInfo.Clear();
+        }
         /// <summary>
         /// Display a temporary message at the info panel's footer.
         /// </summary>
