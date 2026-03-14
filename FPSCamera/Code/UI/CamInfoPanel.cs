@@ -116,10 +116,14 @@ namespace FPSCamera.UI
 
             if (Cam is IFollowCam followcam)
             {
-                leftInfo[Translations.Translate("INFO_NAME")] = followcam.GetFollowName();
+                var name = followcam.GetFollowName();
+                if (!string.IsNullOrEmpty(name))
+                    leftInfo[Translations.Translate("INFO_NAME")] = name;
+
                 var status = followcam.GetStatus();
                 if (!string.IsNullOrEmpty(status))
-                    leftInfo[Translations.Translate("INFO_STATUS")] = followcam.GetStatus();
+                    leftInfo[Translations.Translate("INFO_STATUS")] = status;
+
                 if (Cam is CitizenCam citizenCam)
                 {
                     var anotherStatus = citizenCam.AnotherCam?.GetStatus();

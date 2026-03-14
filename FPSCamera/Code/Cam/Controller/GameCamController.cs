@@ -46,11 +46,22 @@ namespace FPSCamera.Cam.Controller
                 return field;
             }
         }
-
         /// <summary>
         /// Gets the current <see cref="global::CameraController"/>.
         /// </summary>
         public CameraController CameraController => ToolsModifierControl.cameraController;
+
+        /// <summary>
+        /// Gets the current <see cref="global::CinematicCameraController"/>.
+        /// </summary>
+        public CinematicCameraController CinematicCameraController
+        {
+            get
+            {
+                field ??= Object.FindObjectOfType<CinematicCameraController>();
+                return field;
+            }
+        }
 
         /// <summary>
         /// Checks Dof status.
@@ -74,8 +85,15 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void Initialize()
         {
+            if (CinematicCameraController.enabled) // Disable cinematic camera manually in case
+            {
+                CinematicCameraController.AbortScript();
+                CinematicCameraController.enabled = false;
+            }
+
             CameraController.enabled = false;
             ToolsModifierControl.SetTool<DefaultTool>();
+
             if (ModSettings.HideGameUI)
             {
                 savedRect = Camera.main.rect;//need to control Camera.main instead of MainCamera we got, fixed for Dynamic Resolution
@@ -88,8 +106,8 @@ namespace FPSCamera.Cam.Controller
             }
             else
             {
-                if (camDoF != null && IsDoFEnabled)
-                    camDoF.enabled = false;
+                if (IsDoFEnabled)
+                    camDoF?.enabled = false;
             }
             if (ModSettings.SetBackCamera)
             {
