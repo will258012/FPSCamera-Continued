@@ -31,7 +31,7 @@ namespace FPSCamera.Cam
                 FollowID = citizenId;
             }
 
-            isRace = GetCitizenInstance().m_racerIndex != default || GetCitizenInstance().m_performerIndex != default || GetCitizenInstance().m_citizen == default;
+            isRace = GetCitizenInstance().m_racerIndex != default || GetCitizenInstance().m_performerIndex != default || (GetCitizenInstance().m_flags.IsFlagSet(CitizenInstance.Flags.Cheering | CitizenInstance.Flags.Spectating));
 
             Logging.KeyMessage("Citizen cam started");
             Logging.Message($"FollowID:{FollowID} isRace:{isRace}");
