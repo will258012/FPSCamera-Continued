@@ -29,6 +29,12 @@ namespace FPSCamera.Cam.Controller
             get;
             set
             {
+                if (Status == CamStatus.Transitioning || Status == CamStatus.Disabling)
+                {
+                    Logging.Error($"Ignored FPSCam assignment to {value?.Name ?? "null"} due to camera is still busy for disabling");
+                    return;
+                }
+
                 field?.DisableCam();
                 field = value;
                 if (field != null)
@@ -84,7 +90,9 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void EnableCam()
         {
+            Logging.KeyMessage("Enabling FPS Camera");
             OffsetsSettings.Load();
+            GameCamController.Instance.Initialize();
 
             StopAllCoroutines();
             if (ModSettings.HideGameUI)
@@ -96,7 +104,6 @@ namespace FPSCamera.Cam.Controller
             if (ModSettings.SmoothTransition)
                 targetFoV = ModSettings.CamFieldOfView;
 
-            GameCamController.Instance.Initialize();
             OnCameraEnabled?.Invoke();
         }
 
@@ -192,16 +199,16 @@ namespace FPSCamera.Cam.Controller
         {
             transitionTimer = 0f;
             float dist = CameraTransform.position.DistanceTo(GameCamController.Instance.transitionEndPositioning.pos);
-            if (dist <= 2f || dist > ModSettings.MaxTransDistance)
+            if (dist > ModSettings.MaxTransDistance)
             {
                 AfterTransition();
                 return;
             }
 
-            targetFoV = ModSettings.CamFieldOfView;
+            targetFoV = GameCamController.Instance.savedFoV;
             if (GameCamController.Instance.MainCamera.fieldOfView != targetFoV)
                 isScrollTransitioning = true;
-            
+
             Status = CamStatus.Transitioning;
         }
         /// <summary>
@@ -536,7 +543,7 @@ namespace FPSCamera.Cam.Controller
         {
             transitionTimer += Time.deltaTime;
             // If we've reached the distance of the end or time is out
-            if (CameraTransform.position.DistanceTo(GameCamController.Instance.transitionEndPositioning.pos) <= 2f ||
+            if ((CameraTransform.position.DistanceTo(GameCamController.Instance.transitionEndPositioning.pos) <= 2f && !isScrollTransitioning) ||
                 transitionTimer >= MaxTransitioningTime)
             {
                 transitionTimer = 0f;
@@ -584,10 +591,11 @@ namespace FPSCamera.Cam.Controller
         private bool isScrollTransitioning = false;
         private Positioning offset = default;
         private Vector3 offsetFromSetting = default;
-        private float targetFoV = ModSettings.CamFieldOfView;
-        private float transitionTimer = 0f;
 
+        private float transitionTimer = 0f;
         private const float MaxTransitioningTime = 5f;
+
+        private float targetFoV = ModSettings.CamFieldOfView;
         private const float MinFoV = 10f;
         private const float MaxFoV = 75f;
         private const float MouseFactor = .2f;

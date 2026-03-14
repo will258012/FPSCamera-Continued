@@ -116,7 +116,10 @@ namespace FPSCamera.Cam.Controller
             }
 
             savedFoV = MainCamera.fieldOfView;
-            MainCamera.fieldOfView = ModSettings.CamFieldOfView;
+
+            if (!ModSettings.SmoothTransition)
+                MainCamera.fieldOfView = ModSettings.CamFieldOfView;
+            
             savedNearClipPlane = MainCamera.nearClipPlane;
             MainCamera.nearClipPlane = ModSettings.CamNearClipPlane;
         }
@@ -157,7 +160,7 @@ namespace FPSCamera.Cam.Controller
         internal Positioning transitionEndPositioning;
         private ControllerPositioning savedControllerPositioning;
         private Rect savedRect = CameraController.kFullScreenWithoutMenuBarRect;
-        private float savedFoV;
+        internal float savedFoV;
         private float savedNearClipPlane;
     }
 }
