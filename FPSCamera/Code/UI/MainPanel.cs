@@ -175,7 +175,6 @@ namespace FPSCamera.UI
                 allSettingsBtn.eventClick += (_, e) =>
                 {
                     OpenSettingsPanel();
-                    OnEsc();
                 };
                 Panel.height = currentY + walkThruBtn.height + Margin;
             }
@@ -213,8 +212,11 @@ namespace FPSCamera.UI
         }
         public void LocaleChanged()
         {
+            wasVisible = Panel.isVisible;
             Close();
             AddSettings();
+            if (wasVisible)
+                Panel.Show();
         }
         public static void OpenSettingsPanel(string modName)
         {
@@ -267,5 +269,6 @@ namespace FPSCamera.UI
         }
         private UIButton _mainBtn = null;
         private bool isAnimating = false;
+        private bool wasVisible = false;
     }
 }
