@@ -181,6 +181,11 @@ This number sets the distance to give up the transition.",""
 "INFO_STATUS","Status",""
 INFO_FOLLOW,Follow mode
 INFO_OFFSETSAVED,Saved type setting for "{0}"
+INFO_RACE_EVENTROUTE,Event Route
+INFO_RACE_DRIVER,Driver
+INFO_RACE_TEAM,Team
+INFO_RACE_POS,Position
+INFO_RACE_PROGRESS,Progress
 "FOLLOWBTN_TOOLTIP","Start Follow Mode",""
 "WALKTHRUBTN_TEXT","Start Walk-Through",""
 ALLSETTINGSBTN_TEXT,All settings

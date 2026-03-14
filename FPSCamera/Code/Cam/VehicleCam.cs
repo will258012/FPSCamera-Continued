@@ -23,7 +23,10 @@ namespace FPSCamera.Cam
                 SwitchTarget(GetFrontVehicleID());
             hasReversed = GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed);
             if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = (ushort)FollowID;
+
+            isRace = GetVehicle().m_eventRoute != default;
             Logging.KeyMessage("Vehicle cam started");
+            Logging.Message($"FollowID:{FollowID} isRace:{isRace}");
         }
         private void SwitchTarget(ushort id)
         {
@@ -40,16 +43,22 @@ namespace FPSCamera.Cam
         {
             var info = new Dictionary<string, string>();
             var headVehicle = GetVehicle(GetHeadVehicleID());
+
             var ownerId = headVehicle.Info.m_vehicleAI.GetOwnerID(GetHeadVehicleID(), ref headVehicle);
             switch (ownerId.Type)
             {
-                case InstanceType.Building:
+                case InstanceType.Building when !isRace:
                     info[Translations.Translate("INFO_VEHICLE_OWNER")] = BuildingManager.instance.GetBuildingName(ownerId.Building, ownerId); break;
-                case InstanceType.Citizen:
+                case InstanceType.Citizen when !isRace:
                     info[Translations.Translate("INFO_VEHICLE_OWNER")] = CitizenManager.instance.GetCitizenName(ownerId.Citizen); break;
+
+                case InstanceType.Building when isRace:
+                case InstanceType.Citizen when isRace:
+                    info[Translations.Translate("INFO_RACE_EVENTROUTE")] = BuildingManager.instance.GetBuildingName(EventManager.instance.m_eventRoutes[headVehicle.m_eventRoute].m_startBuilding, ownerId);
+                    break;
             }
 
-            InfoUtils.GetMoreInfo(ref info, headVehicle, GetHeadVehicleID());
+            InfoUtils.GetMoreInfo(ref info, headVehicle, GetHeadVehicleID(), isRace);
             return info;
         }
 
@@ -58,7 +67,7 @@ namespace FPSCamera.Cam
             GetVehicle().GetSmoothPosition((ushort)FollowID, out var position, out var rotation);
             return new Positioning(position, rotation);
         }
-        public string GetFollowName() => VehicleManager.instance.GetVehicleName((ushort)FollowID);
+        public string GetFollowName() => VehicleManager.instance.GetVehicleName((ushort)FollowID) ?? GetPrefabName();
         public string GetPrefabName() => GetVehicle().Info.name;
         public float GetSpeed() => GetVehicle().GetSmoothVelocity((ushort)FollowID).magnitude;
         public string GetStatus()
@@ -114,7 +123,8 @@ namespace FPSCamera.Cam
         public ushort GetFrontVehicleID() => GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed) ? GetVehicle().GetLastVehicle((ushort)FollowID) : GetHeadVehicleID();
         public Vehicle GetVehicle() => VehicleManager.instance.m_vehicles.m_buffer[FollowID];
         public static Vehicle GetVehicle(ushort id) => VehicleManager.instance.m_vehicles.m_buffer[id];
-        bool hasReversed = false;
+        private bool hasReversed = false;
+        private readonly bool isRace = false;
     }
 
 }

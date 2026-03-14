@@ -52,7 +52,7 @@ namespace FPSCamera.Cam
 
             items = GetVehicles((v) =>
             {
-                if (v.IsFlagSet(VehicleInfo.VehicleCategory.PassengerCar) || v.IsFlagSet(VehicleInfo.VehicleCategory.Bicycle))
+                if (v.IsFlagSet(VehicleInfo.VehicleCategory.PassengerCar) || v.IsFlagSet(VehicleInfo.VehicleCategory.Bicycle) || v.IsFlagSet(VehicleInfo.VehicleCategory.RaceCar))
                     return ModSettings.SelectDriving;
                 if (v.IsFlagSet(VehicleInfo.VehicleCategory.PublicTransport))
                     return ModSettings.SelectPublicTransit;
