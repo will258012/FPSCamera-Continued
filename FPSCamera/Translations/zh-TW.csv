@@ -186,6 +186,7 @@
 "INFO_RACE_TEAM","Team",""
 "INFO_RACE_POS","Position",""
 "INFO_RACE_PROGRESS","Progress",""
+"INFO_ACMEPOSSAVED","Saved the current position to the ACME slot {0}",""
 "FOLLOWBTN_TOOLTIP","進入跟隨模式",""
 "WALKTHRUBTN_TEXT","進入漫遊模式",""
 "ALLSETTINGSBTN_TEXT","所有設定",""
