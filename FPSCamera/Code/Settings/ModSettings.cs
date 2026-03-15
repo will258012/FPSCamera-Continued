@@ -114,7 +114,8 @@ namespace FPSCamera.Settings
             KeyRotateDown = new KeyOnlyBinding(KeyCode.DownArrow);
             Utils.UUISupport.UUIKey.Keybinding = new Keybinding(KeyCode.F, false, true, false);
 
-            MainButtonPos = new Vector3(0f, 0f);
+            UI.MainPanel.SavedButtonPosition = UI.MainPanel.DefaultPosition;
+            UI.MainPanel.SavedPanelPosition = UI.MainPanel.DefaultPosition;
         }
         public enum SpeedUnits
         {
@@ -485,9 +486,10 @@ namespace FPSCamera.Settings
         #endregion
 
         [XmlElement("MainButtonPos")]
-        public Vector3 XMLMainButtonPos { get => MainButtonPos; set => MainButtonPos = value; }
-        [XmlIgnore]
-        internal static Vector3 MainButtonPos = new(0f, 0f);
+        public Vector3 XMLMainButtonPos { get => UI.MainPanel.SavedButtonPosition; set => UI.MainPanel.SavedButtonPosition = value; }
+
+        [XmlElement("MainPanelPos")]
+        public Vector3 XMLMainPanelPos { get => UI.MainPanel.SavedPanelPosition; set => UI.MainPanel.SavedPanelPosition = value; }
 
         [XmlElement("DSAForCameraIssue")]
         public bool XMLDSAForCameraIssue { get => DSAForCameraIssue; set => DSAForCameraIssue = value; }

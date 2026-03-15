@@ -219,11 +219,11 @@ namespace FPSCamera.Settings.v2
         [XmlElement("MainPanelBtnPos")]
         public string MainPanelBtnPos
         {
-            get => $"{ModSettings.MainButtonPos.x},{ModSettings.MainButtonPos.y}";
+            get => $"{UI.MainPanel.SavedButtonPosition.x},{UI.MainPanel.SavedButtonPosition.y}";
             set
             {
                 var split = value.Split(',');
-                ModSettings.MainButtonPos = new Vector2(
+                UI.MainPanel.SavedButtonPosition = new Vector2(
                     float.Parse(split[0]),
                     float.Parse(split[1])
                 );

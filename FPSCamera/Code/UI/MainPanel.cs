@@ -13,11 +13,35 @@ namespace FPSCamera.UI
 {
     public class MainPanel : MonoBehaviour
     {
+
+        /// <summary>
+        /// Gets the active button instance.
+        /// </summary>
         public UIButton GetMainButton() => _mainBtn ?? UUISupport.UUIButton as UIButton;
+
+        /// <summary>
+        /// Gets the active panel instance.
+        /// </summary>
         public UIPanel Panel { get; set; }
+        /// <summary>
+        /// Gets tje active <see cref="MainPanel"/> instance.
+        /// </summary>
+        public static MainPanel Instance { get; private set; }
+        /// <summary>
+        /// Gets or sets the panel's last saved position.
+        /// </summary>
+        public static Vector3 SavedPanelPosition { get; set; } = DefaultPosition;
+        /// <summary>
+        /// Gets or sets the button's last saved position.
+        /// </summary>
+        public static Vector3 SavedButtonPosition { get; set; } = DefaultPosition;
+
+        public static Vector3 DefaultPosition => Vector3.left;
         private const float Margin = 10f;
         private const float SliderMargin = 60f;
-        public static MainPanel Instance { get; private set; }
+        private const float CloseButtonSize = 35f;
+        private const float MainButtonSize = 40f;
+        private const float TitleHeight = 13f;
         private void Awake()
         {
             Instance = this;
@@ -34,8 +58,8 @@ namespace FPSCamera.UI
 
             AddSettings();
 
-            Panel.eventVisibilityChanged += OnChangedVisibility;
             Panel.isVisible = false;
+            Panel.eventVisibilityChanged += OnChangedVisibility;
 
             if (ModSupport.FoundUUI)
             {
@@ -46,20 +70,20 @@ namespace FPSCamera.UI
             #endregion
 
             #region Main Button
-            float x = ModSettings.MainButtonPos.x, y = ModSettings.MainButtonPos.y;
+            float x = SavedButtonPosition.x, y = SavedButtonPosition.y;
             if (x < 0f || y < 0f)
             {
                 var escbutton = UIView.GetAView().FindUIComponent("Esc");
                 x = escbutton.absolutePosition.x;
                 y = escbutton.absolutePosition.y + escbutton.height * 1.5f;
 
-                ModSettings.MainButtonPos = new Vector3(x, y);
+                SavedButtonPosition = new Vector3(x, y);
             }
             _mainBtn = UIView.GetAView().AddUIComponent(typeof(UIButton)) as UIButton;
             _mainBtn.name = "MainButton";
             _mainBtn.tooltip = Translations.Translate("MAINPANELBTN_TOOLTIP");
             _mainBtn.absolutePosition = new Vector3(x, y);
-            _mainBtn.size = new Vector2(40f, 40f);
+            _mainBtn.size = new Vector2(MainButtonSize, MainButtonSize);
             _mainBtn.scaleFactor = .8f;
             _mainBtn.pressedBgSprite = "OptionBasePressed";
             _mainBtn.normalBgSprite = "OptionBase";
@@ -73,10 +97,8 @@ namespace FPSCamera.UI
             _mainBtn.pressedTextColor = new Color32(30, 30, 44, 255);
             _mainBtn.eventClick += (_, m) =>
             {
-                Panel.absolutePosition = new Vector3(_mainBtn.absolutePosition.x +
-                    (_mainBtn.absolutePosition.x < Screen.width / 2f ? _mainBtn.width - 10f : -Panel.width + 10f),
-                                                           _mainBtn.absolutePosition.y +
-                (_mainBtn.absolutePosition.y < Screen.height / 2f ? _mainBtn.height - 15f : -Panel.height + 15f));
+                if (!Panel.isVisible) LoadPanelPosition();
+
                 Panel.isVisible = !Panel.isVisible;
             };
 
@@ -88,14 +110,14 @@ namespace FPSCamera.UI
             mainBtn_drag.target = _mainBtn;
             mainBtn_drag.transform.parent = _mainBtn.transform;
             mainBtn_drag.eventMouseDown += (_, p) => Panel.isVisible = false;
-            mainBtn_drag.eventMouseUp += (_, p) => { ModSettings.MainButtonPos = _mainBtn.absolutePosition; ModSettings.Save(); };
+            mainBtn_drag.eventMouseUp += (_, p) => { SavedButtonPosition = _mainBtn.absolutePosition; ModSettings.Save(); };
             #endregion
         }
 
         private void AddSettings()
         {
             //settings
-            var currentY = Margin;
+            var currentY = CloseButtonSize + Margin;
             var hideUI_CheckBox = UICheckBoxes.AddPlainCheckBox(Panel, Margin, currentY, Translations.Translate("SETTINGS_HIDEUI"), Panel.width - Margin);
             hideUI_CheckBox.isChecked = ModSettings.HideGameUI;
             hideUI_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.HideGameUI = isChecked;
@@ -182,6 +204,28 @@ namespace FPSCamera.UI
             {
                 Panel.height = currentY;
             }
+            // Title
+            {
+                // Drag bar.
+                var dragHandle = Panel.AddUIComponent<UIDragHandle>();
+                dragHandle.size = Panel.size;
+                dragHandle.relativePosition = Vector3.zero;
+                dragHandle.target = Panel;
+                dragHandle.SendToBack();
+
+                // Title label.
+                var titleLabel = UILabels.AddLabel(Panel, CloseButtonSize, TitleHeight, Translations.Translate("MAINPANELBTN_TOOLTIP"), Panel.width - CloseButtonSize - CloseButtonSize, alignment: UIHorizontalAlignment.Center);
+                titleLabel.SendToBack();
+
+                // Close button.
+                var closeButton = Panel.AddUIComponent<UIButton>();
+                closeButton.relativePosition = new Vector2(Panel.width - CloseButtonSize, 2);
+                closeButton.atlas = UITextures.InGameAtlas;
+                closeButton.normalBgSprite = "buttonclose";
+                closeButton.hoveredBgSprite = "buttonclosehover";
+                closeButton.pressedBgSprite = "buttonclosepressed";
+                closeButton.eventClick += (c, p) => Panel.Hide();
+            }
         }
         private void OnDestory()
         {
@@ -223,13 +267,30 @@ namespace FPSCamera.UI
             var panel = UIView.library.ShowModal<OptionsMainPanel>("OptionsPanel");
             panel.SelectMod(modName);
         }
+        public void LoadPanelPosition()
+        {
+            if (Panel == null) return;
+            var view = UIView.GetAView();
+
+            Panel.absolutePosition = SavedPanelPosition.x >= 0f
+                ? SavedPanelPosition
+                : new Vector3(Mathf.Floor((view.fixedWidth - Panel.width) / 2), Mathf.Floor((view.fixedHeight - Panel.height) / 2));
+
+            // Ensure panel is fully visible on screen (in case of e.g. UI scaling changes).
+            float clampedXpos = Mathf.Clamp(Panel.absolutePosition.x, 0f, view.fixedWidth - Panel.width);
+            float clampedYpos = Mathf.Clamp(Panel.absolutePosition.y, 0f, view.fixedHeight - Panel.height);
+            Panel.absolutePosition = new Vector2(clampedXpos, clampedYpos);
+        }
+
         private static void OpenSettingsPanel() => OpenSettingsPanel(Mod.Instance.Name);
         private void OnChangedVisibility(UIComponent component, bool value)
         {
             if (isAnimating) return;
             if (!value)
             {
+                SavedPanelPosition = Panel.absolutePosition;
                 ModSettings.Save();
+
                 if (ModSettings.Fade)
                 {
                     isAnimating = true;
