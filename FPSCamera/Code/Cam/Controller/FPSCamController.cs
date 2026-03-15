@@ -124,8 +124,12 @@ namespace FPSCamera.Cam.Controller
             if (!GameCamController.Instance.CameraController.GetTarget().IsEmpty)
                 OverrideSetBackCamera = OverrideSetBack.False;
 
-            if (ModSettings.SmoothTransition && (ModSettings.SetBackCamera || OverrideSetBackCamera == OverrideSetBack.ACME) && OverrideSetBackCamera != OverrideSetBack.False)
-                StartTransitioningOnDisabling();
+            if (ModSettings.SmoothTransition)
+            {
+                if ((ModSettings.SetBackCamera || OverrideSetBackCamera == OverrideSetBack.ACME) && OverrideSetBackCamera != OverrideSetBack.False)
+                    StartTransitioningOnDisabling();
+                else StartFOVOnlyTransitioningOnDisabling();
+            }
             else AfterTransition();
 
             OnCameraDisabled?.Invoke();
@@ -194,7 +198,6 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Starts transitioning when the camera needs to be disabled.
         /// </summary>
-        /// <param name="endPos">where to end transitioning.</param>
         public void StartTransitioningOnDisabling()
         {
             transitionTimer = 0f;
@@ -206,10 +209,24 @@ namespace FPSCamera.Cam.Controller
             }
 
             targetFoV = GameCamController.Instance.savedFoV;
-            if (GameCamController.Instance.MainCamera.fieldOfView != targetFoV)
-                isScrollTransitioning = true;
+            if (!GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(targetFoV, .1f))
+                isFOVTransitioning = true;
 
             Status = CamStatus.Transitioning;
+        }
+        /// <summary>
+        /// Starts FOV-only transitioning when the camera needs to be disabled.
+        /// </summary>
+        public void StartFOVOnlyTransitioningOnDisabling()
+        {
+            targetFoV = GameCamController.Instance.savedFoV;
+            if (GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(targetFoV, .1f))
+            {
+                AfterTransition();
+                return;
+            }
+            isFOVTransitioning = true;
+            Status = CamStatus.FOVOnlyTransitioning;
         }
         /// <summary>
         /// Updates the camera state each frame.
@@ -244,17 +261,23 @@ namespace FPSCamera.Cam.Controller
             try
             {
                 HandleInput();
-                if (Status == CamStatus.Transitioning)
+                switch (Status)
                 {
-                    UpdateTransitionPos();
-                    UpdateScrollTransition();
-                }
-                else if (Status == CamStatus.Enabled)
-                {
-                    if (FPSCam is IFollowCam)
-                        UpdateFollowCamPos();
-                    else if (FPSCam is FreeCam freeCam)
-                        UpdateFreeCamPos(freeCam);
+                    case CamStatus.Enabled:
+                        {
+                            if (FPSCam is IFollowCam)
+                                UpdateFollowCamPos();
+                            else if (FPSCam is FreeCam freeCam)
+                                UpdateFreeCamPos(freeCam);
+                            break;
+                        }
+                    case CamStatus.Transitioning:
+                        UpdateTransitionPos();
+                        UpdateFOVTransition();
+                        break;
+                    case CamStatus.FOVOnlyTransitioning:
+                        UpdateFOVOnlyTransition();
+                        break;
                 }
             }
             catch (Exception e)
@@ -385,17 +408,17 @@ namespace FPSCamera.Cam.Controller
                 if (scroll > 0f && currentFoV > MinFoV)
                 {
                     targetFoV = currentFoV / ModSettings.FoViewScrollfactor;
-                    isScrollTransitioning = true;
+                    isFOVTransitioning = true;
                 }
                 else if (scroll < 0f && currentFoV < MaxFoV)
                 {
                     targetFoV = currentFoV * ModSettings.FoViewScrollfactor;
-                    isScrollTransitioning = true;
+                    isFOVTransitioning = true;
                 }
-                else if (!isScrollTransitioning && currentFoV != targetFoV)
-                    isScrollTransitioning = true;
+                else if (!isFOVTransitioning && currentFoV != targetFoV)
+                    isFOVTransitioning = true;
 
-                UpdateScrollTransition();
+                UpdateFOVTransition();
             }
             else
             {
@@ -543,7 +566,7 @@ namespace FPSCamera.Cam.Controller
         {
             transitionTimer += Time.deltaTime;
             // If we've reached the distance of the end or time is out
-            if ((CameraTransform.position.DistanceTo(GameCamController.Instance.transitionEndPositioning.pos) <= 2f && !isScrollTransitioning) ||
+            if ((CameraTransform.position.DistanceTo(GameCamController.Instance.transitionEndPositioning.pos) <= 2f && !isFOVTransitioning) ||
                 transitionTimer >= MaxTransitioningTime)
             {
                 transitionTimer = 0f;
@@ -559,19 +582,36 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Updates the camera's FOV during a scroll transition to smoothly adjust to the target FOV.
         /// </summary>
-        private void UpdateScrollTransition()
+        private void UpdateFOVTransition()
         {
-            if (isScrollTransitioning)
-            {
-                if (GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(targetFoV, .1f))
-                {
-                    GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
-                    isScrollTransitioning = false;
-                }
-                GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(GameCamController.Instance.MainCamera.fieldOfView, targetFoV, Time.deltaTime * ModSettings.TransSpeed);
-            }
-        }
+            if (!isFOVTransitioning)
+                return;
 
+            if (GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(targetFoV, .1f))
+            {
+                GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
+                isFOVTransitioning = false;
+            }
+            GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(GameCamController.Instance.MainCamera.fieldOfView, targetFoV, Time.deltaTime * ModSettings.TransSpeed);
+        }
+        /// <summary>
+        /// Updates the camera's FOV during FOV-only transitioning to smoothly adjust to the target FOV.
+        /// </summary>
+        private void UpdateFOVOnlyTransition()
+        {
+            if (!isFOVTransitioning)
+                return;
+
+            transitionTimer += Time.deltaTime;
+            if (GameCamController.Instance.MainCamera.fieldOfView.AlmostEquals(targetFoV, .1f) || transitionTimer >= MaxTransitioningTime)
+            {
+                transitionTimer = 0f;
+                GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
+                isFOVTransitioning = false;
+                AfterTransition();
+            }
+            GameCamController.Instance.MainCamera.fieldOfView = Mathf.Lerp(GameCamController.Instance.MainCamera.fieldOfView, targetFoV, Time.deltaTime * ModSettings.TransSpeed);
+        }
         [Flags]
         public enum CamStatus
         {
@@ -579,16 +619,23 @@ namespace FPSCamera.Cam.Controller
             Enabled,
             PluginEnabled = 2,
             Transitioning = 4,
-            Disabling = 8
+            Disabling = 8,
+            FOVOnlyTransitioning = 16,
         }
         public enum OverrideSetBack
         {
             None,
+            /// <summary>
+            /// Force the camera to behave as if <see cref="ModSettings.SetBackCamera"/> were disabled.
+            /// </summary>
             False,
+            /// <summary>
+            /// Special setting for ACME support.
+            /// </summary>
             ACME
         }
         private static Transform CameraTransform => GameCamController.Instance.MainCamera.transform;
-        private bool isScrollTransitioning = false;
+        private bool isFOVTransitioning = false;
         private Positioning offset = default;
         private Vector3 offsetFromSetting = default;
 
