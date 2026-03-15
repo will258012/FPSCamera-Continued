@@ -186,6 +186,7 @@
 "INFO_RACE_TEAM","队伍",""
 "INFO_RACE_POS","排名",""
 "INFO_RACE_PROGRESS","进度",""
+"INFO_ACMEPOSSAVED","已将当前位置保存至 ACME 插槽 {0}",""
 "FOLLOWBTN_TOOLTIP","进入跟随模式",""
 "WALKTHRUBTN_TEXT","进入漫游模式",""
 "ALLSETTINGSBTN_TEXT","所有设置",""
