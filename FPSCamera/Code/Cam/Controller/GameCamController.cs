@@ -17,15 +17,15 @@ namespace FPSCamera.Cam.Controller
         {
             get
             {
-                if (_instance == null || _instance.CameraController == null)
+                if (field == null || field.CameraController == null)
                 {
-                    _instance = new GameCamController();
-                    if (_instance.CameraController == null) _instance = null;
+                    field = new GameCamController();
+                    if (field.CameraController == null) field = null;
                 }
-                return _instance;
+                return field;
             }
         }
-        private static GameCamController _instance = null;
+
         /// <summary>
         /// public constructor for the <see cref="GameCamController"/>.
         /// </summary>
@@ -42,16 +42,26 @@ namespace FPSCamera.Cam.Controller
         {
             get
             {
-                if (_mainCamera == null)
-                    _mainCamera = RenderManager.instance.CurrentCameraInfo.m_camera;
-                return _mainCamera;
+                field ??= RenderManager.instance.CurrentCameraInfo.m_camera;
+                return field;
             }
         }
-        private Camera _mainCamera = null;
         /// <summary>
         /// Gets the current <see cref="global::CameraController"/>.
         /// </summary>
         public CameraController CameraController => ToolsModifierControl.cameraController;
+
+        /// <summary>
+        /// Gets the current <see cref="global::CinematicCameraController"/>.
+        /// </summary>
+        public CinematicCameraController CinematicCameraController
+        {
+            get
+            {
+                field ??= Object.FindObjectOfType<CinematicCameraController>();
+                return field;
+            }
+        }
 
         /// <summary>
         /// Checks Dof status.
@@ -75,23 +85,29 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void Initialize()
         {
+            if (CinematicCameraController.enabled) // Disable cinematic camera manually in case
+            {
+                CinematicCameraController.AbortScript();
+                CinematicCameraController.enabled = false;
+            }
+
             CameraController.enabled = false;
             ToolsModifierControl.SetTool<DefaultTool>();
+
             if (ModSettings.HideGameUI)
             {
                 savedRect = Camera.main.rect;//need to control Camera.main instead of MainCamera we got, fixed for Dynamic Resolution
                 Camera.main.rect = CameraController.kFullScreenRect;
             }
-            if (camTiltEffect != null) camTiltEffect.enabled = false;
+            camTiltEffect?.enabled = false;
             if (ModSettings.Dof)
             {
-                if (camDoF != null)
-                    camDoF.enabled = true;
+                camDoF?.enabled = true;
             }
             else
             {
-                if (camDoF != null && IsDoFEnabled)
-                    camDoF.enabled = false;
+                if (IsDoFEnabled)
+                    camDoF?.enabled = false;
             }
             if (ModSettings.SetBackCamera)
             {
@@ -100,7 +116,10 @@ namespace FPSCamera.Cam.Controller
             }
 
             savedFoV = MainCamera.fieldOfView;
-            MainCamera.fieldOfView = ModSettings.CamFieldOfView;
+
+            if (!ModSettings.SmoothTransition)
+                MainCamera.fieldOfView = ModSettings.CamFieldOfView;
+            
             savedNearClipPlane = MainCamera.nearClipPlane;
             MainCamera.nearClipPlane = ModSettings.CamNearClipPlane;
         }
@@ -109,8 +128,8 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void Restore()
         {
-            if (camDoF != null) camDoF.enabled = IsDoFEnabled;
-            if (camTiltEffect != null) camTiltEffect.enabled = IsTiltEffectEnabled;
+            camDoF?.enabled = IsDoFEnabled;
+            camTiltEffect?.enabled = IsTiltEffectEnabled;
 
             MainCamera.fieldOfView = savedFoV;
             MainCamera.nearClipPlane = savedNearClipPlane;
@@ -141,7 +160,7 @@ namespace FPSCamera.Cam.Controller
         internal Positioning transitionEndPositioning;
         private ControllerPositioning savedControllerPositioning;
         private Rect savedRect = CameraController.kFullScreenWithoutMenuBarRect;
-        private float savedFoV;
+        internal float savedFoV;
         private float savedNearClipPlane;
     }
 }

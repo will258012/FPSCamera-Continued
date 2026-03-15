@@ -1,5 +1,8 @@
 ﻿extern alias ACME;
+
+using AlgernonCommons.Translation;
 using FPSCamera.Cam.Controller;
+using FPSCamera.UI;
 using FPSCamera.Utils;
 using HarmonyLib;
 using static ACME.ACME.CameraPositions;
@@ -9,12 +12,14 @@ namespace FPSCamera.Patches
     [HarmonyPatch]
     internal class ACMEPatches
     {
-        private static readonly ACME.ACME.ModSettings ACMESettings = new ACME.ACME.ModSettings();
+        private static readonly ACME.ACME.ModSettings ACMESettings = new();
 
         [HarmonyPatch(typeof(ACME.ACME.CameraPositions), "SavePosition")]
         [HarmonyPostfix]
         private static void SavePosition(int positionIndex)
         {
+            if (FPSCamController.Instance?.Status == FPSCamController.CamStatus.Disabled) return;
+
             var ControllerPositioning = Positioning.MainCameraPositioning.ToControllerPositioning();
             if (ToolManager.instance.m_properties.m_mode == ItemClass.Availability.Game)
             {
@@ -43,32 +48,36 @@ namespace FPSCamera.Patches
                     Height = ControllerPositioning.height,
                     FOV = GameCamController.Instance.MainCamera.fieldOfView
                 };
+                ACME.ACME.Mod.Instance?.SaveSettings();
             }
+
+            CamInfoPanel.Instance?.SetFooterMessage(string.Format(Translations.Translate("INFO_ACMEPOSSAVED"), positionIndex));
         }
 
         [HarmonyPatch(typeof(ACME.ACME.CameraPositions), "LoadPosition")]
         [HarmonyPostfix]
         private static void LoadPosition(int positionIndex)
         {
-            if (FPSCamController.Instance.Status == FPSCamController.CamStatus.Disabled) return;
+            if (FPSCamController.Instance?.Status == FPSCamController.CamStatus.Disabled) return;
 
             var savedPosition =
                 (ToolManager.instance.m_properties.m_mode == ItemClass.Availability.Game) ?
                 AccessUtils.GetStaticFieldValue<SavedPosition[]>(typeof(ACME.ACME.CameraPositions), "GameSavedPositions")[positionIndex] :
                 AccessUtils.GetStaticFieldValue<SavedPosition[]>(typeof(ACME.ACME.CameraPositions), "EditorSavedPositions")[positionIndex];
-            if (savedPosition.IsValid)
+            if (!savedPosition.IsValid)
+                return;
+
+            var positioning = new ControllerPositioning
             {
-                var positioning = new ControllerPositioning
-                {
-                    pos = savedPosition.Position,
-                    angle = savedPosition.Angle,
-                    size = savedPosition.Size,
-                    height = savedPosition.Height,
-                }.ToPositioning();
-                GameCamController.Instance.transitionEndPositioning = positioning;
-                FPSCamController.Instance.OverrideSetBackCamera = FPSCamController.OverrideSetBack.ACME;
-                FPSCamController.Instance.FPSCam = null;
-            }
+                pos = savedPosition.Position,
+                angle = savedPosition.Angle,
+                size = savedPosition.Size,
+                height = savedPosition.Height,
+            }.ToPositioning();
+            GameCamController.Instance.transitionEndPositioning = positioning;
+            GameCamController.Instance.savedFoV = savedPosition.FOV;
+            FPSCamController.Instance.OverrideSetBackCamera = FPSCamController.OverrideSetBack.ACME;
+            FPSCamController.Instance.FPSCam = null;
         }
     }
 }

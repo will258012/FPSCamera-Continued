@@ -15,12 +15,20 @@ namespace FPSCamera.Game
         {
             get
             {
-                if (uiCamera == null)
-                    uiCamera = Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
-                return uiCamera;
+                field ??= Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
+                return field;
             }
         }
-        private static Camera uiCamera = null;
+
+        private static ToolsModifierControl ToolsModifierControl
+        {
+            get
+            {
+                field ??= Object.FindObjectOfType<ToolsModifierControl>();
+                return field;
+            }
+        }
+
         public static IEnumerator ToggleUI(bool visible)
         {
             try
@@ -38,7 +46,7 @@ namespace FPSCamera.Game
 
                 UICamera.enabled = visible;
                 if (!visible)
-                    Object.FindObjectOfType<ToolsModifierControl>().CloseEverything();
+                    ToolsModifierControl.CloseEverything();
             }
             catch (System.Exception e)
             {

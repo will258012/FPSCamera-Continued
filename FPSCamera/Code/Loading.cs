@@ -14,7 +14,7 @@ namespace FPSCamera
 {
     public sealed class Loading : PatcherLoadingBase<OptionsPanel, PatcherBase>
     {
-        protected override List<AppMode> PermittedModes => new List<AppMode> { AppMode.Game, AppMode.MapEditor, AppMode.AssetEditor };
+        protected override List<AppMode> PermittedModes => [AppMode.Game, AppMode.MapEditor, AppMode.AssetEditor];
         protected override List<string> CheckModConflicts() => ModSupport.CheckModConflicts();
         public override void OnLevelUnloading()
         {

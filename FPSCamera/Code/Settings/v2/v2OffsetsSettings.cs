@@ -23,7 +23,7 @@ namespace FPSCamera.Settings.v2
             using (var reader = new StreamReader(SettingsFileName))
             {
                 var xmlSerializer = new XmlSerializer(typeof(v2OffsetsSettings));
-                if (!(xmlSerializer.Deserialize(reader) is v2OffsetsSettings xmlFile))
+                if (xmlSerializer.Deserialize(reader) is not v2OffsetsSettings xmlFile)
                 {
                     throw new FileLoadException("couldn't deserialize XML file ", SettingsFileName);
                 }
@@ -33,7 +33,7 @@ namespace FPSCamera.Settings.v2
                 }
             }
         }
-        private static Dictionary<string, Positioning> offsets { get; set; } = new Dictionary<string, Positioning>();
+        private static Dictionary<string, Positioning> offsets { get; set; } = [];
 
         public XmlSchema GetSchema() => null;
 

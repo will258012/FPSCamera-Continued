@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using System;
 using UnityEngine;
 using static FPSCamera.Game.LodManager.LodConfig;
 namespace FPSCamera.Patches
@@ -10,7 +9,7 @@ namespace FPSCamera.Patches
     internal static class LodPatches
     {
 
-        [HarmonyPatch(typeof(BuildingInfoBase), nameof(BuildingInfoBase.RefreshLevelOfDetail), new Type[] { typeof(Vector3) })]
+        [HarmonyPatch(typeof(BuildingInfoBase), nameof(BuildingInfoBase.RefreshLevelOfDetail), [typeof(Vector3)])]
         [HarmonyPostfix]
         private static void BuildingInfoBaseRefreshLOD(BuildingInfoBase __instance)
         {

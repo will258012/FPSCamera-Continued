@@ -31,7 +31,7 @@ namespace FPSCamera.UI
             Instance = this;
             elapsedTime = 0f; lastBufferStrUpdateTime = tempFooterElapsedTime = -1f;
             mid = footer = "";
-            leftInfo = rightInfo = new Dictionary<string, string>();
+            leftInfo = rightInfo = [];
 
             panelTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
             panelTexture.SetPixel(0, 0, new Color32(45, 40, 105, 200));
@@ -93,7 +93,12 @@ namespace FPSCamera.UI
             FPSCamController.OnCameraDisabled -= SetDisable;
             FPSCamController.EventModeSwitched -= OnModeSwitched;
         }
-        private void OnModeSwitched(string modeName) => SetFooterMessage(modeName, 2f);
+        private void OnModeSwitched(string modeName)
+        {
+            SetFooterMessage(modeName, 2f);
+            leftInfo.Clear();
+            rightInfo.Clear();
+        }
         /// <summary>
         /// Display a temporary message at the info panel's footer.
         /// </summary>
@@ -111,10 +116,14 @@ namespace FPSCamera.UI
 
             if (Cam is IFollowCam followcam)
             {
-                leftInfo[Translations.Translate("INFO_NAME")] = followcam.GetFollowName();
+                var name = followcam.GetFollowName();
+                if (!string.IsNullOrEmpty(name))
+                    leftInfo[Translations.Translate("INFO_NAME")] = name;
+
                 var status = followcam.GetStatus();
                 if (!string.IsNullOrEmpty(status))
-                    leftInfo[Translations.Translate("INFO_STATUS")] = followcam.GetStatus();
+                    leftInfo[Translations.Translate("INFO_STATUS")] = status;
+
                 if (Cam is CitizenCam citizenCam)
                 {
                     var anotherStatus = citizenCam.AnotherCam?.GetStatus();

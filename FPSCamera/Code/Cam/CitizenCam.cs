@@ -1,8 +1,8 @@
 ﻿using AlgernonCommons;
 using AlgernonCommons.Translation;
 using ColossalFramework;
-using ColossalFramework.Math;
 using FPSCamera.Cam.Controller;
+using FPSCamera.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -27,10 +27,14 @@ namespace FPSCamera.Cam
             {
                 CitizenInstanceID = id.CitizenInstance;
                 var citizenId = CitizenManager.instance.m_instances.m_buffer[id.CitizenInstance].m_citizen;
-                FollowInstance = new InstanceID() { Citizen = citizenId };
+                FollowInstance = new() { Citizen = citizenId };
                 FollowID = citizenId;
             }
+
+            isRace = GetCitizenInstance().m_racerIndex != default || GetCitizenInstance().m_performerIndex != default || (GetCitizenInstance().m_flags.IsFlagSet(CitizenInstance.Flags.Cheering | CitizenInstance.Flags.Spectating));
+
             Logging.KeyMessage("Citizen cam started");
+            Logging.Message($"FollowID:{FollowID} isRace:{isRace}");
         }
         public string Name => Translations.Translate("INFO_FOLLOW");
         public uint FollowID { get; private set; }
@@ -40,14 +44,13 @@ namespace FPSCamera.Cam
         /// Will be used if the citizen enters a vehicle. Use caution!
         /// </summary>
         public VehicleCam AnotherCam { get; private set; } = null;
-        private bool IsinVehicle = false;
         private void CheckAnotherCam()
         {
-            if (IsinVehicle)
+            if (isinVehicle)
             {
                 if (GetCitizen().m_vehicle == default || !(AnotherCam?.IsValid() ?? false))
                 {
-                    IsinVehicle = false;
+                    isinVehicle = false;
                     AnotherCam?.DisableCam();
                     AnotherCam = null;
                     SyncCamOffset();
@@ -57,7 +60,7 @@ namespace FPSCamera.Cam
             else if (GetCitizen().m_vehicle != default)
             {
                 ushort vehicleId = GetCitizen().m_vehicle;
-                IsinVehicle = true;
+                isinVehicle = true;
                 AnotherCam = new VehicleCam(new InstanceID() { Vehicle = vehicleId });
                 SyncCamOffset();
                 Logging.KeyMessage("Citizen cam: Started another cam");
@@ -65,30 +68,17 @@ namespace FPSCamera.Cam
         }
         public Dictionary<string, string> GetInfo()
         {
-            var details = new Dictionary<string, string>();
-            var flags = GetCitizen().m_flags;
-            if (GetCitizen().m_flags.IsFlagSet(Citizen.Flags.Tourist) && GetCitizen().m_hotelBuilding != default)
-            {
-                details[Translations.Translate("INFO_HUMAN_HOTEL")] =
-                    BuildingManager.instance.GetBuildingName(GetCitizen().m_hotelBuilding, InstanceID.Empty);
-            }
-            else
-            {
-                details[Translations.Translate("INFO_HUMAN_HOME")] =
-                GetCitizen().m_homeBuilding != default ? BuildingManager.instance.GetBuildingName(GetCitizen().m_homeBuilding, InstanceID.Empty) :
-                Translations.Translate("INFO_HUMAN_HOMELESS");
-            }
-            details[Translations.Translate("INFO_HUMAN_OCCUPATION")] = GetOccupation();
-
+            var info = new Dictionary<string, string>();
+            InfoUtils.GetMoreInfo(ref info, GetCitizen(), GetCitizenInstance(), FollowID, isRace);
 
             var anotherDetails = AnotherCam?.GetInfo();
             if (anotherDetails != null)
-                details = details.Concat(anotherDetails).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            return details;
+                info = info.Concat(anotherDetails).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            return info;
         }
         public Positioning GetPositioning()
         {
-            if (IsinVehicle)
+            if (isinVehicle)
                 return AnotherCam.GetPositioning();
             GetCitizenInstance().GetSmoothPosition(GetCitizen().m_instance, out var pos, out var rotation);
             //If the citizen sit down, adjust the rotation to adapt to the actual direction
@@ -98,10 +88,11 @@ namespace FPSCamera.Cam
             }
             return new Positioning(pos, rotation);
         }
-        public string GetFollowName() => CitizenManager.instance.GetCitizenName(FollowID);
+        public string GetFollowName() => CitizenManager.instance.GetCitizenName(FollowID) ?? CitizenManager.instance.GetInstanceName(CitizenInstanceID) ?? GetPrefabName();
         public string GetPrefabName() => GetCitizenInstance().Info.name;
         public string GetStatus()
         {
+            if (isRace) return null;
             var citizen = GetCitizen();
             var status = GetCitizenInstance().Info.m_citizenAI.GetLocalizedStatus(
                                 FollowID, ref citizen, out var implID);
@@ -116,7 +107,7 @@ namespace FPSCamera.Cam
             return status;
 
         }
-        public float GetSpeed() => IsinVehicle ? AnotherCam.GetSpeed() : GetCitizenInstance().GetLastFrameData().m_velocity.magnitude;
+        public float GetSpeed() => isinVehicle ? AnotherCam.GetSpeed() : GetCitizenInstance().GetLastFrameData().m_velocity.magnitude;
 
         public bool IsValid()
         {
@@ -133,13 +124,13 @@ namespace FPSCamera.Cam
         }
         public void SyncCamOffset()
         {
-            if (IsinVehicle)
+            if (isinVehicle)
                 FPSCamController.Instance.SyncCamOffset(AnotherCam);
             else FPSCamController.Instance.SyncCamOffset(this);
         }
         public void SaveCamOffset()
         {
-            if (IsinVehicle)
+            if (isinVehicle)
                 FPSCamController.Instance.SaveCamOffset(AnotherCam);
             else FPSCamController.Instance.SaveCamOffset(this);
         }
@@ -147,88 +138,21 @@ namespace FPSCamera.Cam
         {
             FollowID = CitizenInstanceID = default;
             FollowInstance = default;
-            if (IsinVehicle)
+            if (isinVehicle)
             {
                 AnotherCam.DisableCam();
-                IsinVehicle = false;
+                isinVehicle = false;
             }
             AnotherCam = null;
         }
 
         private Citizen GetCitizen() => CitizenManager.instance.m_citizens.m_buffer[FollowID];
         private CitizenInstance GetCitizenInstance() => CitizenManager.instance.m_instances.m_buffer[CitizenInstanceID];
-        private string GetOccupation()
-        {
-            var currentSchoolLevel = GetCitizen().GetCurrentSchoolLevel(FollowID);
-            if (GetCitizen().m_flags.IsFlagSet(Citizen.Flags.Tourist))
-            {
-                if (SteamHelper.IsDLCOwned(SteamHelper.DLC.CampusDLC))
-                {
-                    float num = Singleton<ImmaterialResourceManager>.instance.CheckExchangeStudentAttractivenessBonus() * 100f;
-                    var m_randomizer = new Randomizer(FollowID);
-                    int num2 = m_randomizer.Int32(0, 100);
-                    if (num2 < num)
-                    {
-                        return ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_EXCHANGESTUDENT");
-                    }
-                }
 
-                switch (GetCitizen().m_touristType)
-                {
-                    case Citizen.TouristType.Sightseeing:
-                        return ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_TOURIST_SIGHTSEEING");
-                    case Citizen.TouristType.Shopping:
-                        return ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_TOURIST_SHOPPING");
-                    case Citizen.TouristType.Business:
-                        return ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_TOURIST_BUSINESS");
-                    case Citizen.TouristType.Nature:
-                        return ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_TOURIST_NATURE");
-                    default:
-                        return ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_TOURIST");
-                }
-            }
 
-            if (currentSchoolLevel != ItemClass.Level.None)
-            {
-                return ColossalFramework.Globalization.Locale.Get("CITIZEN_SCHOOL_LEVEL", currentSchoolLevel.ToString());
-            }
 
-            return (GetCitizen().m_workBuilding == default) ? ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_UNEMPLOYED") : GetJobTitle();
-        }
-
-        private string GetJobTitle()
-        {
-            ushort workBuilding = GetCitizen().m_workBuilding;
-            var educationLevel = GetCitizen().EducationLevel;
-            var gender = GetCitizenInstance().Info.m_gender;
-            string text = string.Empty;
-            if (Singleton<BuildingManager>.instance.m_buildings.m_buffer[workBuilding].Info.m_buildingAI is CommonBuildingAI commonBuildingAI)
-            {
-                text = commonBuildingAI.GetTitle(gender, educationLevel, workBuilding, FollowID);
-            }
-
-            if (text == string.Empty)
-            {
-                int num = new Randomizer(workBuilding + FollowID).Int32(1, 5);
-                switch (educationLevel)
-                {
-                    case Citizen.Education.Uneducated:
-                        text = ColossalFramework.Globalization.Locale.Get((gender != Citizen.Gender.Female) ? "CITIZEN_OCCUPATION_PROFESSION_UNEDUCATED" : "CITIZEN_OCCUPATION_PROFESSION_UNEDUCATED_FEMALE", num.ToString());
-                        break;
-                    case Citizen.Education.OneSchool:
-                        text = ColossalFramework.Globalization.Locale.Get((gender != Citizen.Gender.Female) ? "CITIZEN_OCCUPATION_PROFESSION_EDUCATED" : "CITIZEN_OCCUPATION_PROFESSION_EDUCATED_FEMALE", num.ToString());
-                        break;
-                    case Citizen.Education.TwoSchools:
-                        text = ColossalFramework.Globalization.Locale.Get((gender != Citizen.Gender.Female) ? "CITIZEN_OCCUPATION_PROFESSION_WELLEDUCATED" : "CITIZEN_OCCUPATION_PROFESSION_WELLEDUCATED_FEMALE", num.ToString());
-                        break;
-                    case Citizen.Education.ThreeSchools:
-                        text = ColossalFramework.Globalization.Locale.Get((gender != Citizen.Gender.Female) ? "CITIZEN_OCCUPATION_PROFESSION_HIGHLYEDUCATED" : "CITIZEN_OCCUPATION_PROFESSION_HIGHLYEDUCATED_FEMALE", num.ToString());
-                        break;
-                }
-            }
-            return text + " " + ColossalFramework.Globalization.Locale.Get("CITIZEN_OCCUPATION_LOCATIONPREPOSITION") + " " + Singleton<BuildingManager>.instance.GetBuildingName(workBuilding, FollowInstance);
-        }
-
+        private bool isinVehicle = false;
+        private readonly bool isRace = false;
     }
 }
 

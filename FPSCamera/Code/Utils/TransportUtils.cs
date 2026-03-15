@@ -6,7 +6,7 @@ namespace FPSCamera.Utils
     public class TransportUtils
     {
         public static readonly TransportInfo.TransportType[] stationTransportType =
-        {
+        [
             TransportInfo.TransportType.Train,
             TransportInfo.TransportType.Metro,
             TransportInfo.TransportType.Monorail,
@@ -16,7 +16,7 @@ namespace FPSCamera.Utils
             TransportInfo.TransportType.Helicopter,
             TransportInfo.TransportType.Ship,
             TransportInfo.TransportType.Trolleybus,
-            };
+            ];
 
         public static string GetStationName(ushort stopId, ushort lineId) => ModSupport.FoundTLM ? ModSupport.TLM_GetStopName(stopId, lineId) : GetStopName(stopId);
 

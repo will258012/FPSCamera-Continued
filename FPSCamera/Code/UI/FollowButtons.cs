@@ -1,4 +1,5 @@
-﻿using AlgernonCommons.Translation;
+﻿using AlgernonCommons;
+using AlgernonCommons.Translation;
 using ColossalFramework.UI;
 using FPSCamera.Cam.Controller;
 using System;
@@ -10,22 +11,48 @@ namespace FPSCamera.UI
     {
         private void Awake()
         {
-            citizenVehicleInfo_Button = Initialize(ref citizenVehicleInfo_Panel);
-            cityServiceVehicleInfo_Button = Initialize(ref cityServiceVehicleInfo_Panel);
-            publicTransportVehicleInfo_Button = Initialize(ref publicTransportVehicleInfo_Panel);
-            citizenInfo_Button = Initialize(ref citizenInfo_Panel);
-            touristInfo_Button = Initialize(ref touristInfo_Panel);
-            FPSCamController.OnCameraEnabled += SetDisable;
-            FPSCamController.OnCameraDisabled += SetEnable;
+            try
+            {
+                citizenVehicleInfo_Button = Initialize(ref citizenVehicleInfo_Panel);
+                cityServiceVehicleInfo_Button = Initialize(ref cityServiceVehicleInfo_Panel);
+                publicTransportVehicleInfo_Button = Initialize(ref publicTransportVehicleInfo_Panel);
+                citizenInfo_Button = Initialize(ref citizenInfo_Panel);
+                touristInfo_Button = Initialize(ref touristInfo_Panel);
+                racePersonInfo_Button = Initialize(ref racePersonInfo_Panel);
+                raceVehicleInfo_Button = Initialize(ref raceVehicleInfo_Panel);
+
+                FPSCamController.OnCameraEnabled += SetDisable;
+                FPSCamController.OnCameraDisabled += SetEnable;
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "Failed to initalize camera buttons");
+            }
         }
         private void Update()
         {
-            UpdateButtonVisibility(citizenVehicleInfo_Panel, citizenVehicleInfo_Button,
+            try
+            {
+                if (Time.time < nextUpdateTime)
+                {
+                    return;
+                }
+                nextUpdateTime = Time.time + updateInterval;
+
+                UpdateButtonVisibility(citizenVehicleInfo_Panel, citizenVehicleInfo_Button,
                 id => id.Type != InstanceType.ParkedVehicle);
-            UpdateButtonVisibility(cityServiceVehicleInfo_Panel, cityServiceVehicleInfo_Button);
-            UpdateButtonVisibility(publicTransportVehicleInfo_Panel, publicTransportVehicleInfo_Button);
-            UpdateButtonVisibility(citizenInfo_Panel, citizenInfo_Button);
-            UpdateButtonVisibility(touristInfo_Panel, touristInfo_Button);
+                UpdateButtonVisibility(cityServiceVehicleInfo_Panel, cityServiceVehicleInfo_Button);
+                UpdateButtonVisibility(publicTransportVehicleInfo_Panel, publicTransportVehicleInfo_Button);
+                UpdateButtonVisibility(citizenInfo_Panel, citizenInfo_Button);
+                UpdateButtonVisibility(touristInfo_Panel, touristInfo_Button);
+                UpdateButtonVisibility(racePersonInfo_Panel, racePersonInfo_Button);
+                UpdateButtonVisibility(raceVehicleInfo_Panel, raceVehicleInfo_Button);
+            }
+            catch (Exception e)
+            {
+                Logging.LogException(e, "Failed to update camera buttons");
+                OnDestroy();
+            }
         }
         private void OnDestroy()
         {
@@ -34,6 +61,8 @@ namespace FPSCamera.UI
             Destroy(publicTransportVehicleInfo_Button);
             Destroy(citizenInfo_Button);
             Destroy(touristInfo_Button);
+            Destroy(racePersonInfo_Button);
+            Destroy(raceVehicleInfo_Button);
             FPSCamController.OnCameraEnabled -= SetDisable;
             FPSCamController.OnCameraDisabled -= SetEnable;
         }
@@ -45,7 +74,7 @@ namespace FPSCamera.UI
         /// <typeparam name="T">The type of the panel.</typeparam>
         /// <param name="panel">Given panel.</param>
         /// <returns>The given panel after add the button.</returns>
-        private UIButton Initialize<T>(ref T panel) where T : WorldInfoPanel
+        private static UIButton Initialize<T>(ref T panel) where T : WorldInfoPanel, new()
         {
             panel = UIView.library.Get<T>(typeof(T).Name);
             return CreateCameraButton(panel);
@@ -56,7 +85,7 @@ namespace FPSCamera.UI
         /// <typeparam name="T">The type of the panel.</typeparam>
         /// <param name="panel">Given panel.</param>
         /// <returns>The follow button.</returns>
-        private static UIButton CreateCameraButton<T>(T panel) where T : WorldInfoPanel
+        private static UIButton CreateCameraButton<T>(T panel) where T : WorldInfoPanel, new()
         {
             var button = panel.component.AddUIComponent<UIButton>();
             button.name = panel.component.name + "_StartFollow";
@@ -90,7 +119,7 @@ namespace FPSCamera.UI
          /// <param name="panel">Given panel.</param>
          /// <param name="button">Given follow button.</param>
          /// <param name="filter">Additional filters.</param>
-        private static void UpdateButtonVisibility<T>(T panel, UIButton button, Func<InstanceID, bool> filter = null) where T : WorldInfoPanel
+        private static void UpdateButtonVisibility<T>(T panel, UIButton button, Func<InstanceID, bool> filter = null) where T : WorldInfoPanel, new()
         {
             if (panel.component.isVisible)
             {
@@ -108,11 +137,20 @@ namespace FPSCamera.UI
         private PublicTransportVehicleWorldInfoPanel publicTransportVehicleInfo_Panel;
         private UIButton publicTransportVehicleInfo_Button;
 
+        private RaceVehicleWorldInfoPanel raceVehicleInfo_Panel;
+        private UIButton raceVehicleInfo_Button;
+
         private CitizenWorldInfoPanel citizenInfo_Panel;
         private UIButton citizenInfo_Button;
 
         private TouristWorldInfoPanel touristInfo_Panel;
         private UIButton touristInfo_Button;
+
+        private RacePersonWorldInfoPanel racePersonInfo_Panel;
+        private UIButton racePersonInfo_Button;
+
+        private float nextUpdateTime;
+        private const float updateInterval = .25f;
     }
 
 }

@@ -1,5 +1,4 @@
-﻿using ColossalFramework;
-using FPSCamera.Settings;
+﻿using FPSCamera.Settings;
 using UnityEngine;
 
 namespace FPSCamera.Utils

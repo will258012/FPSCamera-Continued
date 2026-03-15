@@ -10,6 +10,7 @@ namespace FPSCamera.Settings.v2
     [XmlRoot("Config")]
     public class v2ModSettings : SettingsXMLBase
     {
+#pragma warning disable CA1822
         [XmlIgnore]
         internal static readonly string SettingsFileName = Path.Combine(DataLocation.executableDirectory, "FPSCameraConfig.xml");
 
@@ -18,7 +19,7 @@ namespace FPSCamera.Settings.v2
             using (var reader = new StreamReader(SettingsFileName))
             {
                 var xmlSerializer = new XmlSerializer(typeof(v2ModSettings));
-                if (!(xmlSerializer.Deserialize(reader) is v2ModSettings xmlFile))
+                if (xmlSerializer.Deserialize(reader) is not v2ModSettings xmlFile)
                 {
                     throw new FileLoadException("couldn't deserialize XML file ", SettingsFileName);
                 }
@@ -81,10 +82,7 @@ namespace FPSCamera.Settings.v2
         public string GroundClippingOption
         {
             get => ModSettings.GroundClipping.ToString();
-            set
-            {
-                ModSettings.GroundClipping = (ModSettings.GroundClippings)Enum.Parse(typeof(ModSettings.GroundClippings), value);
-            }
+            set => ModSettings.GroundClipping = (ModSettings.GroundClippings)Enum.Parse(typeof(ModSettings.GroundClippings), value);
         }
 
         [XmlElement("GroundLevelOffset")]
@@ -221,11 +219,11 @@ namespace FPSCamera.Settings.v2
         [XmlElement("MainPanelBtnPos")]
         public string MainPanelBtnPos
         {
-            get => $"{ModSettings.MainButtonPos.x},{ModSettings.MainButtonPos.y}";
+            get => $"{UI.MainPanel.SavedButtonPosition.x},{UI.MainPanel.SavedButtonPosition.y}";
             set
             {
                 var split = value.Split(',');
-                ModSettings.MainButtonPos = new Vector2(
+                UI.MainPanel.SavedButtonPosition = new Vector2(
                     float.Parse(split[0]),
                     float.Parse(split[1])
                 );

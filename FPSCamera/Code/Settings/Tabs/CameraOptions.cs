@@ -172,14 +172,14 @@ namespace FPSCamera.Settings.Tabs
             movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
             currentY += movementSpeed_Slider.height + SliderMargin;
 
-            string[] groundClippingItems = new[]
-            {
+            string[] groundClippingItems =
+            [
                 Translations.Translate("SETTINGS_GROUNDCLIPING_NONE"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_ABOVE_GROUND"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_GROUND"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_ABOVE_ROAD"),
                 Translations.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_ROAD")
-            };
+            ];
 
             groundCliping_dropDown = UIDropDowns.AddPlainDropDown(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClippingItems, (int)ModSettings.GroundClipping, 300);
             groundCliping_dropDown.tooltip = Translations.Translate("SETTINGS_GROUNDCLIPING_DETAIL");

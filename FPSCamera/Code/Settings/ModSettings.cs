@@ -13,6 +13,7 @@ namespace FPSCamera.Settings
     [XmlRoot("FPSCamera")]
     public sealed class ModSettings : SettingsXMLBase
     {
+#pragma warning disable CA1822
         // Settings file name
         [XmlIgnore]
         internal static readonly string SettingsFileName = Path.Combine(DataLocation.localApplicationData, "FPSCamera_Continued.xml");
@@ -20,20 +21,17 @@ namespace FPSCamera.Settings
         internal static void Load() => XMLFileUtils.Load<ModSettings>(SettingsFileName);
 
         internal static void Save() => XMLFileUtils.Save<ModSettings>(SettingsFileName);
+
         [XmlIgnore]
+        [field: XmlIgnore]
         public static ModSettings Instance
         {
             get
             {
-                if (_modSettings == null)
-                {
-                    _modSettings = new ModSettings();
-                }
-                return _modSettings;
+                field ??= new ModSettings();
+                return field;
             }
         }
-        [XmlIgnore]
-        private static ModSettings _modSettings;
 
         // Remember edit values here if the settings have edited!
         internal static void ResetToDefaults()
@@ -116,7 +114,8 @@ namespace FPSCamera.Settings
             KeyRotateDown = new KeyOnlyBinding(KeyCode.DownArrow);
             Utils.UUISupport.UUIKey.Keybinding = new Keybinding(KeyCode.F, false, true, false);
 
-            MainButtonPos = new Vector3(0f, 0f);
+            UI.MainPanel.SavedButtonPosition = UI.MainPanel.DefaultPosition;
+            UI.MainPanel.SavedPanelPosition = UI.MainPanel.DefaultPosition;
         }
         public enum SpeedUnits
         {
@@ -297,17 +296,17 @@ namespace FPSCamera.Settings
         [XmlElement("VehicleFixedOffset")]
         public Vector3 XMLVehicleFixedOffset { get => VehicleFixedOffset; set => VehicleFixedOffset = value; }
         [XmlIgnore]
-        internal static Vector3 VehicleFixedOffset = new Vector3(0f, 2f, 3f);
+        internal static Vector3 VehicleFixedOffset = new(0f, 2f, 3f);
 
         [XmlElement("MidVehFixedOffset")]
         public Vector3 XMLMidVehFixedOffset { get => MidVehFixedOffset; set => MidVehFixedOffset = value; }
         [XmlIgnore]
-        internal static Vector3 MidVehFixedOffset = new Vector3(0f, 3f, -2f);
+        internal static Vector3 MidVehFixedOffset = new(0f, 3f, -2f);
 
         [XmlElement("PedestrianFixedOffset")]
         public Vector3 XMLPedestrianFixedOffset { get => PedestrianFixedOffset; set => PedestrianFixedOffset = value; }
         [XmlIgnore]
-        internal static Vector3 PedestrianFixedOffset = new Vector3(0f, 2f, 0f);
+        internal static Vector3 PedestrianFixedOffset = new(0f, 2f, 0f);
 
         #endregion
         #region Walk-Through Mode Options
@@ -390,106 +389,107 @@ namespace FPSCamera.Settings
         [XmlElement("KeyCamToggle")]
         public Keybinding XMLKeyCamToggle { get => KeyCamToggle; set => KeyCamToggle = value; }
         [XmlIgnore]
-        internal static Keybinding KeyCamToggle = new Keybinding(KeyCode.BackQuote, false, false, false);
+        internal static Keybinding KeyCamToggle = new(KeyCode.BackQuote, false, false, false);
 
         [XmlElement("KeyWalkThruToggle")]
         public Keybinding XMLKeyWalkThruToggle { get => KeyWalkThruToggle; set => KeyWalkThruToggle = value; }
         [XmlIgnore]
-        internal static Keybinding KeyWalkThruToggle = new Keybinding(KeyCode.BackQuote, true, false, false);
+        internal static Keybinding KeyWalkThruToggle = new(KeyCode.BackQuote, true, false, false);
 
         [XmlElement("KeyFollowToggle")]
         public Keybinding XMLKeyFollowToggle { get => KeyFollowToggle; set => KeyFollowToggle = value; }
         [XmlIgnore]
-        internal static Keybinding KeyFollowToggle = new Keybinding(KeyCode.BackQuote, false, true, false);
+        internal static Keybinding KeyFollowToggle = new(KeyCode.BackQuote, false, true, false);
 
         [XmlElement("KeyInfoPanelToggle")]
         public Keybinding XMLKeyInfoPanelToggle { get => KeyInfoPanelToggle; set => KeyInfoPanelToggle = value; }
         [XmlIgnore]
-        internal static Keybinding KeyInfoPanelToggle = new Keybinding(KeyCode.I, true, false, false);
+        internal static Keybinding KeyInfoPanelToggle = new(KeyCode.I, true, false, false);
 
         [XmlElement("KeySpeedUp")]
         public KeyOnlyBinding XMLKeySpeedUp { get => KeySpeedUp; set => KeySpeedUp = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeySpeedUp = new KeyOnlyBinding(KeyCode.CapsLock);
+        internal static KeyOnlyBinding KeySpeedUp = new(KeyCode.CapsLock);
 
         [XmlElement("KeyCamReset")]
         public KeyOnlyBinding XMLKeyCamReset { get => KeyCamReset; set => KeyCamReset = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyCamReset = new KeyOnlyBinding(KeyCode.Minus);
+        internal static KeyOnlyBinding KeyCamReset = new(KeyCode.Minus);
 
         [XmlElement("KeyCursorToggle")]
         public KeyOnlyBinding XMLKeyCursorToggle { get => KeyCursorToggle; set => KeyCursorToggle = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyCursorToggle = new KeyOnlyBinding(KeyCode.Tab);
+        internal static KeyOnlyBinding KeyCursorToggle = new(KeyCode.Tab);
 
         [XmlElement("KeyAutoMove")]
         public KeyOnlyBinding XMLKeyAutoMove { get => KeyAutoMove; set => KeyAutoMove = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyAutoMove = new KeyOnlyBinding(KeyCode.E);
+        internal static KeyOnlyBinding KeyAutoMove = new(KeyCode.E);
 
         [XmlElement("KeySaveOffset")]
         public KeyOnlyBinding XMLKeySaveOffset { get => KeySaveOffset; set => KeySaveOffset = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeySaveOffset = new KeyOnlyBinding(KeyCode.Backslash);
+        internal static KeyOnlyBinding KeySaveOffset = new(KeyCode.Backslash);
 
         [XmlElement("KeyMoveForward")]
         public KeyOnlyBinding XMLKeyMoveForward { get => KeyMoveForward; set => KeyMoveForward = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyMoveForward = new KeyOnlyBinding(KeyCode.W);
+        internal static KeyOnlyBinding KeyMoveForward = new(KeyCode.W);
 
         [XmlElement("KeyMoveBackward")]
         public KeyOnlyBinding XMLKeyMoveBackward { get => KeyMoveBackward; set => KeyMoveBackward = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyMoveBackward = new KeyOnlyBinding(KeyCode.S);
+        internal static KeyOnlyBinding KeyMoveBackward = new(KeyCode.S);
 
         [XmlElement("KeyMoveLeft")]
         public KeyOnlyBinding XMLKeyMoveLeft { get => KeyMoveLeft; set => KeyMoveLeft = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyMoveLeft = new KeyOnlyBinding(KeyCode.A);
+        internal static KeyOnlyBinding KeyMoveLeft = new(KeyCode.A);
 
         [XmlElement("KeyMoveRight")]
         public KeyOnlyBinding XMLKeyMoveRight { get => KeyMoveRight; set => KeyMoveRight = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyMoveRight = new KeyOnlyBinding(KeyCode.D);
+        internal static KeyOnlyBinding KeyMoveRight = new(KeyCode.D);
 
         [XmlElement("KeyMoveUp")]
         public KeyOnlyBinding XMLKeyMoveUp { get => KeyMoveUp; set => KeyMoveUp = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyMoveUp = new KeyOnlyBinding(KeyCode.PageUp);
+        internal static KeyOnlyBinding KeyMoveUp = new(KeyCode.PageUp);
 
         [XmlElement("KeyMoveDown")]
         public KeyOnlyBinding XMLKeyMoveDown { get => KeyMoveDown; set => KeyMoveDown = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyMoveDown = new KeyOnlyBinding(KeyCode.PageDown);
+        internal static KeyOnlyBinding KeyMoveDown = new(KeyCode.PageDown);
 
         [XmlElement("KeyRotateLeft")]
         public KeyOnlyBinding XMLKeyRotateLeft { get => KeyRotateLeft; set => KeyRotateLeft = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyRotateLeft = new KeyOnlyBinding(KeyCode.LeftArrow);
+        internal static KeyOnlyBinding KeyRotateLeft = new(KeyCode.LeftArrow);
 
         [XmlElement("KeyRotateRight")]
         public KeyOnlyBinding XMLKeyRotateRight { get => KeyRotateRight; set => KeyRotateRight = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyRotateRight = new KeyOnlyBinding(KeyCode.RightArrow);
+        internal static KeyOnlyBinding KeyRotateRight = new(KeyCode.RightArrow);
 
         [XmlElement("KeyRotateUp")]
         public KeyOnlyBinding XMLKeyRotateUp { get => KeyRotateUp; set => KeyRotateUp = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyRotateUp = new KeyOnlyBinding(KeyCode.UpArrow);
+        internal static KeyOnlyBinding KeyRotateUp = new(KeyCode.UpArrow);
 
         [XmlElement("KeyRotateDown")]
         public KeyOnlyBinding XMLKeyRotateDown { get => KeyRotateDown; set => KeyRotateDown = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyRotateDown = new KeyOnlyBinding(KeyCode.DownArrow);
+        internal static KeyOnlyBinding KeyRotateDown = new(KeyCode.DownArrow);
 
         [XmlElement("KeyUUIToggle")]
         public Keybinding XMLKeyUUIToggle { get => Utils.UUISupport.UUIKey.Keybinding; set => Utils.UUISupport.UUIKey.Keybinding = value; }
         #endregion
 
         [XmlElement("MainButtonPos")]
-        public Vector3 XMLMainButtonPos { get => MainButtonPos; set => MainButtonPos = value; }
-        [XmlIgnore]
-        internal static Vector3 MainButtonPos = new Vector3(0f, 0f);
+        public Vector3 XMLMainButtonPos { get => UI.MainPanel.SavedButtonPosition; set => UI.MainPanel.SavedButtonPosition = value; }
+
+        [XmlElement("MainPanelPos")]
+        public Vector3 XMLMainPanelPos { get => UI.MainPanel.SavedPanelPosition; set => UI.MainPanel.SavedPanelPosition = value; }
 
         [XmlElement("DSAForCameraIssue")]
         public bool XMLDSAForCameraIssue { get => DSAForCameraIssue; set => DSAForCameraIssue = value; }

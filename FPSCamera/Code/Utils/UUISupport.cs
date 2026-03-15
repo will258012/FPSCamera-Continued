@@ -41,25 +41,8 @@ namespace FPSCamera.Utils
                     onToggle: (value) =>
                     {
                         if (value)
-                        {
-                            var UUIpos = UnifiedUI.GUI.MainPanel.Instance.isVisible
-                                ? UnifiedUI.GUI.MainPanel.Instance.absolutePosition
-                                : Object.FindObjectOfType<UnifiedUI.GUI.FloatingButton>().absolutePosition;
+                            MainPanel.Instance.LoadPanelPosition();
 
-                            var UUIwidth = UnifiedUI.GUI.MainPanel.Instance.isVisible
-                                ? UnifiedUI.GUI.MainPanel.Instance.width
-                                : Object.FindObjectOfType<UnifiedUI.GUI.FloatingButton>().width;
-
-                            var UUIheight = UnifiedUI.GUI.MainPanel.Instance.isVisible
-                                ? UnifiedUI.GUI.MainPanel.Instance.height
-                                : Object.FindObjectOfType<UnifiedUI.GUI.FloatingButton>().height;
-                            // Position the main panel properly based on UUI button position
-                            MainPanel.Instance.Panel.absolutePosition = new Vector3(
-                            UUIpos.x + (UUIpos.x < Screen.width / 2f ?
-                            UUIwidth - 10f : -MainPanel.Instance.Panel.width + 10f),
-                            UUIpos.y + (UUIpos.y < Screen.height / 2f ?
-                            UUIheight - 15f : -MainPanel.Instance.Panel.height + 15f));
-                        }
                         // Set main panel visibility
                         MainPanel.Instance.Panel.isVisible = value;
                     },
@@ -92,7 +75,7 @@ namespace FPSCamera.Utils
             /// </summary>
             public Keybinding Keybinding
             {
-                get => new Keybinding(Key, Control, Shift, Alt);
+                get => new(Key, Control, Shift, Alt);
                 set => this.value = value.Encode();
             }
             public override void OnConflictResolved() => ModSettings.Save();

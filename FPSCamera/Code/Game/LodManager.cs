@@ -41,15 +41,15 @@ namespace FPSCamera.Game
         }
         private static void RefreshLODs()
         {
-            refreshLods<TreeInfo>();
-            refreshLods<PropInfo>();
-            refreshLods<BuildingInfo>();
-            refreshLods<NetInfo>();
-            refreshLods<VehicleInfo>();
-            refreshLods<CitizenInfo>();
+            RefreshLods<TreeInfo>();
+            RefreshLods<PropInfo>();
+            RefreshLods<BuildingInfo>();
+            RefreshLods<NetInfo>();
+            RefreshLods<VehicleInfo>();
+            RefreshLods<CitizenInfo>();
         }
 
-        private static void refreshLods<T>()
+        private static void RefreshLods<T>()
             where T : PrefabInfo
         {
             // Iterate through all loaded prefabs of the specified type.
@@ -98,7 +98,7 @@ namespace FPSCamera.Game
             internal float VehicleLodDistance { get; set; }
 
             internal static LodConfig Low =>
-                new LodConfig(256f,
+                new(256f,
                     256f,
                     10000f,
                     10000f,
@@ -107,7 +107,7 @@ namespace FPSCamera.Game
                     256f
                     );
             internal static LodConfig Mid =>
-                new LodConfig(256f,
+                new(256f,
                     256f,
                     128f,
                     256f,
@@ -116,7 +116,7 @@ namespace FPSCamera.Game
                     256f
                     );
             internal static LodConfig High =>
-                new LodConfig(64f,
+                new(64f,
                     128f,
                     64f,
                     128f,
