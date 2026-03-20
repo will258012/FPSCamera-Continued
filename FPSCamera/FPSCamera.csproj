@@ -11,6 +11,7 @@
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <Deterministic>True</Deterministic>
     <LangVersion>latest</LangVersion>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Code\Patches\ACMEPatches.cs" />

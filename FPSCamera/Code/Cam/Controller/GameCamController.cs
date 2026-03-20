@@ -53,8 +53,9 @@ namespace FPSCamera.Cam.Controller
 
         /// <summary>
         /// Gets the current <see cref="global::CinematicCameraController"/>.
+        /// Returns <c>null</c> when in Editiors.
         /// </summary>
-        public CinematicCameraController CinematicCameraController
+        public CinematicCameraController? CinematicCameraController
         {
             get
             {
@@ -85,7 +86,7 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void Initialize()
         {
-            if (CinematicCameraController.enabled) // Disable cinematic camera manually in case
+            if (CinematicCameraController?.enabled ?? false) // Disable cinematic camera manually in case
             {
                 CinematicCameraController.AbortScript();
                 CinematicCameraController.enabled = false;
