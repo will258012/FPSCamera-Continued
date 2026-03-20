@@ -18,7 +18,7 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void SavePosition(int positionIndex)
         {
-            if (FPSCamController.Instance?.Status == FPSCamController.CamStatus.Disabled) return;
+            if (FPSCamController.Instance == null || FPSCamController.Instance.Status == FPSCamController.CamStatus.Disabled) return;
 
             var ControllerPositioning = Positioning.MainCameraPositioning.ToControllerPositioning();
             if (ToolManager.instance.m_properties.m_mode == ItemClass.Availability.Game)
@@ -58,7 +58,7 @@ namespace FPSCamera.Patches
         [HarmonyPostfix]
         private static void LoadPosition(int positionIndex)
         {
-            if (FPSCamController.Instance?.Status == FPSCamController.CamStatus.Disabled) return;
+            if (FPSCamController.Instance == null || FPSCamController.Instance.Status == FPSCamController.CamStatus.Disabled) return;
 
             var savedPosition =
                 (ToolManager.instance.m_properties.m_mode == ItemClass.Availability.Game) ?

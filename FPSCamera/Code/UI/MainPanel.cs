@@ -224,7 +224,7 @@ namespace FPSCamera.UI
                 closeButton.normalBgSprite = "buttonclose";
                 closeButton.hoveredBgSprite = "buttonclosehover";
                 closeButton.pressedBgSprite = "buttonclosepressed";
-                closeButton.eventClick += (c, p) => Panel.Hide();
+                closeButton.eventClick += (c, p) => OnEsc();
             }
         }
         private void OnDestory()
@@ -236,6 +236,7 @@ namespace FPSCamera.UI
         }
         private void Close()
         {
+            OnEsc();
             foreach (var component in Panel.components)
             {
                 Destroy(component.gameObject);
