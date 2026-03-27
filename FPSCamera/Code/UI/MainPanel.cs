@@ -198,11 +198,16 @@ namespace FPSCamera.UI
                 {
                     OpenSettingsPanel();
                 };
-                Panel.height = currentY + walkThruBtn.height + Margin;
+                Panel.height = currentY + allSettingsBtn.height + Margin;
             }
             else
             {
-                Panel.height = currentY;
+                var allSettingsBtn = UIButtons.AddButton(Panel, (Panel.width - 200f) / 2f, currentY, Translations.Translate("ALLSETTINGSBTN_TEXT"));
+                allSettingsBtn.eventClick += (_, e) =>
+                {
+                    OpenSettingsPanel();
+                };
+                Panel.height = currentY + allSettingsBtn.height + Margin;
             }
             // Title
             {

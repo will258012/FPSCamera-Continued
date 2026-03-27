@@ -83,7 +83,11 @@ namespace FPSCamera.Cam.Controller
         /// <summary>
         /// Called when the script instance is being loaded. Initializes the singleton instance.
         /// </summary>
-        private void Awake() => Instance = this;
+        private void Awake()
+        {
+            Instance = this;
+            isGame = ToolsModifierControl.isGame;
+        }
 
         /// <summary>
         /// Enables the camera and associated UI elements or settings.
@@ -282,7 +286,11 @@ namespace FPSCamera.Cam.Controller
             }
             catch (Exception e)
             {
-                FPSCam = null;
+                if (Status.IsFlagSet(CamStatus.Enabled))
+                    FPSCam = null;
+                else
+                    AfterTransition();
+
                 Logging.LogException(e);
             }
         }
@@ -313,20 +321,23 @@ namespace FPSCamera.Cam.Controller
                     if (FPSCam is not FreeCam) StartFreeCam();
                     else FPSCam = null;
                 }
-                if (ModSettings.KeyWalkThruToggle.KeyTriggered())
+                if (isGame)
                 {
-                    if (FPSCam is not WalkThruCam) StartWalkThruCam();
-                    else FPSCam = null;
-                }
-                if (ModSettings.KeyFollowToggle.KeyTriggered())
-                {
-                    if (FPSCam is IFollowCam followCam)
+                    if (ModSettings.KeyWalkThruToggle.KeyTriggered())
                     {
-                        GameCamController.Instance.CameraController.SetTarget(followCam.FollowInstance, followCam.GetPositioning().pos, true);
-                        FPSCam = null;
+                        if (FPSCam is not WalkThruCam) StartWalkThruCam();
+                        else FPSCam = null;
                     }
-                    else if (Status == CamStatus.Disabled && !GameCamController.Instance.CameraController.GetTarget().IsEmpty)
-                        StartFollowing(GameCamController.Instance.CameraController.GetTarget());
+                    if (ModSettings.KeyFollowToggle.KeyTriggered())
+                    {
+                        if (FPSCam is IFollowCam followCam)
+                        {
+                            GameCamController.Instance.CameraController.SetTarget(followCam.FollowInstance, followCam.GetPositioning().pos, true);
+                            FPSCam = null;
+                        }
+                        else if (Status == CamStatus.Disabled && !GameCamController.Instance.CameraController.GetTarget().IsEmpty)
+                            StartFollowing(GameCamController.Instance.CameraController.GetTarget());
+                    }
                 }
             }
             if (Status.IsFlagSet(CamStatus.Enabled) && ModSettings.KeyInfoPanelToggle.KeyTriggered())
@@ -638,6 +649,7 @@ namespace FPSCamera.Cam.Controller
         private bool isFOVTransitioning = false;
         private Positioning offset = default;
         private Vector3 offsetFromSetting = default;
+        private bool isGame = false;
 
         private float transitionTimer = 0f;
         private const float MaxTransitioningTime = 5f;

@@ -1,25 +1,13 @@
 ﻿using AlgernonCommons;
 using ColossalFramework.UI;
+using FPSCamera.Cam.Controller;
 using FPSCamera.Utils;
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 namespace FPSCamera.Game
 {
     public class UIManager
     {
-        /// <summary>
-        /// Gets the game's UI camera instance.
-        /// </summary>
-        public static Camera UICamera
-        {
-            get
-            {
-                field ??= Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
-                return field;
-            }
-        }
-
         private static ToolsModifierControl ToolsModifierControl
         {
             get
@@ -44,7 +32,7 @@ namespace FPSCamera.Game
                 if (ModSupport.FoundToggleIt)
                     ModSupport.ToggleIt_ToggleUI(visible);
 
-                UICamera.enabled = visible;
+                GameCamController.Instance.UICamera.enabled = visible;
                 if (!visible)
                     ToolsModifierControl.CloseEverything();
             }
