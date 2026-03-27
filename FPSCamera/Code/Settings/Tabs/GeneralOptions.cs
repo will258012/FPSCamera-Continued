@@ -159,13 +159,13 @@ namespace FPSCamera.Settings.Tabs
             #endregion
 
             // Reset mod settings to defaults.
-            defaults_Button = UIButtons.AddButton(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_RESETBTN"));
+            defaults_Button = UIButtons.AddButton(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_RESETBTN"), width: 300, tooltip: Translations.Translate("SETTINGS_RESETBTN"));
             defaults_Button.eventClicked += (c, _) => ResetModSettings();
 
-            var offsetDefault_Button = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(defaults_Button), Translations.Translate("SETTINGS_RESETOFFSETBTN"));
+            var offsetDefault_Button = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(defaults_Button), Translations.Translate("SETTINGS_RESETOFFSETBTN"), width: 300, tooltip: Translations.Translate("SETTINGS_RESETOFFSETBTN"));
             offsetDefault_Button.eventClicked += (c, _) => ResetOffsetSettings();
 
-            var importButton = UIButtons.AddButton(scrollPanel, UILayout.PositionUnder(defaults_Button), Translations.Translate("SETTINGS_IMPORT"));
+            var importButton = UIButtons.AddButton(scrollPanel, UILayout.PositionUnder(defaults_Button), Translations.Translate("SETTINGS_IMPORT"), width: 300, tooltip: Translations.Translate("SETTINGS_IMPORT"));
             importButton.eventClicked += (c, _) =>
             {
                 var notification = NotificationBase.ShowNotification<YesNoNotification>();
@@ -190,7 +190,7 @@ namespace FPSCamera.Settings.Tabs
                     }
                 };
             };
-            var openWikiButton = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(importButton), Translations.Translate("SETTINGS_OPENWIKI"));
+            var openWikiButton = UIButtons.AddButton(scrollPanel, UILayout.PositionRightOf(importButton), Translations.Translate("SETTINGS_OPENWIKI"), width: 300, tooltip: Translations.Translate("SETTINGS_OPENWIKI"));
             openWikiButton.eventClicked += (c, _) => Application.OpenURL("https://github.com/will258012/FPSCamera-Continued/wiki");
         }
         /// <summary>

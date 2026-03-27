@@ -1,5 +1,8 @@
-﻿using FPSCamera.Settings;
+﻿using AlgernonCommons;
+using FPSCamera.Game;
+using FPSCamera.Settings;
 using FPSCamera.Utils;
+using System.Linq;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
 using static FPSCamera.Utils.MathUtils;
@@ -31,25 +34,25 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public GameCamController()
         {
+            CameraController = ToolsModifierControl.cameraController;
+            UICamera = Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
             camDoF = GetComponent<DepthOfField>();
             camTiltEffect = GetComponent<TiltShiftEffect>();
-        }
-
-        /// <summary>
-        /// Gets the game's main camera instance.
-        /// </summary>
-        public Camera MainCamera
-        {
-            get
-            {
-                field ??= RenderManager.instance.CurrentCameraInfo.m_camera;
-                return field;
-            }
         }
         /// <summary>
         /// Gets the current <see cref="global::CameraController"/>.
         /// </summary>
-        public CameraController CameraController => ToolsModifierControl.cameraController;
+        public CameraController CameraController { get; }
+
+        /// <summary>
+        /// Gets the game's main camera instance.
+        /// </summary>
+        public Camera MainCamera => CameraController.m_camera;
+
+        /// <summary>
+        /// Gets the game's UI camera instance.
+        /// </summary>
+        public Camera UICamera { get; }
 
         /// <summary>
         /// Gets the current <see cref="global::CinematicCameraController"/>.
@@ -120,7 +123,7 @@ namespace FPSCamera.Cam.Controller
 
             if (!ModSettings.SmoothTransition)
                 MainCamera.fieldOfView = ModSettings.CamFieldOfView;
-            
+
             savedNearClipPlane = MainCamera.nearClipPlane;
             MainCamera.nearClipPlane = ModSettings.CamNearClipPlane;
         }
@@ -129,32 +132,43 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void Restore()
         {
-            camDoF?.enabled = IsDoFEnabled;
-            camTiltEffect?.enabled = IsTiltEffectEnabled;
+            try
+            {
+                camDoF?.enabled = IsDoFEnabled;
+                camTiltEffect?.enabled = IsTiltEffectEnabled;
 
-            MainCamera.fieldOfView = savedFoV;
-            MainCamera.nearClipPlane = savedNearClipPlane;
-            if (ModSettings.HideGameUI)
-                Camera.main.rect = savedRect;
+                MainCamera.fieldOfView = savedFoV;
+                MainCamera.nearClipPlane = savedNearClipPlane;
 
-            if (FPSCamController.Instance.OverrideSetBackCamera != FPSCamController.OverrideSetBack.ACME)
-                if (ModSettings.SetBackCamera && FPSCamController.Instance.OverrideSetBackCamera != FPSCamController.OverrideSetBack.False)
-                {
-                    savedControllerPositioning.Load();
-                    MainCamera.transform.position = transitionEndPositioning.pos;
-                    MainCamera.transform.rotation = transitionEndPositioning.rotation;
-                }
-                else
-                    Positioning.MainCameraPositioning.ToControllerPositioning().Load();
+                if (ModSettings.HideGameUI)
+                    Camera.main.rect = savedRect;
 
-            FPSCamController.Instance.OverrideSetBackCamera = FPSCamController.OverrideSetBack.None;
-            if (ModSupport.FoundACME)
-                ModSupport.ACME_DisableFPSMode();
+                if (FPSCamController.Instance.OverrideSetBackCamera != FPSCamController.OverrideSetBack.ACME)
+                    if (ModSettings.SetBackCamera && FPSCamController.Instance.OverrideSetBackCamera != FPSCamController.OverrideSetBack.False)
+                    {
+                        savedControllerPositioning.Load();
+                        MainCamera.transform.position = transitionEndPositioning.pos;
+                        MainCamera.transform.rotation = transitionEndPositioning.rotation;
+                    }
+                    else
+                        Positioning.MainCameraPositioning.ToControllerPositioning().Load();
 
-            transitionEndPositioning = default;
-            CameraController.enabled = true;
+                FPSCamController.Instance.OverrideSetBackCamera = FPSCamController.OverrideSetBack.None;
+                if (ModSupport.FoundACME)
+                    ModSupport.ACME_DisableFPSMode();
+
+                transitionEndPositioning = default;
+            }
+            catch (System.Exception e)
+            {
+                Logging.LogException(e);
+            }
+            finally
+            {
+                InputManager.ToggleCursor(true);
+                CameraController.enabled = true;
+            }
         }
-
         private readonly DepthOfField camDoF;
         private readonly TiltShiftEffect camTiltEffect;
 

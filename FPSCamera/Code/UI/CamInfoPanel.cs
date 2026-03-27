@@ -191,22 +191,35 @@ namespace FPSCamera.UI
             var infoMargin = margin * infoMarginRatio;
             var blockWidth = (width - margin) / 5f;
             var infoWidth = blockWidth * 2f - margin;
-            var fieldWidth = (infoWidth * fieldWidthRatio)
-                                 .Clamp(style.fontSize * 5f, style.fontSize * 8f);
-            var textWidth = infoWidth - fieldWidth - margin;
+            var fieldWidth = (infoWidth * fieldWidthRatio).Clamp(style.fontSize * 5f, style.fontSize * 8f);
+
+            var measureStyle = new GUIStyle(style);
+            measureStyle.fontSize = (int)(style.fontSize * fieldFontSizeRatio);
+
+            var leftFieldWidth = Mathf.Max(fieldWidth, GetMaxFieldWidth(leftInfo.Keys, measureStyle) + measureStyle.fontSize);
+            var rightFieldWidth = Mathf.Max(fieldWidth, GetMaxFieldWidth(rightInfo.Keys, measureStyle) + measureStyle.fontSize);
 
             var rect = new Rect(margin, margin, infoWidth, height - margin);
+
+            // LEFT
             style.alignment = TextAnchor.MiddleLeft;
-            var columnRect = rect; columnRect.width = fieldWidth;
+            var columnRect = rect;
+            columnRect.width = leftFieldWidth;
             DrawInfoFields(leftInfo, style, columnRect, infoMargin);
-            columnRect.x += fieldWidth + margin; columnRect.width = textWidth;
+
+            columnRect.x += leftFieldWidth + margin;
+            columnRect.width = infoWidth - leftFieldWidth - margin;
             DrawListInRows(leftInfo.Values, style, columnRect, infoMargin);
 
+            // RIGHT
             rect.x += blockWidth * 3f;
             style.alignment = TextAnchor.MiddleRight;
-            columnRect = rect; columnRect.width = textWidth;
+            columnRect = rect;
+            columnRect.width = infoWidth - rightFieldWidth - margin;
             DrawListInRows(rightInfo.Values, style, columnRect, infoMargin);
-            columnRect.x += textWidth + margin; columnRect.width = fieldWidth;
+
+            columnRect.x += columnRect.width + margin;
+            columnRect.width = rightFieldWidth;
             DrawInfoFields(rightInfo, style, columnRect, infoMargin);
 
             var timerHeight = height / 6f;
@@ -244,6 +257,19 @@ namespace FPSCamera.UI
                 GUI.Label(rowRect, str, style);
                 rowRect.y += rowHeight;
             }
+        }
+        private float GetMaxFieldWidth(IEnumerable<string> keys, GUIStyle style)
+        {
+            float maxWidth = 0f;
+            var content = new GUIContent();
+            foreach (var key in keys)
+            {
+                content.text = key;
+                var size = style.CalcSize(content);
+                maxWidth = Mathf.Max(maxWidth, size.x);
+            }
+
+            return maxWidth;
         }
 
         private const float bufferUpdateInterval = .25f;
