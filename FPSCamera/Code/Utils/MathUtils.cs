@@ -31,6 +31,7 @@ namespace FPSCamera.Utils
             /// <summary>
             /// Convert to <see cref="ControllerPositioning"/> using by <see cref="CameraController"/> (Orbit Rotation). (May introduce distortion)
             /// </summary>
+            [AccessUtils.UsedReflection]
             public ControllerPositioning ToControllerPositioning()
             {
                 var controllerPositioning = new ControllerPositioning();
@@ -93,6 +94,7 @@ namespace FPSCamera.Utils
                 size = Controller.m_targetSize,
                 height = Controller.m_targetHeight,
             };
+            [AccessUtils.UsedReflection]
             public void Load()
             {
                 var traverse = HarmonyLib.Traverse.Create(Controller);

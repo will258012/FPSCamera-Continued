@@ -16,6 +16,7 @@ namespace FPSCamera.Patches
 
         [HarmonyPatch(typeof(ACME.ACME.CameraPositions), "SavePosition")]
         [HarmonyPostfix]
+        [AccessUtils.UsedReflection]
         private static void SavePosition(int positionIndex)
         {
             if (FPSCamController.Instance == null || FPSCamController.Instance.Status == FPSCamController.CamStatus.Disabled) return;
@@ -56,6 +57,7 @@ namespace FPSCamera.Patches
 
         [HarmonyPatch(typeof(ACME.ACME.CameraPositions), "LoadPosition")]
         [HarmonyPostfix]
+        [AccessUtils.UsedReflection]
         private static void LoadPosition(int positionIndex)
         {
             if (FPSCamController.Instance == null || FPSCamController.Instance.Status == FPSCamController.CamStatus.Disabled) return;

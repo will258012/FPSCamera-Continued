@@ -5,6 +5,18 @@ namespace FPSCamera.Utils
 {
     public static class AccessUtils
     {
+        /// <summary>
+        /// Indicates that the attributed code element is accessed via reflection.
+        /// </summary>
+        /// <remarks>
+        /// Reflection has a performance cost.
+        /// Mark code with this attribute when reflection is used.
+        /// <strong>Remember to verify compatibility after game or mod updates, 
+        /// or consider using alternative ways to invoke the target code.</strong>
+        /// </remarks>
+        [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
+        [Obsolete("This code uses reflection. Remember to verify compatibility after game/mod updates.")]
+        public sealed class UsedReflectionAttribute : Attribute;
         public static T GetFieldValue<T>(object obj, string fieldName)
         {
             var fieldInfo = AccessTools.Field(obj.GetType(), fieldName) ?? throw new ArgumentException($"Field '{fieldName}' not found in type '{obj.GetType().FullName}'.");
@@ -37,6 +49,5 @@ namespace FPSCamera.Utils
             var methodInfo = AccessTools.Method(type, methodName, paramTypes) ?? throw new ArgumentException($"Method '{methodName}' not found.");
             return methodInfo.Invoke(obj, parameters);
         }
-
     }
 }
