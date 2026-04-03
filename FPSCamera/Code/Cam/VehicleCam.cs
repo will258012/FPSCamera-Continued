@@ -24,7 +24,7 @@ namespace FPSCamera.Cam
             hasReversed = GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed);
             if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = (ushort)FollowID;
 
-            isRace = GetVehicle().m_eventRoute != default;
+            isRace = GetVehicle().m_eventRoute != default && GetVehicle().Info?.m_vehicleAI is RaceCarAI or RaceBicycleAI or ParadeFloatAI;
             Logging.KeyMessage("Vehicle cam started");
             Logging.Message($"FollowID:{FollowID} isRace:{isRace}");
         }
