@@ -2,6 +2,7 @@
 using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
 using ColossalFramework.UI;
+using FPSCamera.UI;
 using FPSCamera.Utils;
 using UnityEngine;
 
@@ -16,9 +17,9 @@ namespace FPSCamera.Settings.Tabs
         private const float GroupMargin = 40f;
 
         private static OptionsKeymapping KeyCamToggle;
-        private static OptionsKeymapping KeySpeedUp;
+        private static ModifierKeyOptionsKeymapping KeySpeedUp;
         private static OptionsKeymapping KeyCamReset;
-        private static OptionsKeymapping KeyCursorToggle;
+        private static ModifierKeyOptionsKeymapping KeyCursorToggle;
         private static OptionsKeymapping KeyAutoMove;
         private static OptionsKeymapping KeySaveOffset;
         private static OptionsKeymapping KeyMoveForward;
@@ -73,13 +74,13 @@ namespace FPSCamera.Settings.Tabs
             var KeyInfoPanelToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYINFOPANELTOGGLE"), ModSettings.KeyInfoPanelToggle);
             currentY += KeyInfoPanelToggle.Panel.height + Margin;
 
-            KeySpeedUp = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYSPPEDUP"), ModSettings.KeySpeedUp);
+            KeySpeedUp = ModifierKeyOptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYSPPEDUP"), ModSettings.KeySpeedUp);
             currentY += KeySpeedUp.Panel.height + Margin;
 
             KeyCamReset = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYCAMRESET"), ModSettings.KeyCamReset);
             currentY += KeyCamReset.Panel.height + Margin;
 
-            KeyCursorToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYCURSORTOGGLE"), ModSettings.KeyCursorToggle);
+            KeyCursorToggle = ModifierKeyOptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYCURSORTOGGLE"), ModSettings.KeyCursorToggle);
             currentY += KeyCursorToggle.Panel.height + Margin;
 
             KeyAutoMove = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYAUTOMOVE"), ModSettings.KeyAutoMove);

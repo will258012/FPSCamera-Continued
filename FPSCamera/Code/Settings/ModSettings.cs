@@ -97,9 +97,9 @@ namespace FPSCamera.Settings
             KeyWalkThruToggle = new Keybinding(KeyCode.BackQuote, true, false, false);
             KeyFollowToggle = new Keybinding(KeyCode.BackQuote, false, true, false);
             KeyInfoPanelToggle = new Keybinding(KeyCode.I, true, false, false);
-            KeySpeedUp = new KeyOnlyBinding(KeyCode.CapsLock);
+            KeySpeedUp = new KeyOnlyBinding(KeyCode.LeftShift);
             KeyCamReset = new KeyOnlyBinding(KeyCode.Minus);
-            KeyCursorToggle = new KeyOnlyBinding(KeyCode.Tab);
+            KeyCursorToggle = new KeyOnlyBinding(KeyCode.LeftAlt);
             KeyAutoMove = new KeyOnlyBinding(KeyCode.E);
             KeySaveOffset = new KeyOnlyBinding(KeyCode.Backslash);
             KeyMoveForward = new KeyOnlyBinding(KeyCode.W);
@@ -409,7 +409,7 @@ namespace FPSCamera.Settings
         [XmlElement("KeySpeedUp")]
         public KeyOnlyBinding XMLKeySpeedUp { get => KeySpeedUp; set => KeySpeedUp = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeySpeedUp = new(KeyCode.CapsLock);
+        internal static KeyOnlyBinding KeySpeedUp = new(KeyCode.LeftShift);
 
         [XmlElement("KeyCamReset")]
         public KeyOnlyBinding XMLKeyCamReset { get => KeyCamReset; set => KeyCamReset = value; }
@@ -419,7 +419,7 @@ namespace FPSCamera.Settings
         [XmlElement("KeyCursorToggle")]
         public KeyOnlyBinding XMLKeyCursorToggle { get => KeyCursorToggle; set => KeyCursorToggle = value; }
         [XmlIgnore]
-        internal static KeyOnlyBinding KeyCursorToggle = new(KeyCode.Tab);
+        internal static KeyOnlyBinding KeyCursorToggle = new(KeyCode.LeftAlt);
 
         [XmlElement("KeyAutoMove")]
         public KeyOnlyBinding XMLKeyAutoMove { get => KeyAutoMove; set => KeyAutoMove = value; }
