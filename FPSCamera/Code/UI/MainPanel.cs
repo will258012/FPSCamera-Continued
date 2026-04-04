@@ -160,7 +160,7 @@ namespace FPSCamera.UI
                 Translations.Translate("SETTINGS_GROUNDCLIPING_SNAP_TO_ROAD")
             ];
 
-            var groundClipping_dropDown = UIDropDowns.AddPlainDropDown(Panel, Margin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClippingItems, (int)ModSettings.GroundClipping, 150f);
+            var groundClipping_dropDown = UIDropDowns.AddPlainDropDown(Panel, Margin, currentY, Translations.Translate("SETTINGS_GROUNDCLIPING"), groundClippingItems, (int)ModSettings.GroundClipping, Panel.width - 70f);
             groundClipping_dropDown.tooltip = string.Format(Translations.Translate("SETTINGS_GROUNDCLIPING_DETAIL"), "\n");
             groundClipping_dropDown.eventSelectedIndexChanged += (_, index) => ModSettings.GroundClipping = (ModSettings.GroundClippings)index;
             groundClipping_dropDown.parent.relativePosition = new Vector2(Margin, currentY);
