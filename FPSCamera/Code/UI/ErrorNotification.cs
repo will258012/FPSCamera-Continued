@@ -39,11 +39,15 @@ namespace FPSCamera.UI
         /// </summary>
         public override void AddButtons()
         {
-            base.AddButtons();
-            CopyButton = AddButton(2, NumButtons, Translations.Translate("ERROR_COPY"),
-                () => Clipboard.text = errorMessage);
-            SupportButton = AddButton(3, NumButtons, Translations.Translate("ERROR_SUPPORT"),
-                () => Application.OpenURL($"https://steamcommunity.com/sharedfiles/filedetails/?id={WorkshopId}"));
+            try
+            {
+                base.AddButtons();
+                CopyButton = AddButton(2, NumButtons, Translations.Translate("ERROR_COPY"),
+                    () => Clipboard.text = errorMessage);
+                SupportButton = AddButton(3, NumButtons, Translations.Translate("ERROR_SUPPORT"),
+                    () => Application.OpenURL($"https://steamcommunity.com/sharedfiles/filedetails/?id={WorkshopId}"));
+            }
+            catch { }
         }
         /// <summary>
         /// Displays an error notification with exception details.
