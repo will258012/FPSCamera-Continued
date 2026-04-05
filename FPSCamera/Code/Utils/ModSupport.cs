@@ -101,6 +101,7 @@ namespace FPSCamera.Utils
                 Logging.LogException(e, "Failed to search supported mods");
             }
         }
+        [AccessUtils.UsedReflection]
         internal static void ACME_DisableFPSMode()
         {
             var traverse = HarmonyLib.Traverse.CreateWithType("ACME.FPSMode, ACME");

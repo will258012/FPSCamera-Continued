@@ -31,6 +31,7 @@ namespace FPSCamera.Utils
             /// <summary>
             /// Convert to <see cref="ControllerPositioning"/> using by <see cref="CameraController"/> (Orbit Rotation). (May introduce distortion)
             /// </summary>
+            [AccessUtils.UsedReflection]
             public ControllerPositioning ToControllerPositioning()
             {
                 var controllerPositioning = new ControllerPositioning();
@@ -43,7 +44,7 @@ namespace FPSCamera.Utils
 
                 // Calculate the new size (height difference between the camera height and the ground, with some adjust by angles)
                 var newSize = Mathf.Max(0f, pos.y - height)
-                    / Mathf.Lerp(0.15f, 1f, Mathf.Sin(Mathf.Abs(controllerPositioning.angle.y) * Mathf.Deg2Rad));
+                    / Mathf.Lerp(0.15f, 1f, Mathf.Sin(Mathf.Abs(controllerPositioning.targetAngle.y) * Mathf.Deg2Rad));
                 newSize = newSize.Clamp(controller.m_minDistance, controller.m_maxDistance);
 
                 // Calculate targetAngle if necessary.
@@ -53,7 +54,7 @@ namespace FPSCamera.Utils
                     || AccessUtils.GetFieldValue<bool>(controller, "m_cachedFreeCamera")
                     );
                 if (shouldCalculate)
-                    controllerPositioning.angle = ControllerPositioning.CalculateTargetAngle(controllerPositioning.angle, newSize);
+                    controllerPositioning.targetAngle = ControllerPositioning.CalculateTargetAngle(controllerPositioning.targetAngle, newSize);
 
                 var newPos = pos;
                 // Calculate CameraController position based on the camera's transform position.
@@ -81,7 +82,8 @@ namespace FPSCamera.Utils
         public struct ControllerPositioning
         {
             public Vector3 pos;
-            public Vector2 angle;
+            public Vector2? currentAngle;
+            public Vector2 targetAngle;
             public float size;
             public float height;
             private static CameraController Controller => GameCamController.Instance.CameraController;
@@ -89,30 +91,37 @@ namespace FPSCamera.Utils
             => new()
             {
                 pos = Controller.m_targetPosition,
-                angle = Controller.m_targetAngle,
+                currentAngle = Controller.m_currentAngle,
+                targetAngle = Controller.m_targetAngle,
                 size = Controller.m_targetSize,
                 height = Controller.m_targetHeight,
             };
+            [AccessUtils.UsedReflection]
             public void Load()
             {
                 var traverse = HarmonyLib.Traverse.Create(Controller);
 
                 Controller.m_targetPosition = Controller.m_currentPosition = pos;
-                Controller.m_targetAngle = angle;
+                Controller.m_targetAngle = targetAngle;
 
-                var shouldCalculate =
-                    !(ToolManager.instance.m_properties.m_mode.IsFlagSet(ItemClass.Availability.ThemeEditor)
-                    || Controller.m_unlimitedCamera
-                    || traverse.Field("m_cachedFreeCamera").GetValue<bool>()
-                    );
 
-                Controller.m_currentAngle = shouldCalculate ? CalculateCurrentAngle(angle, size) : angle;
+                if (currentAngle.HasValue)
+                    Controller.m_currentAngle = currentAngle.Value;
+                else
+                {
+                    var shouldCalculate =
+                        !(ToolManager.instance.m_properties.m_mode.IsFlagSet(ItemClass.Availability.ThemeEditor)
+                        || Controller.m_unlimitedCamera
+                        || traverse.Field("m_cachedFreeCamera").GetValue<bool>()
+                        );
+                    Controller.m_currentAngle = (shouldCalculate ? CalculateCurrentAngle(targetAngle, size) : targetAngle);
+                }
                 Controller.m_targetSize = Controller.m_currentSize = size;
                 Controller.m_targetHeight = Controller.m_currentHeight = height;
 
 
                 traverse.Field("m_cachedPosition").SetValue(pos);
-                traverse.Field("m_cachedAngle").SetValue(angle);
+                traverse.Field("m_cachedAngle").SetValue(targetAngle);
                 traverse.Field("m_cachedSize").SetValue(size);
                 traverse.Field("m_cachedHeight").SetValue(height);
             }
@@ -130,13 +139,13 @@ namespace FPSCamera.Utils
                 newPos = CameraController.ClampCameraPosition(newPos);
                 return new Positioning(newPos, quaternion);
             }
-            public void CalculateControllerAngle(Quaternion quaternion) => angle = new Vector2(quaternion.eulerAngles.y, quaternion.eulerAngles.x).ClampEulerAngles();
-            public Quaternion FromControllerAngle() => Quaternion.AngleAxis(angle.x, Vector3.up) * Quaternion.AngleAxis(angle.y, Vector3.right);
+            public void CalculateControllerAngle(Quaternion quaternion) => targetAngle = new Vector2(quaternion.eulerAngles.y, quaternion.eulerAngles.x).ClampEulerAngles();
+            public Quaternion FromControllerAngle() => Quaternion.AngleAxis(targetAngle.x, Vector3.up) * Quaternion.AngleAxis(targetAngle.y, Vector3.right);
             public static Vector2 CalculateCurrentAngle(Vector2 targetAngle, float size) => new(targetAngle.x,
                 90f - (90f - targetAngle.y) * (Controller.m_maxTiltDistance * 0.5f / (Controller.m_maxTiltDistance * 0.5f + size)));
             public static Vector2 CalculateTargetAngle(Vector2 currentAngle, float size) => new(currentAngle.x,
                 -((180f * size - currentAngle.y * Controller.m_maxTiltDistance - 2f * currentAngle.y * size) / Controller.m_maxTiltDistance));
-            public override string ToString() => $"Position: {pos}, Angle: {angle}, Size: {size}, Height: {height}";
+            public override string ToString() => $"Position: {pos}, currentAngle: {currentAngle}, targetAngle: {targetAngle}, Size: {size}, Height: {height}";
         }
 
 

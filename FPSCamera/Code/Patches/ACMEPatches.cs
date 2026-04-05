@@ -1,5 +1,4 @@
 ﻿extern alias ACME;
-
 using AlgernonCommons.Translation;
 using FPSCamera.Cam.Controller;
 using FPSCamera.UI;
@@ -16,6 +15,7 @@ namespace FPSCamera.Patches
 
         [HarmonyPatch(typeof(ACME.ACME.CameraPositions), "SavePosition")]
         [HarmonyPostfix]
+        [AccessUtils.UsedReflection]
         private static void SavePosition(int positionIndex)
         {
             if (FPSCamController.Instance == null || FPSCamController.Instance.Status == FPSCamController.CamStatus.Disabled) return;
@@ -28,7 +28,7 @@ namespace FPSCamera.Patches
                 {
                     IsValid = true,
                     Position = ControllerPositioning.pos,
-                    Angle = ControllerPositioning.angle,
+                    Angle = ControllerPositioning.targetAngle,
                     Size = ControllerPositioning.size,
                     Height = ControllerPositioning.height,
                     FOV = GameCamController.Instance.MainCamera.fieldOfView
@@ -42,8 +42,8 @@ namespace FPSCamera.Patches
                     PosX = ControllerPositioning.pos.x,
                     PosY = ControllerPositioning.pos.y,
                     PosZ = ControllerPositioning.pos.z,
-                    AngleX = ControllerPositioning.angle.x,
-                    AngleY = ControllerPositioning.angle.y,
+                    AngleX = ControllerPositioning.targetAngle.x,
+                    AngleY = ControllerPositioning.targetAngle.y,
                     Size = ControllerPositioning.size,
                     Height = ControllerPositioning.height,
                     FOV = GameCamController.Instance.MainCamera.fieldOfView
@@ -56,6 +56,7 @@ namespace FPSCamera.Patches
 
         [HarmonyPatch(typeof(ACME.ACME.CameraPositions), "LoadPosition")]
         [HarmonyPostfix]
+        [AccessUtils.UsedReflection]
         private static void LoadPosition(int positionIndex)
         {
             if (FPSCamController.Instance == null || FPSCamController.Instance.Status == FPSCamController.CamStatus.Disabled) return;
@@ -70,7 +71,7 @@ namespace FPSCamera.Patches
             var positioning = new ControllerPositioning
             {
                 pos = savedPosition.Position,
-                angle = savedPosition.Angle,
+                targetAngle = savedPosition.Angle,
                 size = savedPosition.Size,
                 height = savedPosition.Height,
             }.ToPositioning();

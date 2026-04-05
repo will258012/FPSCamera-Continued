@@ -1,7 +1,9 @@
-﻿using AlgernonCommons.Notifications;
+﻿using AlgernonCommons;
+using AlgernonCommons.Notifications;
 using AlgernonCommons.Translation;
 using ColossalFramework;
 using ColossalFramework.UI;
+using FPSCamera.Cam.Controller;
 using UnityEngine;
 
 namespace FPSCamera.UI
@@ -37,11 +39,15 @@ namespace FPSCamera.UI
         /// </summary>
         public override void AddButtons()
         {
-            base.AddButtons();
-            CopyButton = AddButton(2, NumButtons, Translations.Translate("ERROR_COPY"),
-                () => Clipboard.text = errorMessage);
-            SupportButton = AddButton(3, NumButtons, Translations.Translate("ERROR_SUPPORT"),
-                () => Application.OpenURL($"https://steamcommunity.com/sharedfiles/filedetails/?id={WorkshopId}"));
+            try
+            {
+                base.AddButtons();
+                CopyButton = AddButton(2, NumButtons, Translations.Translate("ERROR_COPY"),
+                    () => Clipboard.text = errorMessage);
+                SupportButton = AddButton(3, NumButtons, Translations.Translate("ERROR_SUPPORT"),
+                    () => Application.OpenURL($"https://steamcommunity.com/sharedfiles/filedetails/?id={WorkshopId}"));
+            }
+            catch { }
         }
         /// <summary>
         /// Displays an error notification with exception details.
@@ -73,6 +79,38 @@ namespace FPSCamera.UI
                         $"{Translations.Translate("ERROR")}\n{message}",
                         true
                     );
+                }
+            }
+        }
+        protected override void OnKeyDown(UIKeyEventParameter keyEvent)
+        {
+            // Ensure key hasn't already been used.
+            if (!keyEvent.used)
+            {
+                // Checking for key - escape and enter.
+                if (keyEvent.keycode == KeyCode.Escape)
+                {
+                    try
+                    {
+                        if (FPSCamController.Instance?.OnEsc() ?? false) return;
+                    }
+                    catch (System.Exception e)
+                    {
+                        Logging.Error(e.ToString());
+                    }
+
+                    // Escape key pressed - use up the event and close the notification.
+                    keyEvent.Use();
+                    Close();
+                }
+                else if (keyEvent.keycode == KeyCode.Return)
+                {
+                    // Enter key pressed - simulate click of first button.
+                    keyEvent.Use();
+                    if (CloseButton is UIButton button)
+                    {
+                        button.SimulateClick();
+                    }
                 }
             }
         }
