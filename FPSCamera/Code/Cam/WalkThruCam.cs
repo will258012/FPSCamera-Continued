@@ -18,8 +18,8 @@ namespace FPSCamera.Cam
         public InstanceID FollowInstance => CurrentCam?.FollowInstance ?? default;
         public string Name => Translations.Translate("SETTINGS_KEYWALKTHRUTOGGLE");
         public float GetSpeed() => CurrentCam?.GetSpeed() ?? default;
-        public string GetFollowName() => CurrentCam?.GetFollowName();
-        public string GetPrefabName() => CurrentCam?.GetPrefabName();
+        public string FollowName => CurrentCam?.FollowName;
+        public string PrefabName => CurrentCam?.PrefabName;
         public Dictionary<string, string> GetInfo() => CurrentCam?.GetInfo();
         public string GetStatus() => CurrentCam?.GetStatus();
         public Positioning GetPositioning() => CurrentCam?.GetPositioning() ?? default;

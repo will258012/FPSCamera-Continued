@@ -19,9 +19,17 @@ namespace FPSCamera.Cam
         {
             FollowInstance = id;
             FollowID = FollowInstance.Vehicle;
+            if (IsValid())
+            {
+                PrefabName = GetVehicle().Info.name;
+                FollowName = VehicleManager.instance.GetVehicleName((ushort)FollowID) ?? PrefabName;
+            }
+
             if (ModSettings.StickToFrontVehicle)
                 SwitchTarget(GetFrontVehicleID());
+
             hasReversed = GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed);
+
             if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = (ushort)FollowID;
 
             isRace = GetVehicle().m_eventRoute != default && GetVehicle().Info?.m_vehicleAI is RaceCarAI or RaceBicycleAI or ParadeFloatAI;
@@ -33,7 +41,11 @@ namespace FPSCamera.Cam
             if (id == FollowID) return;
             FollowID = id;
             FollowInstance = new() { Vehicle = id };
+            PrefabName = GetVehicle().Info.name;
+            FollowName = VehicleManager.instance.GetVehicleName((ushort)FollowID) ?? PrefabName;
+
             SyncCamOffset();
+
             if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = id;
         }
         public string Name => Translations.Translate("INFO_FOLLOW");
@@ -67,8 +79,8 @@ namespace FPSCamera.Cam
             GetVehicle().GetSmoothPosition((ushort)FollowID, out var position, out var rotation);
             return new Positioning(position, rotation);
         }
-        public string GetFollowName() => VehicleManager.instance.GetVehicleName((ushort)FollowID) ?? GetPrefabName();
-        public string GetPrefabName() => GetVehicle().Info.name;
+        public string FollowName { get; private set; }
+        public string PrefabName { get; private set; }
         public float GetSpeed() => GetVehicle().GetSmoothVelocity((ushort)FollowID).magnitude;
         public string GetStatus()
         {
@@ -116,6 +128,7 @@ namespace FPSCamera.Cam
         {
             FollowID = default;
             FollowInstance = default;
+            FollowName = PrefabName = null;
             if (ModSupport.FoundTrainDisplay)
                 ModSupport.FollowVehicleID = default;
         }

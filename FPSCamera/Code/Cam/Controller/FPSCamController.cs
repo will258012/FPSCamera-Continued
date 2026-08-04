@@ -448,7 +448,7 @@ namespace FPSCamera.Cam.Controller
         /// <param name="followCam">Given camera.</param>
         internal void SaveCamOffset(IFollowCam followCam)
         {
-            var name = followCam?.GetPrefabName();
+            var name = followCam?.PrefabName;
             if (name != null)
             {
                 OffsetsSettings.Offsets[name] = offset;
@@ -463,7 +463,7 @@ namespace FPSCamera.Cam.Controller
         /// <param name="followCam">Given camera.</param>
         internal void SyncCamOffset(IFollowCam followCam)
         {
-            var name = followCam?.GetPrefabName();
+            var name = followCam?.PrefabName;
             offset = default;
             offsetFromSetting = default;
 
@@ -477,7 +477,7 @@ namespace FPSCamera.Cam.Controller
                 offsetFromSetting += ModSettings.PedestrianFixedOffset;
             else if (followCam is VehicleCam cam)
             {
-                if (cam.GetVehicle().m_leadingVehicle != default && cam.GetPrefabName() != VehicleCam.GetVehicle(cam.GetFrontVehicleID()).Info.name)
+                if (cam.GetVehicle().m_leadingVehicle != default && cam.PrefabName != VehicleCam.GetVehicle(cam.GetFrontVehicleID()).Info.name)
                     offsetFromSetting += ModSettings.MidVehFixedOffset;
                 else
                     offsetFromSetting += ModSettings.VehicleFixedOffset;
@@ -554,7 +554,7 @@ namespace FPSCamera.Cam.Controller
             {
                 CameraTransform.position =
                 CameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
-                 CameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
+                CameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
                 ? Vector3.Lerp(CameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                 : instancePos;
                 CameraTransform.rotation =

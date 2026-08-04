@@ -30,8 +30,13 @@ namespace FPSCamera.Cam
                 FollowInstance = new() { Citizen = citizenId };
                 FollowID = citizenId;
             }
+            if (IsValid())
+            {
+                PrefabName = GetCitizenInstance().Info.name;
+                FollowName = CitizenManager.instance.GetCitizenName(FollowID) ?? CitizenManager.instance.GetInstanceName(CitizenInstanceID) ?? PrefabName;
 
-            isRace = GetCitizenInstance().m_racerIndex != default || GetCitizenInstance().m_performerIndex != default || (GetCitizenInstance().m_flags.IsFlagSet(CitizenInstance.Flags.Cheering | CitizenInstance.Flags.Spectating));
+                isRace = GetCitizenInstance().m_racerIndex != default || GetCitizenInstance().m_performerIndex != default || GetCitizenInstance().m_flags.IsFlagSet(CitizenInstance.Flags.Cheering | CitizenInstance.Flags.Spectating);
+            }
 
             Logging.KeyMessage("Citizen cam started");
             Logging.Message($"FollowID:{FollowID} isRace:{isRace}");
@@ -88,8 +93,8 @@ namespace FPSCamera.Cam
             }
             return new Positioning(pos, rotation);
         }
-        public string GetFollowName() => CitizenManager.instance.GetCitizenName(FollowID) ?? CitizenManager.instance.GetInstanceName(CitizenInstanceID) ?? GetPrefabName();
-        public string GetPrefabName() => GetCitizenInstance().Info.name;
+        public string FollowName { get; private set; }
+        public string PrefabName { get; private set; }
         public string GetStatus()
         {
             if (isRace) return null;
@@ -138,6 +143,8 @@ namespace FPSCamera.Cam
         {
             FollowID = CitizenInstanceID = default;
             FollowInstance = default;
+            FollowName = PrefabName = null;
+
             if (isinVehicle)
             {
                 AnotherCam.DisableCam();
