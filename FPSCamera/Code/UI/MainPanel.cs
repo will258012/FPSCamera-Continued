@@ -232,7 +232,7 @@ namespace FPSCamera.UI
                 closeButton.eventClick += (c, p) => OnEsc();
             }
         }
-        private void OnDestory()
+        private void OnDestroy()
         {
             Panel.eventVisibilityChanged -= OnChangedVisibility;
 

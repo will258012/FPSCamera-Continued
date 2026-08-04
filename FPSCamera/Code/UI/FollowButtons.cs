@@ -26,7 +26,7 @@ namespace FPSCamera.UI
             }
             catch (Exception e)
             {
-                Logging.LogException(e, "Failed to initalize camera buttons");
+                Logging.LogException(e, "Failed to Initialize camera buttons");
             }
         }
         private void Update()
@@ -124,7 +124,7 @@ namespace FPSCamera.UI
             if (panel.component.isVisible)
             {
                 var instanceID = WorldInfoPanel.GetCurrentInstanceID();
-                button.isVisible = instanceID != default && (filter?.Invoke(instanceID) ?? true);
+                button.isVisible = !instanceID.IsEmpty && (filter?.Invoke(instanceID) ?? true);
             }
         }
 
