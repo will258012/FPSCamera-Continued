@@ -1,5 +1,6 @@
 ﻿using AlgernonCommons;
 using AlgernonCommons.Translation;
+using ColossalFramework;
 using FPSCamera.Cam;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
@@ -31,6 +32,7 @@ namespace FPSCamera.UI
             Instance = this;
             elapsedTime = 0f; lastBufferStrUpdateTime = tempFooterElapsedTime = -1f;
             mid = footer = "";
+            slope = 0f;
             leftInfo = rightInfo = [];
 
             panelTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
@@ -54,8 +56,11 @@ namespace FPSCamera.UI
                     elapsedTime += Time.deltaTime;
                     if (elapsedTime - lastBufferStrUpdateTime > bufferUpdateInterval && UIEnabled)
                     {
-                        UpdateStatus();
-                        UpdateTargetInfo();
+                        if (ModSettings.ShowStatus)
+                        {
+                            UpdateStatus();
+                            UpdateTargetInfo();
+                        }
                         UpdateSpeed();
 
                         if (tempFooterElapsedTime > elapsedTime)
@@ -64,14 +69,30 @@ namespace FPSCamera.UI
                         }
                         else
                         {
-                            footer = Translations.Translate("INFO_TIME");
-                            if (Cam is WalkThruCam walkThruCam)
+                            footer = string.Empty;
+                            if (ModSettings.ShowElapsedTime || ModSettings.ShowInGameTime) footer = Translations.Translate("INFO_TIME");
+                            if (ModSettings.ShowElapsedTime)
                             {
-                                var time = walkThruCam.GetElapsedTime();
-                                footer += $"{(uint)time / 60:00}:{(uint)time % 60:00} / ";
-                            }
+                                if (Cam is WalkThruCam walkThruCam)
+                                {
+                                    var time = walkThruCam.GetElapsedTime();
+                                    footer += $"{(uint)time / 60:00}:{(uint)time % 60:00} / ";
+                                }
 
-                            footer += $"{(uint)elapsedTime / 60:00}:{(uint)elapsedTime % 60:00}";
+                                footer += $"{(uint)elapsedTime / 60:00}:{(uint)elapsedTime % 60:00}";
+                            }
+                            if (ModSettings.ShowInGameTime)
+                            {
+                                if (ModSettings.ShowElapsedTime)
+                                    footer += " / ";
+                                footer += SimulationManager.instance.m_currentGameTime.ToString("HH:mm:ss");
+                            }
+                            if (ModSettings.ShowSlope && !FPSCamController.Instance.Status.IsFlagSet(FPSCamController.CamStatus.PluginEnabled))
+                            {
+                                UpdateSlope();
+                                if (!string.IsNullOrEmpty(footer)) footer += "\n";
+                                footer += $"{Translations.Translate("INFO_SLOPE")}{slope:F1}°";
+                            }
                         }
 
                         lastBufferStrUpdateTime = elapsedTime;
@@ -114,13 +135,13 @@ namespace FPSCamera.UI
         {
             leftInfo = InfoUtils.GetGeoInfo(Cam);
 
-            if (Cam is IFollowCam followcam)
+            if (Cam is IFollowCam followCam)
             {
-                var name = followcam.GetFollowName();
+                var name = followCam.FollowName;
                 if (!string.IsNullOrEmpty(name))
                     leftInfo[Translations.Translate("INFO_NAME")] = name;
 
-                var status = followcam.GetStatus();
+                var status = followCam.GetStatus();
                 if (!string.IsNullOrEmpty(status))
                     leftInfo[Translations.Translate("INFO_STATUS")] = status;
 
@@ -140,13 +161,32 @@ namespace FPSCamera.UI
             }
         }
         private void UpdateSpeed()
-            => mid = string.Format("{0,5:F1} {1}",
+            => mid = string.Format("{0:F1} {1}",
                 ModSettings.SpeedUnit.IsMile() ? Cam.GetSpeed().ToMph() : Cam.GetSpeed().ToKmph(),
                 ModSettings.SpeedUnit.GetSpeedUnitString());
 
+        private void UpdateSlope()
+        {
+            if (Cam is IFollowCam followCam)
+                slope = -Mathf.DeltaAngle(0f, followCam.GetPositioning().rotation.eulerAngles.x);
+            else if (Cam is FreeCam freeCam)
+            {
+                var velocity = freeCam.Velocity;
+                var horizontalSpeed = new Vector2(velocity.x, velocity.z).magnitude;
+
+                slope = horizontalSpeed > 0.01f
+                    ? Mathf.Atan2(velocity.y, horizontalSpeed) * Mathf.Rad2Deg
+                    : slope;
+            }
+        }
+
         private void OnGUI()
         {
-            if (UIEnabled) DrawPanel();
+            if (UIEnabled)
+            {
+                if (ModSettings.ShowStatus) DrawPanel();
+                else DrawCompactPanel();
+            }
             else if (tempFooterElapsedTime > elapsedTime) DrawMinimalMessage();
         }
 
@@ -222,16 +262,57 @@ namespace FPSCamera.UI
             columnRect.width = rightFieldWidth;
             DrawInfoFields(rightInfo, style, columnRect, infoMargin);
 
-            var timerHeight = height / 6f;
-            rect.x -= blockWidth; rect.y = 0f;
-            rect.height = height - timerHeight; rect.width = blockWidth;
+            var footerLines = string.IsNullOrEmpty(footer) ? 0 : footer.Split('\n').Length;
+            var timerHeight = footerLines == 0 ? 0f : height / (footerLines > 1 ? 4f : 6f);
+            rect = new Rect((width - blockWidth) / 2f, 0f, blockWidth, height - timerHeight);
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = (int)(style.fontSize * 1.8f);
             GUI.Label(rect, mid, style);
 
-            rect.y += rect.height; rect.height = timerHeight;
-            style.fontSize = (int)Mathf.Max(8f, style.fontSize / 2.5f);
-            GUI.Label(rect, footer, style);
+            if (footerLines > 0)
+            {
+                rect.y += rect.height; rect.height = timerHeight;
+                style.fontSize = (int)Mathf.Max(8f, style.fontSize / 2.5f);
+                GUI.Label(rect, footer, style);
+            }
+        }
+
+        private void DrawCompactPanel()
+        {
+            var height = (Screen.height * heightRatio).Clamp(100f, 800f)
+                                                       * ModSettings.InfoPanelHeightScale;
+            var baseStyle = new GUIStyle
+            {
+                fontSize = (int)(height * fontHeightRatio),
+                normal = { textColor = new Color(1f, 1f, 1f, .8f) }
+            };
+            var speedStyle = new GUIStyle(baseStyle)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = (int)(baseStyle.fontSize * 1.8f)
+            };
+            var footerStyle = new GUIStyle(speedStyle)
+            {
+                fontSize = (int)Mathf.Max(8f, speedStyle.fontSize / 2.5f)
+            };
+
+            var speedSize = speedStyle.CalcSize(new GUIContent(mid));
+            var footerSize = footerStyle.CalcSize(new GUIContent(footer));
+            var padding = Mathf.Max(8f, height * .06f);
+            var panelWidth = Mathf.Max(speedSize.x, footerSize.x) + (padding * 2f);
+            panelWidth = Mathf.Min(panelWidth, Screen.width - (padding * 2f));
+
+            var speedHeight = speedSize.y + (padding * 2f);
+            var footerLines = string.IsNullOrEmpty(footer) ? 0 : footer.Split('\n').Length;
+            var timerHeight = footerLines == 0 ? 0f : height / (footerLines > 1 ? 4f : 6f);
+            var panelX = (Screen.width - panelWidth) / 2f;
+            var panelY = (height * .375f) - (speedHeight / 2f);
+
+            GUI.Box(new Rect(panelX, panelY, panelWidth, speedHeight + timerHeight), panelTexture);
+            GUI.Label(new Rect(panelX, panelY, panelWidth, speedHeight), mid, speedStyle);
+
+            if (timerHeight > 0f)
+                GUI.Label(new Rect(panelX, panelY + speedHeight, panelWidth, timerHeight), footer, footerStyle);
         }
 
         private void DrawInfoFields(Dictionary<string, string> info, GUIStyle style, Rect rect, float margin)
@@ -284,6 +365,7 @@ namespace FPSCamera.UI
         private const float fieldFontSizeRatio = .8f;
 
         private float elapsedTime, lastBufferStrUpdateTime;
+        private float slope;
 
         private string tempFooter;
         private float tempFooterElapsedTime;
@@ -291,6 +373,8 @@ namespace FPSCamera.UI
         private string mid, footer;
         private Dictionary<string, string> leftInfo, rightInfo;
         private Texture2D panelTexture, infoFieldTexture;
+
+
         private static IFPSCam Cam => FPSCamController.Instance.FPSCam;
     }
 }

@@ -66,7 +66,7 @@
     <PackageReference Include="CitiesHarmony.API" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Resources\icon.png">
+    <None Update="Resources\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Translations\*.csv">

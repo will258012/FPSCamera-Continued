@@ -43,10 +43,14 @@ namespace FPSCamera.Settings
 
             HideGameUI = true;
             SetBackCamera = true;
+            Fade = true;
             ShowInfoPanel = true;
             InfoPanelHeightScale = 1f;
             SpeedUnit = SpeedUnits.km_slash_h;
-            Fade = true;
+            ShowStatus = true;
+            ShowElapsedTime = true;
+            ShowInGameTime = false;
+            ShowSlope = false;
 
             LodOpt = 0;
             ShadowsOpt = false;
@@ -149,6 +153,11 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static bool SetBackCamera = true;
 
+        [XmlElement("Fade")]
+        public bool XMLFade { get => Fade; set => Fade = value; }
+        [XmlIgnore]
+        internal static bool Fade = true;
+
         [XmlElement("ShowInfoPanel")]
         public bool XMLShowInfoPanel { get => ShowInfoPanel; set => ShowInfoPanel = value; }
         [XmlIgnore]
@@ -164,10 +173,25 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static SpeedUnits SpeedUnit = SpeedUnits.km_slash_h;
 
-        [XmlElement("Fade")]
-        public bool XMLFade { get => Fade; set => Fade = value; }
+        [XmlElement(nameof(ShowStatus))]
+        public bool XMLShowStatus { get => ShowStatus; set => ShowStatus = value; }
         [XmlIgnore]
-        internal static bool Fade = true;
+        internal static bool ShowStatus = true;
+
+        [XmlElement(nameof(ShowElapsedTime))]
+        public bool XMLShowElapsedTime { get => ShowElapsedTime; set => ShowElapsedTime = value; }
+        [XmlIgnore]
+        internal static bool ShowElapsedTime = true;
+
+        [XmlElement(nameof(ShowInGameTime))]
+        public bool XMLShowInGameTime { get => ShowInGameTime; set => ShowInGameTime = value; }
+        [XmlIgnore]
+        internal static bool ShowInGameTime = false;
+
+        [XmlElement(nameof(ShowSlope))]
+        public bool XMLShowSlope { get => ShowSlope; set => ShowSlope = value; }
+        [XmlIgnore]
+        internal static bool ShowSlope = false;
 
         #region Optimization Options
         [XmlElement("LodOpt")]

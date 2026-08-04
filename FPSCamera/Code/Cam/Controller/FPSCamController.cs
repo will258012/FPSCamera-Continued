@@ -517,6 +517,8 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void UpdateFreeCamPos(FreeCam freeCam)
         {
+            var previousPosition = CameraTransform.position;
+
             // Automatically move the camera forward if AutoMove is enabled and the secondary mouse button is not pressed.
             if (freeCam.AutoMove && !InputManager.MouseButton.Secondary.MousePressed())
             {
@@ -545,10 +547,6 @@ namespace FPSCamera.Cam.Controller
             // Limit the camera's position to the allowed area.
             instancePos = CameraController.ClampCameraPosition(instancePos);
 
-            // When in free-camera mode, update the speed for info panel to display.
-            if (CamInfoPanel.Instance.UIEnabled)
-                freeCam.UpdateSpeed(CameraTransform.position, instancePos);
-
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
@@ -566,6 +564,11 @@ namespace FPSCamera.Cam.Controller
                 CameraTransform.rotation = instanceRotation;
 
             }
+
+            // When in free-camera mode, update the speed for info panel using the final applied position.
+            if (CamInfoPanel.Instance.UIEnabled)
+                freeCam.UpdateSpeed(previousPosition, CameraTransform.position);
+
             // Reset the position offset after applying.
             offset.pos = Vector3.zero;
         }
