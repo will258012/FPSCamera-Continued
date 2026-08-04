@@ -116,15 +116,22 @@ namespace FPSCamera.Utils
         internal static string TLM_GetLineCode(ushort lineId) => TLMFacade.GetLineStringId(lineId, false);
         internal static void ToggleIt_ToggleUI(bool visible)
         {
-            if (!visible)
+            try
             {
-                ToggleHelper.UpdateRoadNames(false);
-                ToggleHelper.UpdateBuildings(true);
-                ToggleHelper.UpdateContourLines(false);
-                ToggleHelper.UpdateZoning(false);
-                ToggleHelper.UpdateDistrictZones(false);
+                if (!visible)
+                {
+                    ToggleHelper.UpdateRoadNames(false);
+                    ToggleHelper.UpdateBuildings(true);
+                    ToggleHelper.UpdateContourLines(false);
+                    ToggleHelper.UpdateZoning(false);
+                    ToggleHelper.UpdateDistrictZones(false);
+                }
+                else ToggleIt.Managers.ToggleManager.Instance.ApplyAll();
             }
-            else ToggleIt.Managers.ToggleManager.Instance.ApplyAll();
+            catch (Exception e)
+            {
+                Logging.LogException(e, "Failed to toggle UI via Toggle It!");
+            }
         }
     }
 }

@@ -39,7 +39,7 @@ namespace FPSCamera.Game
             catch (System.Exception e)
             {
                 Logging.LogException(e, "Failed to toggle UI");
-                UIView.Show(visible);
+                UIView.Show(true);
             }
             yield break;
         }
