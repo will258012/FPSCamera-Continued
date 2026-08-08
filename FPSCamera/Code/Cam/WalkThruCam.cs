@@ -4,6 +4,7 @@ using ColossalFramework;
 using ColossalFramework.UI;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -23,8 +24,17 @@ namespace FPSCamera.Cam
         public Dictionary<string, string> GetInfo() => CurrentCam?.GetInfo();
         public string GetStatus() => CurrentCam?.GetStatus();
         public Positioning GetPositioning() => CurrentCam?.GetPositioning() ?? default;
-        public void ElapseTime(float seconds) => elapsedTime += seconds;
+        public void ElapseTime(float seconds)
+        {
+            elapsedTime += seconds;
+
+            var currentGameTime = SimulationManager.instance.m_currentGameTime;
+            if (lastGameTime != default && currentGameTime >= lastGameTime)
+                elapsedSimTime += currentGameTime - lastGameTime;
+            lastGameTime = currentGameTime;
+        }
         public float GetElapsedTime() => elapsedTime;
+        public TimeSpan GetElapsedSimTime() => elapsedSimTime;
         public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
         public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
         public bool IsValid()
@@ -101,6 +111,8 @@ namespace FPSCamera.Cam
             while (!(CurrentCam?.IsValid() ?? false) && --attempt >= 0);
 
             elapsedTime = 0f;
+            elapsedSimTime = TimeSpan.Zero;
+            lastGameTime = SimulationManager.instance.m_currentGameTime;
             SyncCamOffset();
         }
         public void DisableCam()
@@ -110,6 +122,8 @@ namespace FPSCamera.Cam
         }
         private const VehicleInfo.VehicleCategory CityServiceCopters = VehicleInfo.VehicleCategory.AmbulanceCopter | VehicleInfo.VehicleCategory.FireCopter | VehicleInfo.VehicleCategory.PoliceCopter | VehicleInfo.VehicleCategory.DisasterCopter;
         private float elapsedTime;
+        private TimeSpan elapsedSimTime;
+        private DateTime lastGameTime;
         private IEnumerable<InstanceID> items;
         private readonly AudioClip disabledClickSound = UIView.GetAView().defaultDisabledClickSound;
 

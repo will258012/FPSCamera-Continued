@@ -4,6 +4,8 @@ using AlgernonCommons.Notifications;
 using AlgernonCommons.Translation;
 using AlgernonCommons.XML;
 using ColossalFramework.IO;
+using FPSCamera.Patches;
+using AlgernonCommons.Patching;
 using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
@@ -49,7 +51,9 @@ namespace FPSCamera.Settings
             SpeedUnit = SpeedUnits.km_slash_h;
             ShowStatus = true;
             ShowElapsedTime = true;
-            ShowInGameTime = false;
+            ShowElapsedSimTime = false;
+            ShowInGameClock = false;
+            ShowRealLifeClock = false;
             ShowSlope = false;
             ShowPassengerExchangeInfo = true;
 
@@ -184,10 +188,20 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static bool ShowElapsedTime = true;
 
-        [XmlElement(nameof(ShowInGameTime))]
-        public bool XMLShowInGameTime { get => ShowInGameTime; set => ShowInGameTime = value; }
+        [XmlElement(nameof(ShowElapsedSimTime))]
+        public bool XMLShowElapsedSimTime { get => ShowElapsedSimTime; set => ShowElapsedSimTime = value; }
         [XmlIgnore]
-        internal static bool ShowInGameTime = false;
+        internal static bool ShowElapsedSimTime = false;
+
+        [XmlElement(nameof(ShowInGameClock))]
+        public bool XMLShowInGameClock { get => ShowInGameClock; set => ShowInGameClock = value; }
+        [XmlIgnore]
+        internal static bool ShowInGameClock = false;
+
+        [XmlElement(nameof(ShowRealLifeClock))]
+        public bool XMLShowRealLifeClock { get => ShowRealLifeClock; set => ShowRealLifeClock = value; }
+        [XmlIgnore]
+        internal static bool ShowRealLifeClock = false;
 
         [XmlElement(nameof(ShowSlope))]
         public bool XMLShowSlope { get => ShowSlope; set => ShowSlope = value; }

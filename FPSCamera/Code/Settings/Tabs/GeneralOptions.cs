@@ -28,7 +28,9 @@ namespace FPSCamera.Settings.Tabs
         private readonly UICheckBox showInfoPanel_CheckBox;
         private readonly UICheckBox showStatus_CheckBox;
         private readonly UICheckBox showElapsedTime_CheckBox;
-        private readonly UICheckBox showInGameTime_CheckBox;
+        private readonly UICheckBox showElapsedSimTime_CheckBox;
+        private readonly UICheckBox showInGameClock_CheckBox;
+        private readonly UICheckBox showRealLifeClock_CheckBox;
         private readonly UICheckBox showSpiritLevel_CheckBox;
         private readonly UICheckBox showPassengerExchangeInfo_CheckBox;
         private readonly UISlider heightScale_Slider;
@@ -126,10 +128,20 @@ namespace FPSCamera.Settings.Tabs
             showElapsedTime_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowElapsedTime = isChecked;
             currentY += showElapsedTime_CheckBox.height + LeftMargin;
 
-            showInGameTime_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWINGAMETIME"));
-            showInGameTime_CheckBox.isChecked = ModSettings.ShowInGameTime;
-            showInGameTime_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowInGameTime = isChecked;
-            currentY += showInGameTime_CheckBox.height + LeftMargin;
+            showElapsedSimTime_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWELAPSEDSIMTIME"));
+            showElapsedSimTime_CheckBox.isChecked = ModSettings.ShowElapsedSimTime;
+            showElapsedSimTime_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowElapsedSimTime = isChecked;
+            currentY += showElapsedSimTime_CheckBox.height + LeftMargin;
+
+            showInGameClock_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWINGAMECLOCK"));
+            showInGameClock_CheckBox.isChecked = ModSettings.ShowInGameClock;
+            showInGameClock_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowInGameClock = isChecked;
+            currentY += showInGameClock_CheckBox.height + LeftMargin;
+
+            showRealLifeClock_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWREALLIFECLOCK"));
+            showRealLifeClock_CheckBox.isChecked = ModSettings.ShowRealLifeClock;
+            showRealLifeClock_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowRealLifeClock = isChecked;
+            currentY += showRealLifeClock_CheckBox.height + LeftMargin;
 
             showSpiritLevel_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWSLOPE"));
             showSpiritLevel_CheckBox.isChecked = ModSettings.ShowSlope;

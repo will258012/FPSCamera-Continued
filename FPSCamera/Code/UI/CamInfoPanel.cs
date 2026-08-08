@@ -107,6 +107,7 @@ namespace FPSCamera.UI
                 if (Cam?.IsValid() ?? false)
                 {
                     elapsedTime += Time.deltaTime;
+                    UpdateElapsedSimTime();
                     if (elapsedTime - lastBufferStrUpdateTime > bufferUpdateInterval && UIEnabled)
                     {
                         if (ModSettings.ShowStatus)
@@ -116,37 +117,7 @@ namespace FPSCamera.UI
                         }
                         UpdateSpeed();
 
-                        if (tempFooterElapsedTime > elapsedTime)
-                        {
-                            footer = tempFooter;
-                        }
-                        else
-                        {
-                            footer = string.Empty;
-                            if (ModSettings.ShowElapsedTime || ModSettings.ShowInGameTime) footer = Translations.Translate("INFO_TIME");
-                            if (ModSettings.ShowElapsedTime)
-                            {
-                                if (Cam is WalkThruCam walkThruCam)
-                                {
-                                    var time = walkThruCam.GetElapsedTime();
-                                    footer += $"{(uint)time / 60:00}:{(uint)time % 60:00} / ";
-                                }
-
-                                footer += $"{(uint)elapsedTime / 60:00}:{(uint)elapsedTime % 60:00}";
-                            }
-                            if (ModSettings.ShowInGameTime)
-                            {
-                                if (ModSettings.ShowElapsedTime)
-                                    footer += " / ";
-                                footer += SimulationManager.instance.m_currentGameTime.ToString("HH:mm:ss");
-                            }
-                            if (ModSettings.ShowSlope && !FPSCamController.Instance.Status.IsFlagSet(FPSCamController.CamStatus.PluginEnabled))
-                            {
-                                UpdateSlope();
-                                if (!string.IsNullOrEmpty(footer)) footer += "\n";
-                                footer += $"{Translations.Translate("INFO_SLOPE")}{slope:F1}°";
-                            }
-                        }
+                        footer = tempFooterElapsedTime > elapsedTime ? tempFooter : FormatFooter();
 
                         lastBufferStrUpdateTime = elapsedTime;
                     }
@@ -247,11 +218,64 @@ namespace FPSCamera.UI
                 ModSettings.SpeedUnit.IsMile() ? Cam.GetSpeed().ToMph() : Cam.GetSpeed().ToKmph(),
                 ModSettings.SpeedUnit.GetSpeedUnitString());
 
+        private string FormatFooter()
+        {
+            var lines = new List<string>();
+            var hasTimeLine = false;
+
+            if (ModSettings.ShowElapsedTime)
+            {
+                var values = new List<string>();
+                if (Cam is WalkThruCam walkThruCam)
+                    values.Add(FormatElapsedTime(walkThruCam.GetElapsedTime()));
+                values.Add(FormatElapsedTime(elapsedTime));
+                lines.Add((hasTimeLine ? "   " : Translations.Translate("INFO_TIME")) + string.Join(" / ", values.ToArray()));
+                hasTimeLine = true;
+            }
+
+            if (ModSettings.ShowElapsedSimTime || ModSettings.ShowInGameClock || ModSettings.ShowRealLifeClock)
+            {
+                var values = new List<string>();
+                if (ModSettings.ShowElapsedSimTime)
+                {
+                    if (Cam is WalkThruCam walkThruCam)
+                        values.Add(FormatElapsedSimTime(walkThruCam.GetElapsedSimTime()));
+                    values.Add(FormatElapsedSimTime(elapsedSimTime));
+                }
+                if (ModSettings.ShowInGameClock)
+                    values.Add(SimulationManager.instance.m_currentGameTime.ToString("HH:mm:ss"));
+                if (ModSettings.ShowRealLifeClock)
+                    values.Add(DateTime.Now.ToString("HH:mm:ss"));
+                lines.Add((hasTimeLine ? "   " : Translations.Translate("INFO_TIME")) + string.Join(" / ", values.ToArray()));
+                hasTimeLine = true;
+            }
+
+            if (ModSettings.ShowSlope)
+            {
+                UpdateSlope();
+                lines.Add($"{Translations.Translate("INFO_SLOPE")} {slope:F1}°");
+            }
+
+            return string.Join("\n", [.. lines]);
+        }
+
+        private static string FormatElapsedTime(float seconds)
+            => $"{(uint)seconds / 60:00}:{(uint)seconds % 60:00}";
+
+        private void UpdateElapsedSimTime()
+        {
+            var currentGameTime = SimulationManager.instance.m_currentGameTime;
+            if (lastGameTime != default && currentGameTime >= lastGameTime)
+                elapsedSimTime += currentGameTime - lastGameTime;
+            lastGameTime = currentGameTime;
+        }
+
+        private static string FormatElapsedSimTime(TimeSpan elapsed)
+            => $"{(uint)elapsed.TotalHours:00}:{elapsed.Minutes:00}:{elapsed.Seconds:00}";
+
         private void UpdateSlope()
         {
-            if (Cam is IFollowCam followCam)
-                slope = -Mathf.DeltaAngle(0f, followCam.GetPositioning().rotation.eulerAngles.x);
-            else if (Cam is FreeCam freeCam)
+            if (Cam is FreeCam freeCam)
             {
                 var velocity = freeCam.Velocity;
                 var horizontalSpeed = new Vector2(velocity.x, velocity.z).magnitude;
@@ -260,6 +284,7 @@ namespace FPSCamera.UI
                     ? Mathf.Atan2(velocity.y, horizontalSpeed) * Mathf.Rad2Deg
                     : slope;
             }
+            else slope = -Mathf.DeltaAngle(0f, Cam.GetPositioning().rotation.eulerAngles.x);
         }
 
         private void OnGUI()
