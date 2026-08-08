@@ -1,4 +1,7 @@
 ﻿using ColossalFramework;
+using FPSCamera.Cam;
+using FPSCamera.Cam.Controller;
+using System;
 using UnityEngine;
 
 namespace FPSCamera.Utils
@@ -89,6 +92,131 @@ namespace FPSCamera.Utils
                 }
             }
             return default;
+        }
+        /// <summary>
+        /// Tracks public-transport passenger exchange at the current stop.
+        /// The game calls UnloadPassengers before LoadPassengers: unload Prefix/Postfix measures
+        /// alighting, then load Prefix/Postfix measures boarding from the post-unload passenger count.
+        /// </summary>
+        public static class PassengerExchangeTracker
+        {
+            public static bool TryGetExchange(out int alighted, out int boarded)
+            {
+                alighted = 0;
+                boarded = 0;
+
+                var vehicleID = GetHeadVehicleID();
+                if (vehicleID == default || !IsStopped(vehicleID))
+                    return false;
+
+                var snapshot = exchangeSnapshot;
+                if (!snapshot.IsValid || snapshot.VehicleID != vehicleID)
+                    return false;
+
+                alighted = snapshot.AlightedCount;
+                boarded = snapshot.BoardedCount;
+                return true;
+            }
+
+            internal static int BeginUnload(ushort vehicleID)
+            {
+                if (!IsFollowingVehicle(vehicleID))
+                    return -1;
+
+                exchangeSnapshot = new ExchangeSnapshot(vehicleID, false, 0, 0);
+
+                return GetPassengerCount(vehicleID);
+            }
+
+            internal static void EndUnload(ushort vehicleID, int previousPassengerCount)
+            {
+                if (previousPassengerCount < 0 || !IsFollowingVehicle(vehicleID))
+                    return;
+
+                // UnloadPassengers Postfix: arrival load - remaining load = passengers who alighted.
+                var alighted = Math.Max(0, previousPassengerCount - GetPassengerCount(vehicleID));
+                exchangeSnapshot = new(vehicleID, true, alighted, 0);
+            }
+
+            internal static int BeginBoarding(ushort vehicleID)
+            {
+                if (!IsFollowingVehicle(vehicleID))
+                    return -1;
+
+                // LoadPassengers Prefix runs after unloading; capture the remaining load for the whole consist.
+                return GetPassengerCount(vehicleID);
+            }
+
+            internal static void EndBoarding(ushort vehicleID, int previousPassengerCount)
+            {
+                if (previousPassengerCount < 0 || !IsFollowingVehicle(vehicleID))
+                    return;
+
+                var snapshot = exchangeSnapshot;
+                if (snapshot.VehicleID != vehicleID)
+                    return;
+
+                // LoadPassengers Postfix: final load - post-unload load = passengers who boarded.
+                // Alighted passengers must not be added again because the Prefix runs after unloading.
+                exchangeSnapshot = new(
+                    vehicleID,
+                    true,
+                    snapshot.AlightedCount,
+                    Math.Max(0, GetPassengerCount(vehicleID) - previousPassengerCount));
+            }
+
+            internal static void Reset()
+            {
+                exchangeSnapshot = ExchangeSnapshot.Empty;
+            }
+
+            private static bool IsStopped(ushort vehicleID)
+            {
+                var vehicles = VehicleManager.instance.m_vehicles.m_buffer;
+                return vehicleID < vehicles.Length &&
+                       vehicles[vehicleID].m_flags.IsFlagSet(Vehicle.Flags.Stopped | Vehicle.Flags.WaitingLoading);
+            }
+
+            private static bool IsFollowingVehicle(ushort vehicleID)
+            {
+                if (vehicleID == default || ModSupport.FollowVehicleID == default || vehicleID != GetHeadVehicleID())
+                    return false;
+
+                return VehicleCam.GetVehicle(vehicleID).m_leadingVehicle == default;
+            }
+            private static ushort GetHeadVehicleID() => VehicleCam.GetVehicle(ModSupport.FollowVehicleID).GetFirstVehicle(ModSupport.FollowVehicleID);
+
+            private static int GetPassengerCount(ushort vehicleID)
+            {
+                if (vehicleID == default)
+                    return default;
+
+                var vehicle = VehicleCam.GetVehicle(vehicleID);
+                // GetBufferStatus supplies the total load, including trailers where applicable.
+                var load = 0;
+                Cam.VehicleCam.GetVehicle(vehicleID).Info?.m_vehicleAI?.GetBufferStatus(vehicleID, ref vehicle, out _, out load, out _);
+                return load;
+            }
+
+            private sealed class ExchangeSnapshot
+            {
+                internal static readonly ExchangeSnapshot Empty = new(default, false, 0, 0);
+
+                internal ExchangeSnapshot(ushort vehicleID, bool isValid, int alightedCount, int boardedCount)
+                {
+                    VehicleID = vehicleID;
+                    IsValid = isValid;
+                    AlightedCount = alightedCount;
+                    BoardedCount = boardedCount;
+                }
+
+                internal ushort VehicleID { get; }
+                internal bool IsValid { get; }
+                internal int AlightedCount { get; }
+                internal int BoardedCount { get; }
+            }
+
+            private static volatile ExchangeSnapshot exchangeSnapshot = ExchangeSnapshot.Empty;
         }
     }
 

@@ -51,6 +51,7 @@ namespace FPSCamera.Settings
             ShowElapsedTime = true;
             ShowInGameTime = false;
             ShowSlope = false;
+            ShowPassengerExchangeInfo = true;
 
             LodOpt = 0;
             ShadowsOpt = false;
@@ -192,6 +193,23 @@ namespace FPSCamera.Settings
         public bool XMLShowSlope { get => ShowSlope; set => ShowSlope = value; }
         [XmlIgnore]
         internal static bool ShowSlope = false;
+
+        [XmlElement(nameof(ShowPassengerExchangeInfo))]
+        public bool XMLShowPassengerExchangeInfo { get => ShowPassengerExchangeInfo; set => ShowPassengerExchangeInfo = value; }
+        [XmlIgnore]
+        internal static bool ShowPassengerExchangeInfo
+        {
+            get => field;
+            set
+            {
+                if (field == value)
+                    return;
+
+                field = value;
+                if (PatcherManager<Patcher>.IsReady)
+                    PatcherManager<Patcher>.Instance?.UpdatePassengerExchangePatches(value);
+            }
+        } = true;
 
         #region Optimization Options
         [XmlElement("LodOpt")]

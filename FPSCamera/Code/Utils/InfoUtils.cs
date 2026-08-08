@@ -3,6 +3,7 @@ using AlgernonCommons.Translation;
 using ColossalFramework;
 using ColossalFramework.Math;
 using FPSCamera.Cam;
+using FPSCamera.Settings;
 using System.Collections.Generic;
 
 namespace FPSCamera.Utils
@@ -165,7 +166,11 @@ namespace FPSCamera.Utils
                     modifyInfo[Translations.Translate(transitTypeKey)] = name;
 
                 vehicle.Info.m_vehicleAI.GetBufferStatus(vehicleid, ref vehicle, out _, out var load, out var capacity);
-                modifyInfo[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_PASSENGER")] = $"{load,4} /{capacity,4}";
+                modifyInfo[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_PASSENGER")] =
+                    ModSettings.ShowPassengerExchangeInfo &&
+                    TransportUtils.PassengerExchangeTracker.TryGetExchange(out var alighted, out var boarded)
+                    ? $"(<color=#FF0000>-{alighted}</color>|<color=#00FF00>+{boarded}</color>) {load} / {capacity}"
+                    : $"{load} / {capacity}";
 
                 string GetTranslateKey() =>
                     typeName == Translations.Translate("VEHICLE_AITYPE_TRAM") ||

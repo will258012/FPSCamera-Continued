@@ -13,7 +13,18 @@ namespace FPSCamera.Utils
         public static bool FoundTLM { get; private set; }
         public static bool FoundTrainDisplay { get; private set; }
         public static bool FoundACME { get; private set; }
-        public static ushort FollowVehicleID { get; internal set; }
+        public static ushort FollowVehicleID
+        {
+            get => field;
+            internal set
+            {
+                if (field == value)
+                    return;
+
+                field = value;
+                TransportUtils.PassengerExchangeTracker.Reset();
+            }
+        }
         internal static bool FoundK45TLM = false;
         internal static List<string> CheckModConflicts()
         {

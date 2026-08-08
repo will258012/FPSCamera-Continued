@@ -30,6 +30,7 @@ namespace FPSCamera.Settings.Tabs
         private readonly UICheckBox showElapsedTime_CheckBox;
         private readonly UICheckBox showInGameTime_CheckBox;
         private readonly UICheckBox showSpiritLevel_CheckBox;
+        private readonly UICheckBox showPassengerExchangeInfo_CheckBox;
         private readonly UISlider heightScale_Slider;
         private readonly UIButton defaults_Button;
         private readonly UIDropDown LodOpt_DropDown;
@@ -134,6 +135,12 @@ namespace FPSCamera.Settings.Tabs
             showSpiritLevel_CheckBox.isChecked = ModSettings.ShowSlope;
             showSpiritLevel_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowSlope = isChecked;
             currentY += showSpiritLevel_CheckBox.height + LeftMargin;
+
+            showPassengerExchangeInfo_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWPASSEREXCHANGEINFO"));
+            showPassengerExchangeInfo_CheckBox.tooltip = Translations.Translate("SETTINGS_SHOWPASSEREXCHANGEINFO_DETAIL");
+            showPassengerExchangeInfo_CheckBox.isChecked = ModSettings.ShowPassengerExchangeInfo;
+            showPassengerExchangeInfo_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowPassengerExchangeInfo = isChecked;
+            currentY += showPassengerExchangeInfo_CheckBox.height + LeftMargin;
             #endregion
 
             #region Smooth Transition Options

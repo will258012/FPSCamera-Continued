@@ -335,7 +335,16 @@ namespace FPSCamera.UI
             var rowRect = rect; rowRect.height = rowHeight - margin;
             foreach (var str in strings)
             {
-                GUI.Label(rowRect, str, style);
+                if (str.Contains("<color"))
+                {
+                    GUIStyle newStyle = new(style)
+                    {
+                        richText = true
+                    };
+                    GUI.Label(rowRect, str, newStyle);
+                }
+                else
+                    GUI.Label(rowRect, str, style);
                 rowRect.y += rowHeight;
             }
         }
