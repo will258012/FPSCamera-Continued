@@ -39,7 +39,7 @@ namespace FPSCamera.Cam
             }
 
             Logging.KeyMessage("Citizen cam started");
-            Logging.Message($"FollowID:{FollowID} isRace:{isRace}");
+            Logging.Message($"Prefab:{PrefabName} FollowID:{FollowID} isRace:{isRace}");
         }
         public string Name => Translations.Translate("INFO_FOLLOW");
         public uint FollowID { get; private set; }

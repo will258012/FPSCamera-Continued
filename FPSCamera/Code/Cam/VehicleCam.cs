@@ -30,11 +30,11 @@ namespace FPSCamera.Cam
 
             hasReversed = GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed);
 
-            if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = (ushort)FollowID;
+            ModSupport.FollowVehicleID = (ushort)FollowID;
 
             isRace = GetVehicle().m_eventRoute != default && GetVehicle().Info?.m_vehicleAI is RaceCarAI or RaceBicycleAI or ParadeFloatAI;
             Logging.KeyMessage("Vehicle cam started");
-            Logging.Message($"FollowID:{FollowID} isRace:{isRace}");
+            Logging.Message($"Prefab:{PrefabName} FollowID:{FollowID} isRace:{isRace}");
         }
         private void SwitchTarget(ushort id)
         {
@@ -46,7 +46,7 @@ namespace FPSCamera.Cam
 
             SyncCamOffset();
 
-            if (ModSupport.FoundTrainDisplay) ModSupport.FollowVehicleID = id;
+            ModSupport.FollowVehicleID = id;
         }
         public string Name => Translations.Translate("INFO_FOLLOW");
         public uint FollowID { get; private set; }
@@ -54,9 +54,10 @@ namespace FPSCamera.Cam
         public Dictionary<string, string> GetInfo()
         {
             var info = new Dictionary<string, string>();
-            var headVehicle = GetVehicle(GetHeadVehicleID());
+            var headVehicleID = GetHeadVehicleID();
+            var headVehicle = GetVehicle(headVehicleID);
 
-            var ownerId = headVehicle.Info.m_vehicleAI.GetOwnerID(GetHeadVehicleID(), ref headVehicle);
+            var ownerId = headVehicle.Info.m_vehicleAI.GetOwnerID(headVehicleID, ref headVehicle);
             switch (ownerId.Type)
             {
                 case InstanceType.Building when !isRace:
@@ -70,7 +71,7 @@ namespace FPSCamera.Cam
                     break;
             }
 
-            InfoUtils.GetMoreInfo(ref info, headVehicle, GetHeadVehicleID(), isRace);
+            InfoUtils.GetMoreInfo(ref info, headVehicle, headVehicleID, isRace);
             return info;
         }
 
@@ -84,9 +85,10 @@ namespace FPSCamera.Cam
         public float GetSpeed() => GetVehicle().GetSmoothVelocity((ushort)FollowID).magnitude;
         public string GetStatus()
         {
-            var headVehicle = GetVehicle(GetHeadVehicleID());
+            var headVehicleID = GetHeadVehicleID();
+            var headVehicle = GetVehicle(headVehicleID);
             var status = headVehicle.Info.m_vehicleAI.GetLocalizedStatus(
-                                GetHeadVehicleID(), ref headVehicle, out var implID);
+                                headVehicleID, ref headVehicle, out var implID);
             switch (implID.Type)
             {
                 case InstanceType.Building:
@@ -129,8 +131,7 @@ namespace FPSCamera.Cam
             FollowID = default;
             FollowInstance = default;
             FollowName = PrefabName = null;
-            if (ModSupport.FoundTrainDisplay)
-                ModSupport.FollowVehicleID = default;
+            ModSupport.FollowVehicleID = default;
         }
         public ushort GetHeadVehicleID() => GetVehicle().GetFirstVehicle((ushort)FollowID);
         public ushort GetFrontVehicleID() => GetVehicle().m_flags.IsFlagSet(Vehicle.Flags.Reversed) ? GetVehicle().GetLastVehicle((ushort)FollowID) : GetHeadVehicleID();
