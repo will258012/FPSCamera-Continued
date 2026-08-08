@@ -229,7 +229,19 @@ namespace FPSCamera.Settings
         [XmlElement("LodOpt")]
         public int XMLLodOpt { get => LodOpt; set => LodOpt = value; }
         [XmlIgnore]
-        internal static int LodOpt = 0;
+        internal static int LodOpt
+        {
+            get => field;
+            set
+            {
+                if (field == value)
+                    return;
+
+                field = value;
+                if (PatcherManager<Patcher>.IsReady)
+                    PatcherManager<Patcher>.Instance?.UpdateLodPatches(value != 0);
+            }
+        }
 
         [XmlElement("ShadowsOpt")]
         public bool XMLShadowsOpt { get => ShadowsOpt; set => ShadowsOpt = value; }

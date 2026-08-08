@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace FPSCamera
 {
-    public sealed class Loading : PatcherLoadingBase<OptionsPanel, PatcherBase>
+    public sealed class Loading : PatcherLoadingBase<OptionsPanel, Patches.Patcher>
     {
         protected override List<AppMode> PermittedModes => [AppMode.Game, AppMode.MapEditor, AppMode.AssetEditor];
         protected override List<string> CheckModConflicts() => ModSupport.CheckModConflicts();

@@ -8,7 +8,7 @@ using ICities;
 
 namespace FPSCamera
 {
-    public sealed class Mod : PatcherMod<OptionsPanel, PatcherBase>, IUserMod
+    public sealed class Mod : PatcherMod<OptionsPanel, Patches.Patcher>, IUserMod
     {
         public override string BaseName => "First Person Camera - Continued";
         public override string HarmonyID => "Will258012.FPSCamera.Continued";
