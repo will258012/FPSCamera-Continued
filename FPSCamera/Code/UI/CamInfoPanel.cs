@@ -5,6 +5,7 @@ using FPSCamera.Cam;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,20 +14,27 @@ namespace FPSCamera.UI
     public class CamInfoPanel : MonoBehaviour
     {
         public static CamInfoPanel Instance { get; private set; }
-        public bool UIEnabled { get; set; }
-        private void OnEnable()
+        public bool UIEnabled
         {
-            elapsedTime = 0f;
-            lastBufferStrUpdateTime = tempFooterElapsedTime = -1f;
+            get => field;
+            set
+            {
+                var wasUIEnabled = field;
+                field = value;
+                if (value)
+                {
+                    fadeDrawMode = GetPanelDrawMode();
+                    fadeHelper.FadeIn();
+                }
+                else if (!HasMinimalMessage || !FPSCamController.Instance.Status.IsFlagSet(FPSCamController.CamStatus.Enabled))
+                {
+                    if (wasUIEnabled)
+                        fadeDrawMode = GetPanelDrawMode();
+                    fadeHelper.FadeOut();
+                }
+                else fadeDrawMode = DrawMode.MinimalMessage;
+            }
         }
-
-        private void OnDisable()
-        {
-            leftInfo.Clear();
-            rightInfo.Clear();
-        }
-        private void SetEnable() { enabled = true; if (ModSettings.ShowInfoPanel) UIEnabled = true; }
-        private void SetDisable() { enabled = false; UIEnabled = false; }
         private void Awake()
         {
             Instance = this;
@@ -44,9 +52,54 @@ namespace FPSCamera.UI
             FPSCamController.OnCameraEnabled += SetEnable;
             FPSCamController.OnCameraDisabled += SetDisable;
             FPSCamController.EventModeSwitched += OnModeSwitched;
+            fadeHelper.OnFadeCompleted += OnFadeCompleted;
             enabled = UIEnabled = false;
         }
+        private void OnEnable()
+        {
+            elapsedTime = 0f;
+            elapsedSimTime = TimeSpan.Zero;
+            lastGameTime = SimulationManager.instance.m_currentGameTime;
+            tempFooter = null;
+            lastBufferStrUpdateTime = tempFooterElapsedTime = -1f;
+        }
 
+        private void OnDisable()
+        {
+            leftInfo.Clear();
+            rightInfo.Clear();
+            fadeHelper.Reset();
+        }
+        private void SetEnable()
+        {
+            enabled = true;
+            UIEnabled = ModSettings.ShowInfoPanel;
+        }
+
+        private void SetDisable()
+        {
+            UIEnabled = false;
+        }
+
+        private void OnDestroy()
+        {
+            FPSCamController.OnCameraEnabled -= SetEnable;
+            FPSCamController.OnCameraDisabled -= SetDisable;
+            FPSCamController.EventModeSwitched -= OnModeSwitched;
+            fadeHelper.OnFadeCompleted -= OnFadeCompleted;
+        }
+        private void OnModeSwitched(string modeName)
+        {
+            SetFooterMessage(modeName, 2f);
+            leftInfo.Clear();
+            rightInfo.Clear();
+        }
+        private void OnFadeCompleted(FadeHelper.FadeType fadeType)
+        {
+            if (fadeType == FadeHelper.FadeType.Out && !FPSCamController.Instance.Status.IsFlagSet(FPSCamController.CamStatus.Enabled))
+                enabled = false;
+            if (HasMinimalMessage && elapsedTime >= tempFooterElapsedTime) ClearFooterMessage();
+        }
         private void Update()
         {
             try
@@ -98,7 +151,11 @@ namespace FPSCamera.UI
                         lastBufferStrUpdateTime = elapsedTime;
                     }
                 }
-                else
+                else if (!UIEnabled && !string.IsNullOrEmpty(tempFooter))
+                {
+                    elapsedTime += Time.deltaTime;
+                }
+                else if (fadeHelper.Status == FadeHelper.FadeType.None)
                     enabled = false;
             }
             catch (System.Exception e)
@@ -108,18 +165,28 @@ namespace FPSCamera.UI
             }
         }
 
-        private void OnDestroy()
+        private void LateUpdate()
         {
-            FPSCamController.OnCameraEnabled -= SetEnable;
-            FPSCamController.OnCameraDisabled -= SetDisable;
-            FPSCamController.EventModeSwitched -= OnModeSwitched;
+            try
+            {
+                if (HasMinimalMessage && elapsedTime >= tempFooterElapsedTime)
+                {
+                    if (!UIEnabled)
+                    {
+                        if (!fadeHelper.IsFading)
+                            fadeHelper.FadeOut();
+                    }
+                    else ClearFooterMessage();
+                }
+            }
+            catch (System.Exception e)
+            {
+                enabled = false;
+                Logging.LogException(e, "CamInfoPanel is disabled due to some issues");
+            }
         }
-        private void OnModeSwitched(string modeName)
-        {
-            SetFooterMessage(modeName, 2f);
-            leftInfo.Clear();
-            rightInfo.Clear();
-        }
+
+
         /// <summary>
         /// Display a temporary message at the info panel's footer.
         /// </summary>
@@ -129,7 +196,22 @@ namespace FPSCamera.UI
         {
             tempFooter = message;
             tempFooterElapsedTime = elapsedTime + duration;
+
+            if (!UIEnabled)
+            {
+                fadeDrawMode = DrawMode.MinimalMessage;
+                fadeHelper.FadeIn();
+            }
         }
+        /// <summary>
+        /// Remove the footer temporary message immediately.
+        /// </summary>
+        public void ClearFooterMessage()
+        {
+            tempFooter = null;
+            tempFooterElapsedTime = -1f;
+        }
+        private bool HasMinimalMessage => !string.IsNullOrEmpty(tempFooter);
 
         private void UpdateStatus()
         {
@@ -182,23 +264,40 @@ namespace FPSCamera.UI
 
         private void OnGUI()
         {
-            if (UIEnabled)
+            if (Event.current.type != EventType.Repaint || fadeHelper.Opacity <= 0f)
+                return;
+
+            var originalColor = GUI.color;
+            GUI.color = new Color(originalColor.r, originalColor.g, originalColor.b, originalColor.a * fadeHelper.Opacity);
+            try
             {
-                if (ModSettings.ShowStatus) DrawPanel();
-                else DrawCompactPanel();
+                switch (UIEnabled && !fadeHelper.IsFading ? GetPanelDrawMode() : fadeDrawMode)
+                {
+                    case DrawMode.MinimalMessage:
+                        DrawMinimalMessage();
+                        break;
+                    case DrawMode.Panel:
+                        DrawPanel();
+                        break;
+                    case DrawMode.CompactPanel:
+                        DrawCompactPanel();
+                        break;
+                }
             }
-            else if (tempFooterElapsedTime > elapsedTime) DrawMinimalMessage();
+            finally
+            {
+                GUI.color = originalColor;
+            }
         }
+        private static DrawMode GetPanelDrawMode() => ModSettings.ShowStatus ? DrawMode.Panel : DrawMode.CompactPanel;
 
         private void DrawMinimalMessage()
         {
-            if (string.IsNullOrEmpty(tempFooter)) return;
-
             var style = new GUIStyle
             {
                 fontSize = (int)(16f * ModSettings.InfoPanelHeightScale),
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(1f, 1f, 1f, 0.8f) }
+                normal = { textColor = new Color(1f, 1f, 1f, .8f) }
             };
 
             var textSize = style.CalcSize(new GUIContent(tempFooter));
@@ -233,8 +332,10 @@ namespace FPSCamera.UI
             var infoWidth = blockWidth * 2f - margin;
             var fieldWidth = (infoWidth * fieldWidthRatio).Clamp(style.fontSize * 5f, style.fontSize * 8f);
 
-            var measureStyle = new GUIStyle(style);
-            measureStyle.fontSize = (int)(style.fontSize * fieldFontSizeRatio);
+            var measureStyle = new GUIStyle(style)
+            {
+                fontSize = (int)(style.fontSize * fieldFontSizeRatio)
+            };
 
             var leftFieldWidth = Mathf.Max(fieldWidth, GetMaxFieldWidth(leftInfo.Keys, measureStyle) + measureStyle.fontSize);
             var rightFieldWidth = Mathf.Max(fieldWidth, GetMaxFieldWidth(rightInfo.Keys, measureStyle) + measureStyle.fontSize);
@@ -263,7 +364,7 @@ namespace FPSCamera.UI
             DrawInfoFields(rightInfo, style, columnRect, infoMargin);
 
             var footerLines = string.IsNullOrEmpty(footer) ? 0 : footer.Split('\n').Length;
-            var timerHeight = footerLines == 0 ? 0f : height / (footerLines > 1 ? 4f : 6f);
+            var timerHeight = GetFooterHeight(height, footerLines);
             rect = new Rect((width - blockWidth) / 2f, 0f, blockWidth, height - timerHeight);
             style.alignment = TextAnchor.MiddleCenter;
             style.fontSize = (int)(style.fontSize * 1.8f);
@@ -304,7 +405,7 @@ namespace FPSCamera.UI
 
             var speedHeight = speedSize.y + (padding * 2f);
             var footerLines = string.IsNullOrEmpty(footer) ? 0 : footer.Split('\n').Length;
-            var timerHeight = footerLines == 0 ? 0f : height / (footerLines > 1 ? 4f : 6f);
+            var timerHeight = GetFooterHeight(height, footerLines);
             var panelX = (Screen.width - panelWidth) / 2f;
             var panelY = (height * .375f) - (speedHeight / 2f);
 
@@ -314,6 +415,9 @@ namespace FPSCamera.UI
             if (timerHeight > 0f)
                 GUI.Label(new Rect(panelX, panelY + speedHeight, panelWidth, timerHeight), footer, footerStyle);
         }
+
+        private static float GetFooterHeight(float panelHeight, int lineCount)
+            => lineCount == 0 ? 0f : panelHeight * (Mathf.Min(lineCount, 3) + 1f) / 12f;
 
         private void DrawInfoFields(Dictionary<string, string> info, GUIStyle style, Rect rect, float margin)
         {
@@ -374,7 +478,12 @@ namespace FPSCamera.UI
         private const float fieldFontSizeRatio = .8f;
 
         private float elapsedTime, lastBufferStrUpdateTime;
+        private TimeSpan elapsedSimTime;
+        private DateTime lastGameTime;
         private float slope;
+
+        private readonly FadeHelper fadeHelper = new InfoPanelFadeHelper();
+        private DrawMode fadeDrawMode;
 
         private string tempFooter;
         private float tempFooterElapsedTime;
@@ -383,7 +492,22 @@ namespace FPSCamera.UI
         private Dictionary<string, string> leftInfo, rightInfo;
         private Texture2D panelTexture, infoFieldTexture;
 
+        private sealed class InfoPanelFadeHelper : FadeHelper
+        {
+            public override string FadeID => Mod.Instance.HarmonyID + ".CamInfoPanel.Fade";
+            public override float Opacity { get; set; }
+        }
+
+        private enum DrawMode
+        {
+            None,
+            MinimalMessage,
+            Panel,
+            CompactPanel,
+        }
+
 
         private static IFPSCam Cam => FPSCamController.Instance.FPSCam;
+
     }
 }

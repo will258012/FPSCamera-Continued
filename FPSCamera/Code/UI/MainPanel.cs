@@ -5,7 +5,6 @@ using ColossalFramework.UI;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
-using System;
 using UnifiedUI.GUI;
 using UnityEngine;
 
@@ -55,11 +54,14 @@ namespace FPSCamera.UI
             Panel.atlas = UITextures.InGameAtlas;
             Panel.backgroundSprite = "UnlockingPanel2";
             Panel.width = 400f;
+            Panel.opacity = 0f;
 
             AddSettings();
 
             Panel.isVisible = false;
             Panel.eventVisibilityChanged += OnChangedVisibility;
+            fadeHelper.OnFadeCompleted += OnFadeCompleted;
+
 
             if (ModSupport.FoundUUI)
             {
@@ -235,17 +237,10 @@ namespace FPSCamera.UI
         private void OnDestroy()
         {
             Panel.eventVisibilityChanged -= OnChangedVisibility;
+            fadeHelper.OnFadeCompleted -= OnFadeCompleted;
 
             Destroy(Panel);
             Destroy(GetMainButton());
-        }
-        private void Close()
-        {
-            OnEsc();
-            foreach (var component in Panel.components)
-            {
-                Destroy(component.gameObject);
-            }
         }
         public bool OnEsc()
         {
@@ -262,11 +257,15 @@ namespace FPSCamera.UI
         }
         public void LocaleChanged()
         {
-            wasVisible = Panel.isVisible;
-            Close();
+            var wasVisible = Panel.isVisible;
+            fadeHelper.Reset();
+            foreach (var component in Panel.components)
+            {
+                Destroy(component.gameObject);
+            }
             AddSettings();
-            if (wasVisible)
-                Panel.Show();
+            Panel.opacity = wasVisible ? 1f : 0f;
+            Panel.isVisible = wasVisible;
         }
         public static void OpenSettingsPanel(string modName)
         {
@@ -291,51 +290,42 @@ namespace FPSCamera.UI
         private static void OpenSettingsPanel() => OpenSettingsPanel(Mod.Instance.Name);
         private void OnChangedVisibility(UIComponent component, bool value)
         {
-            if (isAnimating) return;
+            if (fadeHelper.Status != FadeHelper.FadeType.None) return;
             if (!value)
             {
                 SavedPanelPosition = Panel.absolutePosition;
                 ModSettings.Save();
+            }
 
-                if (ModSettings.Fade)
-                {
-                    isAnimating = true;
-                    RunFadeInOrOutAnimation(value, () =>
-                    {
-                        Panel.isVisible = false;
-                        isAnimating = false;
-                    });
-                }
-                else
-                {
-                    Panel.opacity = 0f;
-                }
+            Panel.isVisible = true;
+
+            if (value)
+            {
+                fadeHelper.FadeIn();
             }
             else
-            {
-                Panel.opacity = 1f;
-                if (ModSettings.Fade)
-                {
-                    isAnimating = true;
-                    RunFadeInOrOutAnimation(value, () => isAnimating = false);
-                }
-            }
-        }
-        //Edited from BrokenNodeDetector.UI.RunFadeInOrOutAnimation() by krzychu1245. Many Thanks!
-        private void RunFadeInOrOutAnimation(bool status, Action action = null)
-        {
-            if (!Panel.isVisible)
-            {
-                Panel.isVisible = true;
-            }
+                fadeHelper.FadeOut();
 
-            ValueAnimator.Animate("fade_in_out",
-                f => Panel.opacity = f,
-                new AnimatedFloat(status ? 0f : 1f, status ? 1f : 0.0f, 0.2f, EasingType.SineEaseOut),
-                () => action?.Invoke());
         }
+        private void OnFadeCompleted(FadeHelper.FadeType fadeType)
+        {
+            if (fadeType == FadeHelper.FadeType.Out)
+                Panel.isVisible = false;
+        }
+
         private UIButton _mainBtn = null;
-        private bool isAnimating = false;
-        private bool wasVisible = false;
+
+        private FadeHelper fadeHelper = new MainPanelFadeHelper();
+
+        private sealed class MainPanelFadeHelper() : FadeHelper
+        {
+
+            public override string FadeID => Mod.Instance.HarmonyID + ".MainPanel.Fade";
+            public override float Opacity
+            {
+                get => Instance.Panel.opacity;
+                set => Instance.Panel.opacity = value;
+            }
+        }
     }
 }
