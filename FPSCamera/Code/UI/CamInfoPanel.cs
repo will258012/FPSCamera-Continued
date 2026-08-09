@@ -90,6 +90,10 @@ namespace FPSCamera.UI
         }
         private void OnModeSwitched(string modeName)
         {
+            elapsedTime = 0f;
+            elapsedSimTime = TimeSpan.Zero;
+            lastGameTime = SimulationManager.instance.m_currentGameTime;
+            lastBufferStrUpdateTime = -1f;
             SetFooterMessage(modeName, 2f);
             leftInfo.Clear();
             rightInfo.Clear();
@@ -466,11 +470,10 @@ namespace FPSCamera.UI
             {
                 if (str.Contains("<color"))
                 {
-                    GUIStyle newStyle = new(style)
-                    {
-                        richText = true
-                    };
-                    GUI.Label(rowRect, str, newStyle);
+                    var originalRichText = style.richText;
+                    style.richText = true;
+                    GUI.Label(rowRect, str, style);
+                    style.richText = originalRichText;
                 }
                 else
                     GUI.Label(rowRect, str, style);
