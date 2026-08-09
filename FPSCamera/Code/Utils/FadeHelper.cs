@@ -1,5 +1,4 @@
-﻿using AlgernonCommons;
-using ColossalFramework;
+﻿using ColossalFramework;
 using FPSCamera.Settings;
 using UnityEngine;
 
@@ -54,6 +53,7 @@ public abstract class FadeHelper
     public event FadeCompletedEventHandler OnFadeCompleted;
 
     private int fadeAnimationVersion;
+    private int? completingAnimationVersion;
 
     /// <summary>
     /// Show the panel: fade in.
@@ -75,8 +75,12 @@ public abstract class FadeHelper
     {
         Opacity = 0f;
         Status = FadeType.None;
-        ValueAnimator.Cancel(FadeID);
-        fadeAnimationVersion = default;
+        // ValueAnimator removes a completed entry after invoking its callback; do not remove it twice.
+        if (completingAnimationVersion != fadeAnimationVersion)
+        {
+            fadeAnimationVersion++;
+            ValueAnimator.Cancel(FadeID);
+        }
     }
 
     /// <summary>
@@ -104,14 +108,9 @@ public abstract class FadeHelper
             return;
         }
 
-        if (IsFading)
-        {
-            Logging.Message($"Detected multiple fade requests for {FadeID}: requested {fadeType} fade to opacity {targetOpacity}, but another animation is already running");
-            ValueAnimator.Cancel(FadeID);
-        }
-
         var animationVersion = ++fadeAnimationVersion;
 
+        // Named animations are replaced in place, so cancelling first would mutate the active update list.
         ValueAnimator.Animate(FadeID,
             value =>
             {
@@ -123,7 +122,16 @@ public abstract class FadeHelper
             {
                 if (animationVersion == fadeAnimationVersion)
                 {
-                    Complete(targetOpacity);
+                    var previousCompletingVersion = completingAnimationVersion;
+                    completingAnimationVersion = animationVersion;
+                    try
+                    {
+                        Complete(targetOpacity);
+                    }
+                    finally
+                    {
+                        completingAnimationVersion = previousCompletingVersion;
+                    }
                 }
             });
     }
@@ -132,8 +140,16 @@ public abstract class FadeHelper
     {
         Opacity = targetOpacity;
         var status = Status;
-        OnFadeCompleted?.Invoke(status);
-        Status = FadeType.None;
+        var animationVersion = fadeAnimationVersion;
+        try
+        {
+            OnFadeCompleted?.Invoke(status);
+        }
+        finally
+        {
+            if (animationVersion == fadeAnimationVersion)
+                Status = FadeType.None;
+        }
     }
 
 }
