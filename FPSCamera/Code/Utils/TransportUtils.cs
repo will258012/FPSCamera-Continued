@@ -1,7 +1,10 @@
 ﻿using ColossalFramework;
 using FPSCamera.Cam;
-using FPSCamera.Cam.Controller;
 using System;
+#if DEBUG
+using AlgernonCommons;
+using System.Text;
+#endif
 using UnityEngine;
 
 namespace FPSCamera.Utils
@@ -125,7 +128,11 @@ namespace FPSCamera.Utils
 
                 exchangeSnapshot = new ExchangeSnapshot(vehicleID, false, 0, 0);
 
-                return GetPassengerCount(vehicleID);
+                var passengerCount = GetPassengerCount(vehicleID);
+#if DEBUG
+                LogPassengerState("Unload Prefix", vehicleID, passengerCount);
+#endif
+                return passengerCount;
             }
 
             internal static void EndUnload(ushort vehicleID, int previousPassengerCount)
@@ -134,7 +141,11 @@ namespace FPSCamera.Utils
                     return;
 
                 // UnloadPassengers Postfix: arrival load - remaining load = passengers who alighted.
-                var alighted = Math.Max(0, previousPassengerCount - GetPassengerCount(vehicleID));
+                var passengerCount = GetPassengerCount(vehicleID);
+                var alighted = Math.Max(0, previousPassengerCount - passengerCount);
+#if DEBUG
+                LogPassengerState("Unload Postfix", vehicleID, passengerCount, previousPassengerCount, alighted);
+#endif
                 exchangeSnapshot = new(vehicleID, true, alighted, 0);
             }
 
@@ -144,7 +155,11 @@ namespace FPSCamera.Utils
                     return -1;
 
                 // LoadPassengers Prefix runs after unloading; capture the remaining load for the whole consist.
-                return GetPassengerCount(vehicleID);
+                var passengerCount = GetPassengerCount(vehicleID);
+#if DEBUG
+                LogPassengerState("Load Prefix", vehicleID, passengerCount);
+#endif
+                return passengerCount;
             }
 
             internal static void EndBoarding(ushort vehicleID, int previousPassengerCount)
@@ -158,11 +173,16 @@ namespace FPSCamera.Utils
 
                 // LoadPassengers Postfix: final load - post-unload load = passengers who boarded.
                 // Alighted passengers must not be added again because the Prefix runs after unloading.
+                var passengerCount = GetPassengerCount(vehicleID);
+                var boarded = Math.Max(0, passengerCount - previousPassengerCount);
+#if DEBUG
+                LogPassengerState("Load Postfix", vehicleID, passengerCount, previousPassengerCount, boarded);
+#endif
                 exchangeSnapshot = new(
                     vehicleID,
                     true,
                     snapshot.AlightedCount,
-                    Math.Max(0, GetPassengerCount(vehicleID) - previousPassengerCount));
+                    boarded);
             }
 
             internal static void Reset()
@@ -197,6 +217,70 @@ namespace FPSCamera.Utils
                 Cam.VehicleCam.GetVehicle(vehicleID).Info?.m_vehicleAI?.GetBufferStatus(vehicleID, ref vehicle, out _, out load, out _);
                 return load;
             }
+
+#if DEBUG
+            private static void LogPassengerState(string phase, ushort vehicleID, int reportedLoad, int previousLoad = -1, int exchangeCount = -1)
+            {
+                var vehicles = VehicleManager.instance.m_vehicles.m_buffer;
+                if (vehicleID == default || vehicleID >= vehicles.Length)
+                {
+                    Logging.Message($"Passenger exchange {phase}: invalid vehicle {vehicleID}");
+                    return;
+                }
+
+                var chain = new StringBuilder();
+                var reportingVehicle = vehicles[vehicleID];
+                var lineID = reportingVehicle.m_transportLine;
+                var stopID = reportingVehicle.m_targetBuilding;
+                var stationName = lineID != default && stopID != default
+                    ? TransportUtils.GetStationName(stopID, lineID)
+                    : "<unavailable>";
+                var verifiedLoad = 0;
+                var reportedCapacity = 0;
+                reportingVehicle.Info?.m_vehicleAI?.GetBufferStatus(
+                    vehicleID,
+                    ref reportingVehicle,
+                    out _,
+                    out verifiedLoad,
+                    out reportedCapacity);
+                var currentVehicleID = vehicleID;
+                var rawTransferSize = 0;
+                var rawCapacity = 0;
+                var vehicleCount = 0;
+                while (currentVehicleID != default && currentVehicleID < vehicles.Length && vehicleCount < 16384)
+                {
+                    var currentVehicle = vehicles[currentVehicleID];
+                    var info = currentVehicle.Info;
+                    var capacity = info?.m_vehicleAI?.GetPassengerCapacity(false) ?? 0;
+
+                    if (chain.Length > 0)
+                        chain.Append(" -> ");
+                    chain.Append(currentVehicleID)
+                         .Append('[')
+                         .Append(info?.m_vehicleAI?.GetType().Name ?? "NoAI")
+                         .Append(" transfer=")
+                         .Append(currentVehicle.m_transferSize)
+                         .Append(" capacity=")
+                         .Append(capacity)
+                         .Append(']');
+
+                    rawTransferSize += currentVehicle.m_transferSize;
+                    rawCapacity += capacity;
+                    currentVehicleID = currentVehicle.m_trailingVehicle;
+                    vehicleCount++;
+                }
+
+                if (currentVehicleID != default)
+                    chain.Append(currentVehicleID >= vehicles.Length ? " -> invalid ID" : " -> traversal limit reached");
+
+                Logging.Message(
+                    $"Passenger exchange {phase}: vehicle={vehicleID}, followed={ModSupport.FollowVehicleID}, " +
+                    $"line={lineID}, stop={stopID}, station=\"{stationName}\", " +
+                    $"reportedLoad={reportedLoad}, verifiedLoad={verifiedLoad}, reportedCapacity={reportedCapacity}, " +
+                    $"previousLoad={previousLoad}, exchange={exchangeCount}, " +
+                    $"rawTransferSum={rawTransferSize}, rawCapacitySum={rawCapacity}, chain={chain}");
+            }
+#endif
 
             private sealed class ExchangeSnapshot
             {
