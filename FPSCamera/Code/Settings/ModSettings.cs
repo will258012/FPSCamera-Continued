@@ -1,11 +1,11 @@
 ﻿using AlgernonCommons;
 using AlgernonCommons.Keybinding;
 using AlgernonCommons.Notifications;
+using AlgernonCommons.Patching;
 using AlgernonCommons.Translation;
 using AlgernonCommons.XML;
 using ColossalFramework.IO;
 using FPSCamera.Patches;
-using AlgernonCommons.Patching;
 using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
@@ -70,6 +70,7 @@ namespace FPSCamera.Settings
             CamFieldOfView = 45f;
             CamNearClipPlane = 1f;
             FoViewScrollfactor = 1.2f;
+            ACMEBehavior = ACMEBehaviors.FreeCam;
 
             ShowCursorFree = false;
             MovementSpeed = 30f;
@@ -146,6 +147,12 @@ namespace FPSCamera.Settings
             AboveRoad,
             [XmlEnum("4")]
             SnapToRoad
+        };
+
+        public enum ACMEBehaviors
+        {
+            FreeCam,
+            DisableCam
         };
         #region General Options
         [XmlElement("HideGameUI")]
@@ -301,6 +308,11 @@ namespace FPSCamera.Settings
         public float XMLFoViewScrollfactor { get => FoViewScrollfactor; set => FoViewScrollfactor = value; }
         [XmlIgnore]
         internal static float FoViewScrollfactor = 1.2f;
+
+        [XmlElement("ACMEBehavior")]
+        public ACMEBehaviors XMLACMEBehavior { get => ACMEBehavior; set => ACMEBehavior = value; }
+        [XmlIgnore]
+        internal static ACMEBehaviors ACMEBehavior = ACMEBehaviors.FreeCam;
 
         #endregion
         #region Free-Camera Mode Options

@@ -190,6 +190,18 @@ namespace FPSCamera.Cam.Controller
             FPSCam = new FreeCam();
             offset = new Positioning(Vector3.zero, GameCamController.Instance.MainCamera.transform.rotation);
         }
+        /// <summary>
+        /// Starts Free-camera mode.
+        /// </summary>
+        public void StartFreeCam(Positioning positioning, float fov = -1f)
+        {
+            Logging.KeyMessage("Starting Free-Camera mode");
+            FPSCam = new FreeCam();
+            GameCamController.Instance.MainCamera.transform.position = positioning.pos;
+            offset = new Positioning(Vector3.zero, positioning.rotation);
+            if (fov == -1f) fov = ModSettings.CamFieldOfView;
+            targetFoV = fov;
+        }
 
         /// <summary>
         /// Starts Walk-through mode.
@@ -349,10 +361,7 @@ namespace FPSCamera.Cam.Controller
                 ModSettings.KeyCamReset.KeyTriggered())
             {
                 (FPSCam as IFollowCam)?.SyncCamOffset();
-                if (ModSettings.SmoothTransition)
-                    targetFoV = ModSettings.CamFieldOfView;
-                else
-                    GameCamController.Instance.MainCamera.fieldOfView = ModSettings.CamFieldOfView;
+                targetFoV = ModSettings.CamFieldOfView;
             }
 
             if (InputManager.MouseButton.Secondary.MouseTriggered() && ModSettings.ManualSwitchWalk)
@@ -413,32 +422,26 @@ namespace FPSCamera.Cam.Controller
 
             // scroll zooming
             var scroll = InputManager.MouseScroll;
+            var currentFoV = GameCamController.Instance.MainCamera.fieldOfView;
+            if (scroll > 0f && currentFoV > MinFoV)
+            {
+                targetFoV = currentFoV / ModSettings.FoViewScrollfactor;
+            }
+            else if (scroll < 0f && currentFoV < MaxFoV)
+            {
+                targetFoV = currentFoV * ModSettings.FoViewScrollfactor;
+            }
+
             if (ModSettings.SmoothTransition)
             {
-                var currentFoV = GameCamController.Instance.MainCamera.fieldOfView;
-                if (scroll > 0f && currentFoV > MinFoV)
-                {
-                    targetFoV = currentFoV / ModSettings.FoViewScrollfactor;
-                    isFOVTransitioning = true;
-                }
-                else if (scroll < 0f && currentFoV < MaxFoV)
-                {
-                    targetFoV = currentFoV * ModSettings.FoViewScrollfactor;
-                    isFOVTransitioning = true;
-                }
-                else if (!isFOVTransitioning && currentFoV != targetFoV)
+                if (!isFOVTransitioning && !currentFoV.AlmostEquals(targetFoV))
                     isFOVTransitioning = true;
 
                 UpdateFOVTransition();
             }
             else
             {
-                var FoV = GameCamController.Instance.MainCamera.fieldOfView;
-
-                if (scroll > 0f && FoV > MinFoV)
-                    GameCamController.Instance.MainCamera.fieldOfView = FoV / ModSettings.FoViewScrollfactor;
-                else if (scroll < 0f && FoV < MaxFoV)
-                    GameCamController.Instance.MainCamera.fieldOfView = FoV * ModSettings.FoViewScrollfactor;
+                GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
             }
         }
 
@@ -657,7 +660,7 @@ namespace FPSCamera.Cam.Controller
         private float transitionTimer = 0f;
         private const float MaxTransitioningTime = 5f;
 
-        private float targetFoV = ModSettings.CamFieldOfView;
+        internal float targetFoV = ModSettings.CamFieldOfView;
         private const float MinFoV = 10f;
         private const float MaxFoV = 75f;
         private const float MouseFactor = .2f;

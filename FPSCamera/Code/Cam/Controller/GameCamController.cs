@@ -120,9 +120,7 @@ namespace FPSCamera.Cam.Controller
             }
 
             savedFoV = MainCamera.fieldOfView;
-
-            if (!ModSettings.SmoothTransition)
-                MainCamera.fieldOfView = ModSettings.CamFieldOfView;
+            FPSCamController.Instance.targetFoV = ModSettings.CamFieldOfView;
 
             savedNearClipPlane = MainCamera.nearClipPlane;
             MainCamera.nearClipPlane = ModSettings.CamNearClipPlane;
