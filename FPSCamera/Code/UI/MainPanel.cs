@@ -1,6 +1,5 @@
 ﻿using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
-using ColossalFramework;
 using ColossalFramework.UI;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
@@ -99,9 +98,9 @@ namespace FPSCamera.UI
             _mainBtn.pressedTextColor = new Color32(30, 30, 44, 255);
             _mainBtn.eventClick += (_, m) =>
             {
-                if (!Panel.isVisible) LoadPanelPosition();
+                if (!targetVisible) LoadPanelPosition();
 
-                Panel.isVisible = !Panel.isVisible;
+                OnChangedVisibility(Panel, !targetVisible);
             };
 
             //drag
@@ -111,7 +110,7 @@ namespace FPSCamera.UI
             mainBtn_drag.relativePosition = Vector3.zero;
             mainBtn_drag.target = _mainBtn;
             mainBtn_drag.transform.parent = _mainBtn.transform;
-            mainBtn_drag.eventMouseDown += (_, p) => Panel.isVisible = false;
+            mainBtn_drag.eventMouseDown += (_, p) => OnChangedVisibility(Panel, false);
             mainBtn_drag.eventMouseUp += (_, p) => { SavedButtonPosition = _mainBtn.absolutePosition; ModSettings.Save(); };
             #endregion
         }
@@ -236,6 +235,7 @@ namespace FPSCamera.UI
         }
         private void OnDestroy()
         {
+            fadeHelper.Reset();
             Panel.eventVisibilityChanged -= OnChangedVisibility;
             fadeHelper.OnFadeCompleted -= OnFadeCompleted;
 
@@ -244,9 +244,9 @@ namespace FPSCamera.UI
         }
         public bool OnEsc()
         {
-            if (Panel.isVisible)
+            if (targetVisible)
             {
-                Panel.isVisible = false;
+                OnChangedVisibility(Panel, false);
                 if (ModSupport.FoundUUI)
                 {
                     (GetMainButton() as ButtonBase).IsActive = false;
@@ -257,15 +257,16 @@ namespace FPSCamera.UI
         }
         public void LocaleChanged()
         {
-            var wasVisible = Panel.isVisible;
+            var wasVisible = targetVisible;
             fadeHelper.Reset();
             foreach (var component in Panel.components)
             {
                 Destroy(component.gameObject);
             }
             AddSettings();
+            targetVisible = wasVisible;
             Panel.opacity = wasVisible ? 1f : 0f;
-            Panel.isVisible = wasVisible;
+            SetPanelVisibilityImmediate(wasVisible);
         }
         public static void OpenSettingsPanel(string modName)
         {
@@ -288,34 +289,58 @@ namespace FPSCamera.UI
         }
 
         private static void OpenSettingsPanel() => OpenSettingsPanel(Mod.Instance.Name);
-        private void OnChangedVisibility(UIComponent component, bool value)
+        internal void OnChangedVisibility(UIComponent _, bool visible)
         {
-            if (fadeHelper.Status != FadeHelper.FadeType.None) return;
-            if (!value)
+            if (changingPanelVisibility)
+                return;
+
+            var wasTargetVisible = targetVisible;
+            targetVisible = visible;
+
+            if (!visible && wasTargetVisible)
             {
                 SavedPanelPosition = Panel.absolutePosition;
                 ModSettings.Save();
             }
 
-            Panel.isVisible = true;
+            if (!visible && !Panel.isVisible && fadeHelper.Opacity <= 0f && !fadeHelper.IsFading)
+                return;
 
-            if (value)
-            {
+            // Keep the panel active while fading so opacity changes remain visible.
+            SetPanelVisibilityImmediate(true);
+
+            if (visible)
                 fadeHelper.FadeIn();
-            }
             else
                 fadeHelper.FadeOut();
-
         }
         private void OnFadeCompleted(FadeHelper.FadeType fadeType)
         {
-            if (fadeType == FadeHelper.FadeType.Out)
-                Panel.isVisible = false;
+            if (fadeType == FadeHelper.FadeType.Out && !targetVisible)
+                SetPanelVisibilityImmediate(false);
+        }
+
+        private void SetPanelVisibilityImmediate(bool visible)
+        {
+            if (Panel.isVisible == visible)
+                return;
+
+            changingPanelVisibility = true;
+            try
+            {
+                Panel.isVisible = visible;
+            }
+            finally
+            {
+                changingPanelVisibility = false;
+            }
         }
 
         private UIButton _mainBtn = null;
 
         private FadeHelper fadeHelper = new MainPanelFadeHelper();
+        private bool targetVisible;
+        private bool changingPanelVisibility;
 
         private sealed class MainPanelFadeHelper() : FadeHelper
         {

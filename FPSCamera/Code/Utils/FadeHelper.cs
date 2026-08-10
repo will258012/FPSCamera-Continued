@@ -97,12 +97,12 @@ public abstract class FadeHelper
     /// </remarks>
     public void FadeTo(float targetOpacity, FadeType fadeType = FadeType.None)
     {
-        if (fadeType == FadeType.None && !Mathf.Approximately(Opacity, targetOpacity))
+        if (fadeType == FadeType.None && !Opacity.AlmostEquals(targetOpacity))
             fadeType = (Opacity - targetOpacity) > 0f ? FadeType.Out : FadeType.In;
 
         Status = fadeType;
 
-        if (!ModSettings.Fade || Mathf.Approximately(Opacity, targetOpacity))
+        if (!ModSettings.Fade || Opacity.AlmostEquals(targetOpacity))
         {
             Complete(targetOpacity);
             return;
