@@ -7,6 +7,7 @@ using FPSCamera.Settings;
 using FPSCamera.Utils;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace FPSCamera.UI
@@ -472,7 +473,7 @@ namespace FPSCamera.UI
                 {
                     var originalRichText = style.richText;
                     style.richText = true;
-                    GUI.Label(rowRect, str, style);
+                    GUI.Label(rowRect, ApplyRichTextOpacity(str), style);
                     style.richText = originalRichText;
                 }
                 else
@@ -480,6 +481,41 @@ namespace FPSCamera.UI
                 rowRect.y += rowHeight;
             }
         }
+
+        private string ApplyRichTextOpacity(string text)
+        {
+            if (fadeHelper.Opacity >= 1f)
+                return text;
+
+            const string colorTagPrefix = "<color=#";
+            var tagIndex = text.IndexOf(colorTagPrefix, StringComparison.Ordinal);
+            if (tagIndex < 0)
+                return text;
+
+            var alpha = ((byte)Mathf.RoundToInt(Mathf.Clamp01(fadeHelper.Opacity) * 255f)).ToString("X2");
+            var builder = new StringBuilder(text.Length + 2);
+            var sourceIndex = 0;
+
+            while (tagIndex >= 0)
+            {
+                var colorStart = tagIndex + colorTagPrefix.Length;
+                var tagEnd = text.IndexOf('>', colorStart);
+                if (tagEnd < 0)
+                    break;
+
+                builder.Append(text, sourceIndex, tagEnd - sourceIndex);
+                if (tagEnd - colorStart == 6)
+                    builder.Append(alpha);
+                builder.Append('>');
+
+                sourceIndex = tagEnd + 1;
+                tagIndex = text.IndexOf(colorTagPrefix, sourceIndex, StringComparison.Ordinal);
+            }
+
+            builder.Append(text, sourceIndex, text.Length - sourceIndex);
+            return builder.ToString();
+        }
+
         private float GetMaxFieldWidth(IEnumerable<string> keys, GUIStyle style)
         {
             float maxWidth = 0f;

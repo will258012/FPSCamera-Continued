@@ -21,8 +21,10 @@ namespace FPSCamera.Utils
                 if (field == value)
                     return;
 
+                var previousVehicleID = field;
                 field = value;
-                TransportUtils.PassengerExchangeTracker.Reset();
+                if (!TransportUtils.PassengerExchangeTracker.IsSameVehicleConsist(previousVehicleID, value))
+                    TransportUtils.PassengerExchangeTracker.Reset();
             }
         }
         internal static bool FoundK45TLM = false;
@@ -146,4 +148,3 @@ namespace FPSCamera.Utils
         }
     }
 }
-

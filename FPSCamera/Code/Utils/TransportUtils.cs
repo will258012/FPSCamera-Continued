@@ -97,7 +97,7 @@ namespace FPSCamera.Utils
             return default;
         }
         /// <summary>
-        /// Tracks public-transport passenger exchange at the current stop.
+        /// Tracks public-transport passenger exchange from the most recently completed stop.
         /// The game calls UnloadPassengers before LoadPassengers: unload Prefix/Postfix measures
         /// alighting, then load Prefix/Postfix measures boarding from the post-unload passenger count.
         /// </summary>
@@ -108,12 +108,8 @@ namespace FPSCamera.Utils
                 alighted = 0;
                 boarded = 0;
 
-                var vehicleID = GetHeadVehicleID();
-                if (vehicleID == default || !IsStopped(vehicleID))
-                    return false;
-
                 var snapshot = exchangeSnapshot;
-                if (!snapshot.IsValid || snapshot.VehicleID != vehicleID)
+                if (!snapshot.IsValid || snapshot.VehicleID == default)
                     return false;
 
                 alighted = snapshot.AlightedCount;
@@ -125,8 +121,6 @@ namespace FPSCamera.Utils
             {
                 if (!IsFollowingVehicle(vehicleID))
                     return -1;
-
-                exchangeSnapshot = new ExchangeSnapshot(vehicleID, false, 0, 0);
 
                 var passengerCount = GetPassengerCount(vehicleID);
 #if DEBUG
@@ -190,19 +184,26 @@ namespace FPSCamera.Utils
                 exchangeSnapshot = ExchangeSnapshot.Empty;
             }
 
-            private static bool IsStopped(ushort vehicleID)
+            internal static bool IsSameVehicleConsist(ushort firstVehicleID, ushort secondVehicleID)
             {
+                if (firstVehicleID == default || secondVehicleID == default)
+                    return false;
+
                 var vehicles = VehicleManager.instance.m_vehicles.m_buffer;
-                return vehicleID < vehicles.Length &&
-                       vehicles[vehicleID].m_flags.IsFlagSet(Vehicle.Flags.Stopped | Vehicle.Flags.WaitingLoading);
+
+                var firstVehicle = vehicles[firstVehicleID];
+                var secondVehicle = vehicles[secondVehicleID];
+
+                return firstVehicle.GetFirstVehicle(firstVehicleID) ==
+                       secondVehicle.GetFirstVehicle(secondVehicleID);
             }
 
             private static bool IsFollowingVehicle(ushort vehicleID)
             {
-                if (vehicleID == default || ModSupport.FollowVehicleID == default || vehicleID != GetHeadVehicleID())
+                if (vehicleID == default || ModSupport.FollowVehicleID == default || !VehicleCam.GetVehicle(vehicleID).Info.vehicleCategory.IsFlagSet(VehicleInfo.VehicleCategory.PublicTransport))
                     return false;
 
-                return VehicleCam.GetVehicle(vehicleID).m_leadingVehicle == default;
+                return vehicleID == GetHeadVehicleID() && VehicleCam.GetVehicle(vehicleID).m_leadingVehicle == default;
             }
             private static ushort GetHeadVehicleID() => VehicleCam.GetVehicle(ModSupport.FollowVehicleID).GetFirstVehicle(ModSupport.FollowVehicleID);
 
@@ -214,7 +215,7 @@ namespace FPSCamera.Utils
                 var vehicle = VehicleCam.GetVehicle(vehicleID);
                 // GetBufferStatus supplies the total load, including trailers where applicable.
                 var load = 0;
-                Cam.VehicleCam.GetVehicle(vehicleID).Info?.m_vehicleAI?.GetBufferStatus(vehicleID, ref vehicle, out _, out load, out _);
+                VehicleCam.GetVehicle(vehicleID).Info?.m_vehicleAI?.GetBufferStatus(vehicleID, ref vehicle, out _, out load, out _);
                 return load;
             }
 

@@ -169,7 +169,7 @@ namespace FPSCamera.Utils
                 modifyInfo[Translations.Translate("INFO_VEHICLE_PUBLICTRANSIT_PASSENGER")] =
                     ModSettings.ShowPassengerExchangeInfo &&
                     TransportUtils.PassengerExchangeTracker.TryGetExchange(out var alighted, out var boarded)
-                    ? $"(<color=#FF0000>-{alighted}</color>|<color=#00FF00>+{boarded}</color>) {load} / {capacity}"
+                    ? $"(<color=#FF6B6B>-{alighted}</color>|<color=#00FF00>+{boarded}</color>) {load} / {capacity}"
                     : $"{load} / {capacity}";
 
                 string GetTranslateKey() =>
