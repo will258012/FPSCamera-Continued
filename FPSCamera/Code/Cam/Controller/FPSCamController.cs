@@ -188,6 +188,7 @@ namespace FPSCamera.Cam.Controller
         {
             Logging.KeyMessage("Starting Free-Camera mode");
             FPSCam = new FreeCam();
+            if (FPSCam is not FreeCam) return;
             offset = new Positioning(Vector3.zero, GameCamController.Instance.MainCamera.transform.rotation);
         }
         /// <summary>
@@ -195,8 +196,10 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         public void StartFreeCam(Positioning positioning, float fov = -1f)
         {
-            Logging.KeyMessage("Starting Free-Camera mode");
+            Logging.KeyMessage("Starting Free-Camera mode and setting position to ", positioning.pos);
             FPSCam = new FreeCam();
+            if (FPSCam is not FreeCam) return;
+
             GameCamController.Instance.MainCamera.transform.position = positioning.pos;
             offset = new Positioning(Vector3.zero, positioning.rotation);
             if (fov == -1f) fov = ModSettings.CamFieldOfView;
@@ -441,7 +444,8 @@ namespace FPSCamera.Cam.Controller
             }
             else
             {
-                GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
+                if (!currentFoV.AlmostEquals(targetFoV))
+                    GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
             }
         }
 
@@ -661,8 +665,9 @@ namespace FPSCamera.Cam.Controller
         private const float MaxTransitioningTime = 5f;
 
         internal float targetFoV = ModSettings.CamFieldOfView;
-        private const float MinFoV = 10f;
-        private const float MaxFoV = 75f;
+
+        public const float MinFoV = 10f;
+        public const float MaxFoV = 75f;
         private const float MouseFactor = .2f;
     }
 }

@@ -66,7 +66,6 @@ public sealed class Patcher : PatcherBase
             patcher.UnpatchAll();
         ListMethods();
     }
-
     public new void ListMethods()
     {
         base.ListMethods();
@@ -94,7 +93,7 @@ internal abstract class OptionalPatcherBase : PatcherBase
         catch (Exception e)
         {
             harmony.UnpatchAll(HarmonyID);
-            Logging.LogException(e,"Failed to patch ", HarmonyID);
+            Logging.LogException(e, "Failed to patch ", HarmonyID);
         }
     }
 

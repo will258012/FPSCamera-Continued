@@ -249,7 +249,7 @@ namespace FPSCamera.UI
                 OnChangedVisibility(Panel, false);
                 if (ModSupport.FoundUUI)
                 {
-                    (GetMainButton() as ButtonBase).IsActive = false;
+                    (GetMainButton() as ButtonBase)?.IsActive = false;
                 }
                 return true;
             }

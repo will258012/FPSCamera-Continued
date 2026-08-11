@@ -79,7 +79,7 @@ namespace FPSCamera.Patches
 
             if (ModSettings.ACMEBehavior == ModSettings.ACMEBehaviors.FreeCam)
             {
-                FPSCamController.Instance.StartFreeCam(positioning, savedPosition.FOV);
+                FPSCamController.Instance.StartFreeCam(positioning, savedPosition.FOV.Clamp(FPSCamController.MinFoV, FPSCamController.MaxFoV));
             }
             else
             {

@@ -2,7 +2,6 @@
 using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
 using ColossalFramework.UI;
-using FPSCamera.UI;
 using FPSCamera.Utils;
 using UnityEngine;
 
