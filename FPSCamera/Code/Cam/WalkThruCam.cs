@@ -27,14 +27,9 @@ namespace FPSCamera.Cam
         public void ElapseTime(float seconds)
         {
             elapsedTime += seconds;
-
-            var currentGameTime = SimulationManager.instance.m_currentGameTime;
-            if (lastGameTime != default && currentGameTime >= lastGameTime)
-                elapsedSimTime += currentGameTime - lastGameTime;
-            lastGameTime = currentGameTime;
         }
         public float GetElapsedTime() => elapsedTime;
-        public TimeSpan GetElapsedSimTime() => elapsedSimTime;
+        public TimeSpan GetElapsedSimTime() => simulationElapsedTimer.Elapsed;
         public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
         public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
         public bool IsValid()
@@ -111,8 +106,7 @@ namespace FPSCamera.Cam
             while (!(CurrentCam?.IsValid() ?? false) && --attempt >= 0);
 
             elapsedTime = 0f;
-            elapsedSimTime = TimeSpan.Zero;
-            lastGameTime = SimulationManager.instance.m_currentGameTime;
+            simulationElapsedTimer.Reset();
             SyncCamOffset();
         }
         public void DisableCam()
@@ -122,8 +116,7 @@ namespace FPSCamera.Cam
         }
         private const VehicleInfo.VehicleCategory CityServiceCopters = VehicleInfo.VehicleCategory.AmbulanceCopter | VehicleInfo.VehicleCategory.FireCopter | VehicleInfo.VehicleCategory.PoliceCopter | VehicleInfo.VehicleCategory.DisasterCopter;
         private float elapsedTime;
-        private TimeSpan elapsedSimTime;
-        private DateTime lastGameTime;
+        private readonly SimulationElapsedTimer simulationElapsedTimer = new();
         private IEnumerable<InstanceID> items;
         private readonly AudioClip disabledClickSound = UIView.GetAView().defaultDisabledClickSound;
 

@@ -24,10 +24,11 @@ namespace FPSCamera.UI
                 field = value;
                 if (value)
                 {
+                    enabled = true;
                     fadeDrawMode = GetPanelDrawMode();
                     fadeHelper.FadeIn();
                 }
-                else if (!HasMinimalMessage || !FPSCamController.Instance.Status.IsFlagSet(FPSCamController.CamStatus.Enabled))
+                else if (!HasMinimalMessage || fadeHelper.onDisabled)
                 {
                     if (wasUIEnabled)
                         fadeDrawMode = GetPanelDrawMode();
@@ -59,8 +60,7 @@ namespace FPSCamera.UI
         private void OnEnable()
         {
             elapsedTime = 0f;
-            elapsedSimTime = TimeSpan.Zero;
-            lastGameTime = SimulationManager.instance.m_currentGameTime;
+            simulationElapsedTimer.Reset();
             tempFooter = null;
             lastBufferStrUpdateTime = tempFooterElapsedTime = -1f;
         }
@@ -73,12 +73,14 @@ namespace FPSCamera.UI
         }
         private void SetEnable()
         {
+            fadeHelper.Reset();
             enabled = true;
-            UIEnabled = ModSettings.ShowInfoPanel;
+            UIEnabled = ModSettings.ShowInfoPanel;       
         }
 
         private void SetDisable()
         {
+            fadeHelper.onDisabled = true;
             UIEnabled = false;
         }
 
@@ -92,8 +94,7 @@ namespace FPSCamera.UI
         private void OnModeSwitched(string modeName)
         {
             elapsedTime = 0f;
-            elapsedSimTime = TimeSpan.Zero;
-            lastGameTime = SimulationManager.instance.m_currentGameTime;
+            simulationElapsedTimer.Reset();
             lastBufferStrUpdateTime = -1f;
             SetFooterMessage(modeName, 2f);
             leftInfo.Clear();
@@ -101,8 +102,11 @@ namespace FPSCamera.UI
         }
         private void OnFadeCompleted(FadeHelper.FadeType fadeType)
         {
-            if (fadeType == FadeHelper.FadeType.Out && !FPSCamController.Instance.Status.IsFlagSet(FPSCamController.CamStatus.Enabled))
+            if (fadeType == FadeHelper.FadeType.Out && fadeHelper.onDisabled)
+            {
                 enabled = false;
+                fadeHelper.onDisabled = false;
+            }
             if (HasMinimalMessage && elapsedTime >= tempFooterElapsedTime) ClearFooterMessage();
         }
         private void Update()
@@ -112,7 +116,6 @@ namespace FPSCamera.UI
                 if (Cam?.IsValid() ?? false)
                 {
                     elapsedTime += Time.deltaTime;
-                    UpdateElapsedSimTime();
                     if (elapsedTime - lastBufferStrUpdateTime > bufferUpdateInterval && UIEnabled)
                     {
                         if (ModSettings.ShowStatus)
@@ -245,7 +248,7 @@ namespace FPSCamera.UI
                 {
                     if (Cam is WalkThruCam walkThruCam)
                         values.Add(FormatElapsedSimTime(walkThruCam.GetElapsedSimTime()));
-                    values.Add(FormatElapsedSimTime(elapsedSimTime));
+                    values.Add(FormatElapsedSimTime(simulationElapsedTimer.Elapsed));
                 }
                 if (ModSettings.ShowInGameClock)
                     values.Add(SimulationManager.instance.m_currentGameTime.ToString("HH:mm:ss"));
@@ -266,14 +269,6 @@ namespace FPSCamera.UI
 
         private static string FormatElapsedTime(float seconds)
             => $"{(uint)seconds / 60:00}:{(uint)seconds % 60:00}";
-
-        private void UpdateElapsedSimTime()
-        {
-            var currentGameTime = SimulationManager.instance.m_currentGameTime;
-            if (lastGameTime != default && currentGameTime >= lastGameTime)
-                elapsedSimTime += currentGameTime - lastGameTime;
-            lastGameTime = currentGameTime;
-        }
 
         private static string FormatElapsedSimTime(TimeSpan elapsed)
             => $"{(uint)elapsed.TotalHours:00}:{elapsed.Minutes:00}:{elapsed.Seconds:00}";
@@ -542,11 +537,10 @@ namespace FPSCamera.UI
         private const float fieldFontSizeRatio = .8f;
 
         private float elapsedTime, lastBufferStrUpdateTime;
-        private TimeSpan elapsedSimTime;
-        private DateTime lastGameTime;
+        private readonly SimulationElapsedTimer simulationElapsedTimer = new();
         private float slope;
 
-        private readonly FadeHelper fadeHelper = new InfoPanelFadeHelper();
+        private readonly InfoPanelFadeHelper fadeHelper = new InfoPanelFadeHelper();
         private DrawMode fadeDrawMode;
 
         private string tempFooter;
@@ -560,6 +554,8 @@ namespace FPSCamera.UI
         {
             public override string FadeID => Mod.Instance.HarmonyID + ".CamInfoPanel.Fade";
             public override float Opacity { get; set; }
+
+            internal bool onDisabled = false;
         }
 
         private enum DrawMode
