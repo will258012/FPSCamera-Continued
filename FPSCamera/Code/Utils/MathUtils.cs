@@ -12,6 +12,13 @@ namespace FPSCamera.Utils
 
         public struct Positioning
         {
+            private const int CoarseSearchSegments = 16;
+            private const int RefinementIterations = 20;
+            private const int PositionIterations = 8;
+            private const int CameraControllerPositionIterations = 3;
+            private const float PositionToleranceSqr = 0.0001f;
+            private const float GoldenRatio = 0.61803398875f;
+
             //z:forward y:up x:left
             [XmlElement("Position")]
             public Vector3 pos;
@@ -38,45 +45,199 @@ namespace FPSCamera.Utils
                 var controller = GameCamController.Instance.CameraController;
                 var mainCamera = GameCamController.Instance.MainCamera;
 
-                // Calculate the ground height and angle.
-                var height = MapUtils.GetMinHeightAt(pos);
+                // FPS camera positioning guarantees zero roll, so its Euler yaw and pitch
+                // map directly to CameraController's two rotation axes.
                 controllerPositioning.CalculateControllerAngle(rotation);
+                var currentAngle = controllerPositioning.targetAngle;
+                var controllerRotation = controllerPositioning.FromControllerAngle();
+                var candidate = FindBestControllerPositioning(controllerRotation, controller, mainCamera);
 
-                // Calculate the new size (height difference between the camera height and the ground, with some adjust by angles)
-                var newSize = Mathf.Max(0f, pos.y - height)
-                    / Mathf.Lerp(0.15f, 1f, Mathf.Sin(Mathf.Abs(controllerPositioning.targetAngle.y) * Mathf.Deg2Rad));
-                newSize = newSize.Clamp(controller.m_minDistance, controller.m_maxDistance);
-
-                // Calculate targetAngle if necessary.
+                // Convert the rendered pitch back to CameraController's target pitch when
+                // the game applies its distance-dependent tilt adjustment.
                 var shouldCalculate =
                     !(ToolManager.instance.m_properties.m_mode.IsFlagSet(ItemClass.Availability.ThemeEditor)
                     || controller.m_unlimitedCamera //This value would be set to true if there's another camera mod, such as ACME.
                     || AccessUtils.GetFieldValue<bool>(controller, "m_cachedFreeCamera")
                     );
-                if (shouldCalculate)
-                    controllerPositioning.targetAngle = ControllerPositioning.CalculateTargetAngle(controllerPositioning.targetAngle, newSize);
 
-                var newPos = pos;
-                // Calculate CameraController position based on the camera's transform position.
-                for (int i = 1; i <= 3; i++)
-                {
-                    height = TerrainManager.instance.SampleRawHeightSmoothWithWater(newPos, true, 2f);
-                    newPos.y = height + newSize * 0.05f + 10f;
-                    //Calculate distance (Z offset).
-                    float distance = newSize
-                                * Mathf.Max(0f, 1f - height / controller.m_maxDistance)
-                                / Mathf.Tan(mainCamera.fieldOfView * Mathf.Deg2Rad);
-                    newPos = pos + (rotation * Vector3.forward * distance);
-                    // Limit the camera's position to the allowed area.
-                    newPos = CameraController.ClampCameraPosition(newPos);
-                    if (newPos.sqrMagnitude < 0.0001f) break;
-                }
-                controllerPositioning.size = Mathf.Abs(newSize - controller.m_targetSize) >= 100f ? newSize : controller.m_targetSize;
-                controllerPositioning.pos = Vector3.Distance(newPos, controller.m_targetPosition) >= 10f ? newPos : controller.m_targetPosition;
-                controllerPositioning.height = Mathf.Abs(height - controller.m_targetHeight) >= 10f ? height : controller.m_targetHeight;
+                controllerPositioning.pos = candidate.position;
+                controllerPositioning.currentAngle = currentAngle;
+                controllerPositioning.targetAngle = currentAngle;
+                if (shouldCalculate)
+                    controllerPositioning.targetAngle = ControllerPositioning.CalculateTargetAngle(currentAngle, candidate.size);
+                controllerPositioning.size = candidate.size;
+                controllerPositioning.height = candidate.height;
 
                 return controllerPositioning;
             }
+
+            private ControllerPositioningCandidate FindBestControllerPositioning(
+                Quaternion controllerRotation,
+                CameraController controller,
+                Camera mainCamera)
+            {
+                var preferredSize = Mathf.Clamp(controller.m_targetSize, controller.m_minDistance, controller.m_maxDistance);
+                var best = EvaluateControllerPositioning(preferredSize, controllerRotation, controller, mainCamera);
+                if (best.error < PositionToleranceSqr)
+                    return best;
+                var range = controller.m_maxDistance - controller.m_minDistance;
+                if (range <= 0f)
+                    return best;
+
+                var coarseStep = range / CoarseSearchSegments;
+                for (int i = 0; i <= CoarseSearchSegments; i++)
+                {
+                    var size = controller.m_minDistance + coarseStep * i;
+                    var candidate = EvaluateControllerPositioning(size, controllerRotation, controller, mainCamera);
+                    if (IsBetterCandidate(candidate, best, preferredSize))
+                        best = candidate;
+                }
+
+                // Refine around the best coarse result. The forward model is normally
+                // smooth in this interval; keeping the coarse pass makes terrain steps
+                // and collision discontinuities less likely to select a wrong basin.
+                var left = Mathf.Max(controller.m_minDistance, best.size - coarseStep);
+                var right = Mathf.Min(controller.m_maxDistance, best.size + coarseStep);
+                var leftSize = right - (right - left) * GoldenRatio;
+                var rightSize = left + (right - left) * GoldenRatio;
+                var leftCandidate = EvaluateControllerPositioning(leftSize, controllerRotation, controller, mainCamera);
+                var rightCandidate = EvaluateControllerPositioning(rightSize, controllerRotation, controller, mainCamera);
+
+                for (int i = 0; i < RefinementIterations; i++)
+                {
+                    if (IsBetterCandidate(leftCandidate, best, preferredSize))
+                        best = leftCandidate;
+                    if (IsBetterCandidate(rightCandidate, best, preferredSize))
+                        best = rightCandidate;
+
+                    if (leftCandidate.error <= rightCandidate.error)
+                    {
+                        right = rightSize;
+                        rightSize = leftSize;
+                        rightCandidate = leftCandidate;
+                        leftSize = right - (right - left) * GoldenRatio;
+                        leftCandidate = EvaluateControllerPositioning(leftSize, controllerRotation, controller, mainCamera);
+                    }
+                    else
+                    {
+                        left = leftSize;
+                        leftSize = rightSize;
+                        leftCandidate = rightCandidate;
+                        rightSize = left + (right - left) * GoldenRatio;
+                        rightCandidate = EvaluateControllerPositioning(rightSize, controllerRotation, controller, mainCamera);
+                    }
+                }
+
+                if (IsBetterCandidate(leftCandidate, best, preferredSize))
+                    best = leftCandidate;
+                if (IsBetterCandidate(rightCandidate, best, preferredSize))
+                    best = rightCandidate;
+                return best;
+            }
+
+            private ControllerPositioningCandidate EvaluateControllerPositioning(
+                float size,
+                Quaternion controllerRotation,
+                CameraController controller,
+                Camera mainCamera)
+            {
+                var forward = controllerRotation * Vector3.forward;
+                var targetPosition = pos;
+                var height = TerrainManager.instance.SampleRawHeightSmoothWithWater(targetPosition, true, 2f);
+                var distance = CalculateControllerDistance(size, height, controller, mainCamera);
+
+                // First solve the orbit centre in XZ. Terrain height changes the camera
+                // distance, so this is a small fixed-point problem on uneven terrain.
+                for (int i = 0; i < PositionIterations; i++)
+                {
+                    height = TerrainManager.instance.SampleRawHeightSmoothWithWater(targetPosition, true, 2f);
+                    distance = CalculateControllerDistance(size, height, controller, mainCamera);
+                    var nextTargetPosition = CameraController.ClampCameraPosition(pos + forward * distance);
+                    var deltaX = nextTargetPosition.x - targetPosition.x;
+                    var deltaZ = nextTargetPosition.z - targetPosition.z;
+                    targetPosition.x = nextTargetPosition.x;
+                    targetPosition.z = nextTargetPosition.z;
+                    if (deltaX * deltaX + deltaZ * deltaZ < PositionToleranceSqr)
+                        break;
+                }
+
+                // Mirror CameraController.UpdateTargetPosition, including its three-pass
+                // map-edge correction. Repeat the whole update only if its final target
+                // clamp changed XZ, so the returned state is stable on the next LateUpdate.
+                var clampedCameraPosition = pos;
+                for (int i = 0; i < PositionIterations; i++)
+                {
+                    var previousX = targetPosition.x;
+                    var previousZ = targetPosition.z;
+                    for (int j = 0; j < CameraControllerPositionIterations; j++)
+                    {
+                        height = TerrainManager.instance.SampleRawHeightSmoothWithWater(targetPosition, true, 2f);
+                        targetPosition.y = height + size * 0.05f + controller.m_minDistance / 4f;
+                        distance = CalculateControllerDistance(size, height, controller, mainCamera);
+                        var cameraPosition = targetPosition - forward * distance;
+                        clampedCameraPosition = CameraController.ClampCameraPosition(cameraPosition);
+                        var correction = clampedCameraPosition - cameraPosition;
+                        targetPosition += correction;
+                        if (correction.sqrMagnitude < PositionToleranceSqr)
+                            break;
+                    }
+
+                    targetPosition.y += CameraController.CalculateCameraHeightOffset(clampedCameraPosition, distance);
+                    targetPosition = CameraController.ClampCameraPosition(targetPosition);
+                    var deltaX = targetPosition.x - previousX;
+                    var deltaZ = targetPosition.z - previousZ;
+                    if (deltaX * deltaX + deltaZ * deltaZ < PositionToleranceSqr)
+                        break;
+                }
+
+                // Mirror CameraController.UpdateTransform to score the actual rendered
+                // position rather than comparing controller fields independently.
+                var cameraResult = targetPosition - forward * distance;
+                cameraResult.y += CameraController.CalculateCameraHeightOffset(cameraResult, distance);
+                cameraResult = CameraController.ClampCameraPosition(cameraResult);
+                var error = (cameraResult - pos).sqrMagnitude;
+                if (float.IsNaN(error) || float.IsInfinity(error))
+                    error = float.MaxValue;
+
+                return new ControllerPositioningCandidate
+                {
+                    position = targetPosition,
+                    size = size,
+                    height = height,
+                    error = error,
+                };
+            }
+
+            private static float CalculateControllerDistance(
+                float size,
+                float height,
+                CameraController controller,
+                Camera mainCamera)
+                => size
+                    * Mathf.Max(0f, 1f - height / controller.m_maxDistance)
+                    / Mathf.Tan(mainCamera.fieldOfView * Mathf.Deg2Rad);
+
+            private static bool IsBetterCandidate(
+                ControllerPositioningCandidate candidate,
+                ControllerPositioningCandidate current,
+                float preferredSize)
+            {
+                const float equalErrorTolerance = 0.000001f;
+                if (candidate.error < current.error - equalErrorTolerance)
+                    return true;
+                if (Mathf.Abs(candidate.error - current.error) > equalErrorTolerance)
+                    return false;
+                return Mathf.Abs(candidate.size - preferredSize) < Mathf.Abs(current.size - preferredSize);
+            }
+
+            private struct ControllerPositioningCandidate
+            {
+                public Vector3 position;
+                public float size;
+                public float height;
+                public float error;
+            }
+
             public override string ToString() => $"Position: {pos}, Rotation: {rotation}";
         }
         public struct ControllerPositioning
@@ -139,7 +300,9 @@ namespace FPSCamera.Utils
                 newPos = CameraController.ClampCameraPosition(newPos);
                 return new Positioning(newPos, quaternion);
             }
-            public void CalculateControllerAngle(Quaternion quaternion) => targetAngle = new Vector2(quaternion.eulerAngles.y, quaternion.eulerAngles.x).ClampEulerAngles();
+            public void CalculateControllerAngle(Quaternion quaternion)
+                => targetAngle = ClampEulerAngles(
+                    new Vector2(quaternion.eulerAngles.y, quaternion.eulerAngles.x));
             public Quaternion FromControllerAngle() => Quaternion.AngleAxis(targetAngle.x, Vector3.up) * Quaternion.AngleAxis(targetAngle.y, Vector3.right);
             public static Vector2 CalculateCurrentAngle(Vector2 targetAngle, float size) => new(targetAngle.x,
                 90f - (90f - targetAngle.y) * (Controller.m_maxTiltDistance * 0.5f / (Controller.m_maxTiltDistance * 0.5f + size)));
