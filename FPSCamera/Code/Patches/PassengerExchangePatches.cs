@@ -52,33 +52,21 @@ internal static class PassengerExchangePatches
 
     internal static class LoadPassengersPatch
     {
-        internal static void Prefix(ushort vehicleID, out int __state)
+        internal static void Prefix(ushort vehicleID, out PassengerExchangeTracker.ExchangeState __state)
             => __state = PassengerExchangeTracker.BeginBoarding(vehicleID);
 
-        internal static void Postfix(ushort vehicleID, int __state)
-            => PassengerExchangeTracker.EndBoarding(vehicleID, __state);
+        internal static void Postfix(PassengerExchangeTracker.ExchangeState __state)
+            => PassengerExchangeTracker.EndBoarding(__state);
     }
     internal static class UnloadPassengersPatch
     {
-        internal static void Prefix(ushort vehicleID, out UnloadState __state)
-            => __state = new(vehicleID, PassengerExchangeTracker.BeginUnload(vehicleID));
+        internal static void Prefix(ushort vehicleID, out PassengerExchangeTracker.ExchangeState __state)
+            => __state = PassengerExchangeTracker.BeginUnload(vehicleID);
 
-        internal static void Postfix(UnloadState __state)
-            => PassengerExchangeTracker.EndUnload(__state.VehicleID, __state.PreviousPassengerCount);
-
-        // Multi-car vehicles overwrite the vehicleID argument while walking their trailer chain.
-        // Preserve the original lead vehicle ID for the Postfix instead of reading the final argument value.
-        internal readonly struct UnloadState
-        {
-            internal UnloadState(ushort vehicleID, int previousPassengerCount)
-            {
-                VehicleID = vehicleID;
-                PreviousPassengerCount = previousPassengerCount;
-            }
-
-            internal ushort VehicleID { get; }
-            internal int PreviousPassengerCount { get; }
-        }
+        // Multi-car implementations overwrite vehicleID while walking their trailers, so the
+        // state retains the original lead vehicle and follow context for the Postfix.
+        internal static void Postfix(PassengerExchangeTracker.ExchangeState __state)
+            => PassengerExchangeTracker.EndUnload(__state);
     }
 
 

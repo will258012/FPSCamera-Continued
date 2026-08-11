@@ -117,63 +117,77 @@ namespace FPSCamera.Utils
                 return true;
             }
 
-            internal static int BeginUnload(ushort vehicleID)
+            internal static ExchangeState BeginUnload(ushort vehicleID)
             {
-                if (!IsFollowingVehicle(vehicleID))
-                    return -1;
+                var state = BeginExchange(vehicleID);
+                if (!state.IsValid)
+                    return state;
 
-                var passengerCount = GetPassengerCount(vehicleID);
 #if DEBUG
-                LogPassengerState("Unload Prefix", vehicleID, passengerCount);
+                LogPassengerState("Unload Prefix", vehicleID, state.PreviousPassengerCount);
 #endif
-                return passengerCount;
+                return state;
             }
 
-            internal static void EndUnload(ushort vehicleID, int previousPassengerCount)
+            internal static void EndUnload(ExchangeState state)
             {
-                if (previousPassengerCount < 0 || !IsFollowingVehicle(vehicleID))
+                if (!IsCurrentExchange(state))
                     return;
 
                 // UnloadPassengers Postfix: arrival load - remaining load = passengers who alighted.
-                var passengerCount = GetPassengerCount(vehicleID);
-                var alighted = Math.Max(0, previousPassengerCount - passengerCount);
+                var passengerCount = GetPassengerCount(state.VehicleID);
+                var alighted = Math.Max(0, state.PreviousPassengerCount - passengerCount);
 #if DEBUG
-                LogPassengerState("Unload Postfix", vehicleID, passengerCount, previousPassengerCount, alighted);
+                LogPassengerState("Unload Postfix", state.VehicleID, passengerCount, state.PreviousPassengerCount, alighted);
 #endif
-                exchangeSnapshot = new(vehicleID, true, alighted, 0);
+                exchangeSnapshot = new(state.VehicleID, true, alighted, 0);
+                boardingBaseline = new(
+                    state.VehicleID,
+                    state.FollowVehicleID,
+                    SimulationManager.instance.m_currentFrameIndex,
+                    passengerCount);
             }
 
-            internal static int BeginBoarding(ushort vehicleID)
+            internal static ExchangeState BeginBoarding(ushort vehicleID)
             {
-                if (!IsFollowingVehicle(vehicleID))
-                    return -1;
+                var baseline = boardingBaseline;
+                boardingBaseline = BoardingBaseline.Empty;
 
-                // LoadPassengers Prefix runs after unloading; capture the remaining load for the whole consist.
-                var passengerCount = GetPassengerCount(vehicleID);
+                ExchangeState state;
+                if (baseline.Matches(vehicleID, ModSupport.FollowVehicleID, SimulationManager.instance.m_currentFrameIndex))
+                    state = new(vehicleID, baseline.FollowVehicleID, baseline.PassengerCount);
+                else
+                    state = BeginExchange(vehicleID);
+
+                if (!state.IsValid)
+                    return state;
+
+                // LoadPassengers follows UnloadPassengers in the same simulation frame, so reuse the
+                // post-unload count instead of querying the whole consist a second time.
 #if DEBUG
-                LogPassengerState("Load Prefix", vehicleID, passengerCount);
+                LogPassengerState("Load Prefix", vehicleID, state.PreviousPassengerCount);
 #endif
-                return passengerCount;
+                return state;
             }
 
-            internal static void EndBoarding(ushort vehicleID, int previousPassengerCount)
+            internal static void EndBoarding(ExchangeState state)
             {
-                if (previousPassengerCount < 0 || !IsFollowingVehicle(vehicleID))
+                if (!IsCurrentExchange(state))
                     return;
 
                 var snapshot = exchangeSnapshot;
-                if (snapshot.VehicleID != vehicleID)
+                if (snapshot.VehicleID != state.VehicleID)
                     return;
 
                 // LoadPassengers Postfix: final load - post-unload load = passengers who boarded.
                 // Alighted passengers must not be added again because the Prefix runs after unloading.
-                var passengerCount = GetPassengerCount(vehicleID);
-                var boarded = Math.Max(0, passengerCount - previousPassengerCount);
+                var passengerCount = GetPassengerCount(state.VehicleID);
+                var boarded = Math.Max(0, passengerCount - state.PreviousPassengerCount);
 #if DEBUG
-                LogPassengerState("Load Postfix", vehicleID, passengerCount, previousPassengerCount, boarded);
+                LogPassengerState("Load Postfix", state.VehicleID, passengerCount, state.PreviousPassengerCount, boarded);
 #endif
                 exchangeSnapshot = new(
-                    vehicleID,
+                    state.VehicleID,
                     true,
                     snapshot.AlightedCount,
                     boarded);
@@ -182,6 +196,7 @@ namespace FPSCamera.Utils
             internal static void Reset()
             {
                 exchangeSnapshot = ExchangeSnapshot.Empty;
+                boardingBaseline = BoardingBaseline.Empty;
             }
 
             internal static bool IsSameVehicleConsist(ushort firstVehicleID, ushort secondVehicleID)
@@ -198,14 +213,26 @@ namespace FPSCamera.Utils
                        secondVehicle.GetFirstVehicle(secondVehicleID);
             }
 
-            private static bool IsFollowingVehicle(ushort vehicleID)
+            private static ExchangeState BeginExchange(ushort vehicleID)
             {
-                if (vehicleID == default || ModSupport.FollowVehicleID == default || !VehicleCam.GetVehicle(vehicleID).Info.vehicleCategory.IsFlagSet(VehicleInfo.VehicleCategory.PublicTransport))
+                var followVehicleID = ModSupport.FollowVehicleID;
+                if (!IsFollowingVehicle(vehicleID, followVehicleID))
+                    return default;
+
+                return new(vehicleID, followVehicleID, GetPassengerCount(vehicleID));
+            }
+
+            private static bool IsCurrentExchange(ExchangeState state)
+                => state.IsValid && state.FollowVehicleID == ModSupport.FollowVehicleID;
+
+            private static bool IsFollowingVehicle(ushort vehicleID, ushort followVehicleID)
+            {
+                if (vehicleID == default || followVehicleID == default || !(VehicleCam.GetVehicle(vehicleID).Info?.vehicleCategory.IsFlagSet(VehicleInfo.VehicleCategory.PublicTransport) ?? false))
                     return false;
 
-                return vehicleID == GetHeadVehicleID() && VehicleCam.GetVehicle(vehicleID).m_leadingVehicle == default;
+                return vehicleID == GetHeadVehicleID(followVehicleID) && VehicleCam.GetVehicle(vehicleID).m_leadingVehicle == default;
             }
-            private static ushort GetHeadVehicleID() => VehicleCam.GetVehicle(ModSupport.FollowVehicleID).GetFirstVehicle(ModSupport.FollowVehicleID);
+            private static ushort GetHeadVehicleID(ushort followVehicleID) => VehicleCam.GetVehicle(followVehicleID).GetFirstVehicle(followVehicleID);
 
             private static int GetPassengerCount(ushort vehicleID)
             {
@@ -301,7 +328,47 @@ namespace FPSCamera.Utils
                 internal int BoardedCount { get; }
             }
 
+            private sealed class BoardingBaseline
+            {
+                internal static readonly BoardingBaseline Empty = new(default, default, default, default);
+
+                internal BoardingBaseline(ushort vehicleID, ushort followVehicleID, uint frameIndex, int passengerCount)
+                {
+                    VehicleID = vehicleID;
+                    FollowVehicleID = followVehicleID;
+                    FrameIndex = frameIndex;
+                    PassengerCount = passengerCount;
+                }
+
+                internal ushort VehicleID { get; }
+                internal ushort FollowVehicleID { get; }
+                internal uint FrameIndex { get; }
+                internal int PassengerCount { get; }
+
+                internal bool Matches(ushort vehicleID, ushort followVehicleID, uint frameIndex)
+                    => VehicleID != default &&
+                       VehicleID == vehicleID &&
+                       FollowVehicleID == followVehicleID &&
+                       FrameIndex == frameIndex;
+            }
+
+            internal readonly struct ExchangeState
+            {
+                internal ExchangeState(ushort vehicleID, ushort followVehicleID, int previousPassengerCount)
+                {
+                    VehicleID = vehicleID;
+                    FollowVehicleID = followVehicleID;
+                    PreviousPassengerCount = previousPassengerCount;
+                }
+
+                internal ushort VehicleID { get; }
+                internal ushort FollowVehicleID { get; }
+                internal int PreviousPassengerCount { get; }
+                internal bool IsValid => VehicleID != default && FollowVehicleID != default;
+            }
+
             private static volatile ExchangeSnapshot exchangeSnapshot = ExchangeSnapshot.Empty;
+            private static volatile BoardingBaseline boardingBaseline = BoardingBaseline.Empty;
         }
     }
 
