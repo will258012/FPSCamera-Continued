@@ -75,7 +75,7 @@ namespace FPSCamera.UI
         {
             fadeHelper.Reset();
             enabled = true;
-            UIEnabled = ModSettings.ShowInfoPanel;       
+            UIEnabled = ModSettings.ShowInfoPanel;
         }
 
         private void SetDisable()
@@ -241,17 +241,21 @@ namespace FPSCamera.UI
                 hasTimeLine = true;
             }
 
-            if (ModSettings.ShowElapsedSimTime || ModSettings.ShowInGameClock || ModSettings.ShowRealLifeClock)
+            if ((!Loading.IsScenario && (ModSettings.ShowElapsedSimTime || ModSettings.ShowInGameClock)) ||
+                ModSettings.ShowRealLifeClock)
             {
                 var values = new List<string>();
-                if (ModSettings.ShowElapsedSimTime)
+                if (!Loading.IsScenario)
                 {
-                    if (Cam is WalkThruCam walkThruCam)
-                        values.Add(FormatElapsedSimTime(walkThruCam.GetElapsedSimTime()));
-                    values.Add(FormatElapsedSimTime(simulationElapsedTimer.Elapsed));
+                    if (ModSettings.ShowElapsedSimTime)
+                    {
+                        if (Cam is WalkThruCam walkThruCam)
+                            values.Add(FormatElapsedSimTime(walkThruCam.GetElapsedSimTime()));
+                        values.Add(FormatElapsedSimTime(simulationElapsedTimer.Elapsed));
+                    }
+                    if (ModSettings.ShowInGameClock)
+                        values.Add(SimulationManager.instance.m_currentGameTime.ToString("HH:mm:ss"));
                 }
-                if (ModSettings.ShowInGameClock)
-                    values.Add(SimulationManager.instance.m_currentGameTime.ToString("HH:mm:ss"));
                 if (ModSettings.ShowRealLifeClock)
                     values.Add(DateTime.Now.ToString("HH:mm:ss"));
                 lines.Add((hasTimeLine ? "   " : Translations.Translate("INFO_TIME")) + string.Join(" / ", values.ToArray()));

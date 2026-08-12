@@ -86,9 +86,8 @@ namespace FPSCamera.Cam.Controller
         private void Awake()
         {
             Instance = this;
-            isGame = ToolsModifierControl.isGame;
-        }
 
+        }
         /// <summary>
         /// Enables the camera and associated UI elements or settings.
         /// </summary>
@@ -329,14 +328,14 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void HandleInput()
         {
-            if (!SimulationManager.instance.ForcedSimulationPaused) // If the game isn't in the pause menu
+            if (!SimulationManager.instance.ForcedSimulationPaused || Loading.IsScenario) // If the game isn't in the pause menu
             {
                 if (ModSettings.KeyCamToggle.KeyTriggered())
                 {
                     if (FPSCam is not FreeCam) StartFreeCam();
                     else FPSCam = null;
                 }
-                if (isGame)
+                if (Loading.IsGame)
                 {
                     if (ModSettings.KeyWalkThruToggle.KeyTriggered())
                     {
@@ -659,7 +658,6 @@ namespace FPSCamera.Cam.Controller
         private bool isFOVTransitioning = false;
         private Positioning offset = default;
         private Vector3 offsetFromSetting = default;
-        private bool isGame = false;
 
         private float transitionTimer = 0f;
         private const float MaxTransitioningTime = 5f;

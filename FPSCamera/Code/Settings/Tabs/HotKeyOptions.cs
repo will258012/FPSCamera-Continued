@@ -61,15 +61,16 @@ namespace FPSCamera.Settings.Tabs
             KeyCamToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYCAMTOGGLE"), ModSettings.KeyCamToggle);
             KeyCamToggle.Panel.tooltip = Translations.Translate("SETTINGS_KEYTOGGLE_DETAIL");
             currentY += KeyCamToggle.Panel.height + Margin;
+            if (Loading.IsGame)
+            {
+                var KeyWalkThruToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYWALKTHRUTOGGLE"), ModSettings.KeyWalkThruToggle);
+                KeyWalkThruToggle.Panel.tooltip = Translations.Translate("SETTINGS_KEYTOGGLE_DETAIL");
+                currentY += KeyWalkThruToggle.Panel.height + Margin;
 
-            var KeyWalkThruToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYWALKTHRUTOGGLE"), ModSettings.KeyWalkThruToggle);
-            KeyWalkThruToggle.Panel.tooltip = Translations.Translate("SETTINGS_KEYTOGGLE_DETAIL");
-            currentY += KeyWalkThruToggle.Panel.height + Margin;
-
-            var KeyFollowToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYFOLLOWTOGGLE"), ModSettings.KeyFollowToggle);
-            KeyFollowToggle.Panel.tooltip = Translations.Translate("SETTINGS_KEYFOLLOWTOGGLE_DETAIL");
-            currentY += KeyFollowToggle.Panel.height + Margin;
-
+                var KeyFollowToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYFOLLOWTOGGLE"), ModSettings.KeyFollowToggle);
+                KeyFollowToggle.Panel.tooltip = Translations.Translate("SETTINGS_KEYFOLLOWTOGGLE_DETAIL");
+                currentY += KeyFollowToggle.Panel.height + Margin;
+            }
             var KeyInfoPanelToggle = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYINFOPANELTOGGLE"), ModSettings.KeyInfoPanelToggle);
             currentY += KeyInfoPanelToggle.Panel.height + Margin;
 
@@ -85,11 +86,12 @@ namespace FPSCamera.Settings.Tabs
             KeyAutoMove = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYAUTOMOVE"), ModSettings.KeyAutoMove);
             KeyAutoMove.Panel.tooltip = Translations.Translate("SETTINGS_KEYAUTOMOVE_DETAIL");
             currentY += KeyAutoMove.Panel.height + Margin;
-
-            KeySaveOffset = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYSAVEFOFFSET"), ModSettings.KeySaveOffset);
-            KeySaveOffset.Panel.tooltip = Translations.Translate("SETTINGS_KEYSAVEFOFFSET_DETAIL");
-            currentY += KeySaveOffset.Panel.height + Margin;
-
+            if (Loading.IsGame)
+            {
+                KeySaveOffset = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYSAVEFOFFSET"), ModSettings.KeySaveOffset);
+                KeySaveOffset.Panel.tooltip = Translations.Translate("SETTINGS_KEYSAVEFOFFSET_DETAIL");
+                currentY += KeySaveOffset.Panel.height + Margin;
+            }
             KeyMoveForward = OptionsKeymapping.AddKeymapping(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_KEYMOVEFORWARD"), ModSettings.KeyMoveForward);
             currentY += KeyMoveForward.Panel.height + Margin;
 

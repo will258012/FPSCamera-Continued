@@ -127,17 +127,18 @@ namespace FPSCamera.Settings.Tabs
             showElapsedTime_CheckBox.isChecked = ModSettings.ShowElapsedTime;
             showElapsedTime_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowElapsedTime = isChecked;
             currentY += showElapsedTime_CheckBox.height + LeftMargin;
+            if (!Loading.IsScenario)
+            {
+                showElapsedSimTime_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWELAPSEDSIMTIME"));
+                showElapsedSimTime_CheckBox.isChecked = ModSettings.ShowElapsedSimTime;
+                showElapsedSimTime_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowElapsedSimTime = isChecked;
+                currentY += showElapsedSimTime_CheckBox.height + LeftMargin;
 
-            showElapsedSimTime_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWELAPSEDSIMTIME"));
-            showElapsedSimTime_CheckBox.isChecked = ModSettings.ShowElapsedSimTime;
-            showElapsedSimTime_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowElapsedSimTime = isChecked;
-            currentY += showElapsedSimTime_CheckBox.height + LeftMargin;
-
-            showInGameClock_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWINGAMECLOCK"));
-            showInGameClock_CheckBox.isChecked = ModSettings.ShowInGameClock;
-            showInGameClock_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowInGameClock = isChecked;
-            currentY += showInGameClock_CheckBox.height + LeftMargin;
-
+                showInGameClock_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWINGAMECLOCK"));
+                showInGameClock_CheckBox.isChecked = ModSettings.ShowInGameClock;
+                showInGameClock_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowInGameClock = isChecked;
+                currentY += showInGameClock_CheckBox.height + LeftMargin;
+            }
             showRealLifeClock_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWREALLIFECLOCK"));
             showRealLifeClock_CheckBox.isChecked = ModSettings.ShowRealLifeClock;
             showRealLifeClock_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowRealLifeClock = isChecked;
@@ -147,12 +148,14 @@ namespace FPSCamera.Settings.Tabs
             showSpiritLevel_CheckBox.isChecked = ModSettings.ShowSlope;
             showSpiritLevel_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowSlope = isChecked;
             currentY += showSpiritLevel_CheckBox.height + LeftMargin;
-
-            showPassengerExchangeInfo_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWPASSEREXCHANGEINFO"));
-            showPassengerExchangeInfo_CheckBox.tooltip = Translations.Translate("SETTINGS_SHOWPASSEREXCHANGEINFO_DETAIL");
-            showPassengerExchangeInfo_CheckBox.isChecked = ModSettings.ShowPassengerExchangeInfo;
-            showPassengerExchangeInfo_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowPassengerExchangeInfo = isChecked;
-            currentY += showPassengerExchangeInfo_CheckBox.height + LeftMargin;
+            if (Loading.IsGame)
+            {
+                showPassengerExchangeInfo_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWPASSEREXCHANGEINFO"));
+                showPassengerExchangeInfo_CheckBox.tooltip = Translations.Translate("SETTINGS_SHOWPASSEREXCHANGEINFO_DETAIL");
+                showPassengerExchangeInfo_CheckBox.isChecked = ModSettings.ShowPassengerExchangeInfo;
+                showPassengerExchangeInfo_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowPassengerExchangeInfo = isChecked;
+                currentY += showPassengerExchangeInfo_CheckBox.height + LeftMargin;
+            }
             #endregion
 
             #region Smooth Transition Options

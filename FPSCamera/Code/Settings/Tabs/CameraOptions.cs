@@ -70,8 +70,11 @@ namespace FPSCamera.Settings.Tabs
             this.tabStrip = AutoTabstrip.AddTabstrip(panel, 0f, 0f, panel.width, panel.height, out _, tabHeight: 40f);
             CameraControls(0);
             FreeMode(1);
-            FollowMode(2);
-            WalkThruMode(3);
+            if (Loading.IsGame)
+            {
+                FollowMode(2);
+                WalkThruMode(3);
+            }
 
             // Select first tab.
             this.tabStrip.selectedIndex = -1;

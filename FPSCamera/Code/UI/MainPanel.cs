@@ -86,6 +86,7 @@ namespace FPSCamera.UI
             _mainBtn.absolutePosition = new Vector3(x, y);
             _mainBtn.size = new Vector2(MainButtonSize, MainButtonSize);
             _mainBtn.scaleFactor = .8f;
+            _mainBtn.atlas = UITextures.InGameAtlas;
             _mainBtn.pressedBgSprite = "OptionBasePressed";
             _mainBtn.normalBgSprite = "OptionBase";
             _mainBtn.hoveredBgSprite = "OptionBaseHovered";
@@ -143,11 +144,12 @@ namespace FPSCamera.UI
             var movementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.MovementSpeed, Panel.width - 70f);
             movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
             currentY += movementSpeed_Slider.height + SliderMargin;
-
-            var offsetMovementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_OFFSETMOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.OffsetMovementSpeed, Panel.width - 70f);
-            offsetMovementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.OffsetMovementSpeed = value;
-            currentY += offsetMovementSpeed_Slider.height + SliderMargin;
-
+            if (Loading.IsGame)
+            {
+                var offsetMovementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_OFFSETMOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.OffsetMovementSpeed, Panel.width - 70f);
+                offsetMovementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.OffsetMovementSpeed = value;
+                currentY += offsetMovementSpeed_Slider.height + SliderMargin;
+            }
             var fov_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_FIELDOFVIEW"), 10f, 75f, 1f, ModSettings.CamFieldOfView, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "°"), Panel.width - 70f);
             fov_Slider.eventValueChanged += (_, value) => ModSettings.CamFieldOfView = value;
             currentY += fov_Slider.height + SliderMargin;
@@ -168,7 +170,7 @@ namespace FPSCamera.UI
             groundClipping_dropDown.canFocus = false;
             currentY += groundClipping_dropDown.parent.height + Margin;
 
-            if (ToolsModifierControl.isGame)
+            if (Loading.IsGame)
             {
                 var stickToFrontVehicle_CheckBox = UICheckBoxes.AddPlainCheckBox(Panel, Margin, currentY, Translations.Translate("SETTINGS_STICKTOFRONTVEHICLE"), Panel.width - Margin);
                 stickToFrontVehicle_CheckBox.isChecked = ModSettings.StickToFrontVehicle;
