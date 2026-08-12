@@ -1,6 +1,7 @@
 ﻿extern alias ACME;
 using AlgernonCommons.Translation;
 using FPSCamera.Cam.Controller;
+using FPSCamera.Settings;
 using FPSCamera.UI;
 using FPSCamera.Utils;
 using HarmonyLib;
@@ -75,10 +76,18 @@ namespace FPSCamera.Patches
                 size = savedPosition.Size,
                 height = savedPosition.Height,
             }.ToPositioning();
-            GameCamController.Instance.transitionEndPositioning = positioning;
-            GameCamController.Instance.savedFoV = savedPosition.FOV;
-            FPSCamController.Instance.OverrideSetBackCamera = FPSCamController.OverrideSetBack.ACME;
-            FPSCamController.Instance.FPSCam = null;
+
+            if (ModSettings.ACMEBehavior == ModSettings.ACMEBehaviors.FreeCam)
+            {
+                FPSCamController.Instance.StartFreeCam(positioning, savedPosition.FOV.Clamp(FPSCamController.MinFoV, FPSCamController.MaxFoV));
+            }
+            else
+            {
+                GameCamController.Instance.transitionEndPositioning = positioning;
+                GameCamController.Instance.savedFoV = savedPosition.FOV;
+                FPSCamController.Instance.OverrideSetBackCamera = FPSCamController.OverrideSetBack.ACME;
+                FPSCamController.Instance.FPSCam = null;
+            }
         }
     }
 }

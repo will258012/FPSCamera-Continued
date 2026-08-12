@@ -26,6 +26,13 @@ namespace FPSCamera.Settings.Tabs
         private readonly UICheckBox setBackCamera_CheckBox;
         private readonly UIDropDown speedUnit_DropDown;
         private readonly UICheckBox showInfoPanel_CheckBox;
+        private readonly UICheckBox showStatus_CheckBox;
+        private readonly UICheckBox showElapsedTime_CheckBox;
+        private readonly UICheckBox showElapsedSimTime_CheckBox;
+        private readonly UICheckBox showInGameClock_CheckBox;
+        private readonly UICheckBox showRealLifeClock_CheckBox;
+        private readonly UICheckBox showSpiritLevel_CheckBox;
+        private readonly UICheckBox showPassengerExchangeInfo_CheckBox;
         private readonly UISlider heightScale_Slider;
         private readonly UIButton defaults_Button;
         private readonly UIDropDown LodOpt_DropDown;
@@ -83,6 +90,15 @@ namespace FPSCamera.Settings.Tabs
             setBackCamera_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.SetBackCamera = isChecked;
             currentY += setBackCamera_CheckBox.height + LeftMargin;
 
+            fade_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_FADE"));
+            fade_CheckBox.isChecked = ModSettings.Fade;
+            fade_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.Fade = isChecked;
+            currentY += fade_CheckBox.height + LeftMargin;
+
+            #region Info Panel Options
+            UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_INFOPANEL"));
+            currentY += TitleMargin;
+
             showInfoPanel_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWINFOPANEL"));
             showInfoPanel_CheckBox.isChecked = ModSettings.ShowInfoPanel;
             showInfoPanel_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowInfoPanel = isChecked;
@@ -102,11 +118,45 @@ namespace FPSCamera.Settings.Tabs
             speedUnit_DropDown.parent.relativePosition = new Vector2(LeftMargin, currentY);
             currentY += speedUnit_DropDown.parent.height + LeftMargin;
 
-            fade_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_FADE"));
-            fade_CheckBox.isChecked = ModSettings.Fade;
-            fade_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.Fade = isChecked;
-            currentY += fade_CheckBox.height + LeftMargin;
+            showStatus_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWSTATUS"));
+            showStatus_CheckBox.isChecked = ModSettings.ShowStatus;
+            showStatus_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowStatus = isChecked;
+            currentY += showStatus_CheckBox.height + LeftMargin;
 
+            showElapsedTime_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWELAPSEDTIME"));
+            showElapsedTime_CheckBox.isChecked = ModSettings.ShowElapsedTime;
+            showElapsedTime_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowElapsedTime = isChecked;
+            currentY += showElapsedTime_CheckBox.height + LeftMargin;
+            if (!Loading.IsScenario)
+            {
+                showElapsedSimTime_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWELAPSEDSIMTIME"));
+                showElapsedSimTime_CheckBox.isChecked = ModSettings.ShowElapsedSimTime;
+                showElapsedSimTime_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowElapsedSimTime = isChecked;
+                currentY += showElapsedSimTime_CheckBox.height + LeftMargin;
+
+                showInGameClock_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWINGAMECLOCK"));
+                showInGameClock_CheckBox.isChecked = ModSettings.ShowInGameClock;
+                showInGameClock_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowInGameClock = isChecked;
+                currentY += showInGameClock_CheckBox.height + LeftMargin;
+            }
+            showRealLifeClock_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWREALLIFECLOCK"));
+            showRealLifeClock_CheckBox.isChecked = ModSettings.ShowRealLifeClock;
+            showRealLifeClock_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowRealLifeClock = isChecked;
+            currentY += showRealLifeClock_CheckBox.height + LeftMargin;
+
+            showSpiritLevel_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWSLOPE"));
+            showSpiritLevel_CheckBox.isChecked = ModSettings.ShowSlope;
+            showSpiritLevel_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowSlope = isChecked;
+            currentY += showSpiritLevel_CheckBox.height + LeftMargin;
+            if (Loading.IsGame)
+            {
+                showPassengerExchangeInfo_CheckBox = UICheckBoxes.AddPlainCheckBox(scrollPanel, LeftMargin, currentY, Translations.Translate("SETTINGS_SHOWPASSEREXCHANGEINFO"));
+                showPassengerExchangeInfo_CheckBox.tooltip = Translations.Translate("SETTINGS_SHOWPASSEREXCHANGEINFO_DETAIL");
+                showPassengerExchangeInfo_CheckBox.isChecked = ModSettings.ShowPassengerExchangeInfo;
+                showPassengerExchangeInfo_CheckBox.eventCheckChanged += (_, isChecked) => ModSettings.ShowPassengerExchangeInfo = isChecked;
+                currentY += showPassengerExchangeInfo_CheckBox.height + LeftMargin;
+            }
+            #endregion
 
             #region Smooth Transition Options
             UISpacers.AddTitleSpacer(scrollPanel, Margin, currentY, headerWidth, Translations.Translate("SETTINGS_GROUPNAME_SMOOTHTRANS"));

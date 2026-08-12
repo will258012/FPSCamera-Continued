@@ -13,7 +13,20 @@ namespace FPSCamera.Utils
         public static bool FoundTLM { get; private set; }
         public static bool FoundTrainDisplay { get; private set; }
         public static bool FoundACME { get; private set; }
-        public static ushort FollowVehicleID { get; internal set; }
+        public static ushort FollowVehicleID
+        {
+            get => field;
+            internal set
+            {
+                if (field == value)
+                    return;
+
+                var previousVehicleID = field;
+                field = value;
+                if (!TransportUtils.PassengerExchangeTracker.IsSameVehicleConsist(previousVehicleID, value))
+                    TransportUtils.PassengerExchangeTracker.Reset();
+            }
+        }
         internal static bool FoundK45TLM = false;
         internal static List<string> CheckModConflicts()
         {
@@ -116,16 +129,22 @@ namespace FPSCamera.Utils
         internal static string TLM_GetLineCode(ushort lineId) => TLMFacade.GetLineStringId(lineId, false);
         internal static void ToggleIt_ToggleUI(bool visible)
         {
-            if (!visible)
+            try
             {
-                ToggleHelper.UpdateRoadNames(false);
-                ToggleHelper.UpdateBuildings(true);
-                ToggleHelper.UpdateContourLines(false);
-                ToggleHelper.UpdateZoning(false);
-                ToggleHelper.UpdateDistrictZones(false);
+                if (!visible)
+                {
+                    ToggleHelper.UpdateRoadNames(false);
+                    ToggleHelper.UpdateBuildings(true);
+                    ToggleHelper.UpdateContourLines(false);
+                    ToggleHelper.UpdateZoning(false);
+                    ToggleHelper.UpdateDistrictZones(false);
+                }
+                else ToggleIt.Managers.ToggleManager.Instance.ApplyAll();
             }
-            else ToggleIt.Managers.ToggleManager.Instance.ApplyAll();
+            catch (Exception e)
+            {
+                Logging.LogException(e, "Failed to toggle UI via Toggle It!");
+            }
         }
     }
 }
-

@@ -1,9 +1,11 @@
 ﻿using AlgernonCommons;
 using AlgernonCommons.Keybinding;
 using AlgernonCommons.Notifications;
+using AlgernonCommons.Patching;
 using AlgernonCommons.Translation;
 using AlgernonCommons.XML;
 using ColossalFramework.IO;
+using FPSCamera.Patches;
 using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
@@ -43,10 +45,17 @@ namespace FPSCamera.Settings
 
             HideGameUI = true;
             SetBackCamera = true;
+            Fade = true;
             ShowInfoPanel = true;
             InfoPanelHeightScale = 1f;
             SpeedUnit = SpeedUnits.km_slash_h;
-            Fade = true;
+            ShowStatus = true;
+            ShowElapsedTime = true;
+            ShowElapsedSimTime = false;
+            ShowInGameClock = false;
+            ShowRealLifeClock = false;
+            ShowSlope = false;
+            ShowPassengerExchangeInfo = true;
 
             LodOpt = 0;
             ShadowsOpt = false;
@@ -61,6 +70,7 @@ namespace FPSCamera.Settings
             CamFieldOfView = 45f;
             CamNearClipPlane = 1f;
             FoViewScrollfactor = 1.2f;
+            ACMEBehavior = ACMEBehaviors.FreeCam;
 
             ShowCursorFree = false;
             MovementSpeed = 30f;
@@ -138,6 +148,12 @@ namespace FPSCamera.Settings
             [XmlEnum("4")]
             SnapToRoad
         };
+
+        public enum ACMEBehaviors
+        {
+            FreeCam,
+            DisableCam
+        };
         #region General Options
         [XmlElement("HideGameUI")]
         public bool XMLHideGameUI { get => HideGameUI; set => HideGameUI = value; }
@@ -148,6 +164,11 @@ namespace FPSCamera.Settings
         public bool XMLSetBackCamera { get => SetBackCamera; set => SetBackCamera = value; }
         [XmlIgnore]
         internal static bool SetBackCamera = true;
+
+        [XmlElement("Fade")]
+        public bool XMLFade { get => Fade; set => Fade = value; }
+        [XmlIgnore]
+        internal static bool Fade = true;
 
         [XmlElement("ShowInfoPanel")]
         public bool XMLShowInfoPanel { get => ShowInfoPanel; set => ShowInfoPanel = value; }
@@ -164,16 +185,70 @@ namespace FPSCamera.Settings
         [XmlIgnore]
         internal static SpeedUnits SpeedUnit = SpeedUnits.km_slash_h;
 
-        [XmlElement("Fade")]
-        public bool XMLFade { get => Fade; set => Fade = value; }
+        [XmlElement(nameof(ShowStatus))]
+        public bool XMLShowStatus { get => ShowStatus; set => ShowStatus = value; }
         [XmlIgnore]
-        internal static bool Fade = true;
+        internal static bool ShowStatus = true;
+
+        [XmlElement(nameof(ShowElapsedTime))]
+        public bool XMLShowElapsedTime { get => ShowElapsedTime; set => ShowElapsedTime = value; }
+        [XmlIgnore]
+        internal static bool ShowElapsedTime = true;
+
+        [XmlElement(nameof(ShowElapsedSimTime))]
+        public bool XMLShowElapsedSimTime { get => ShowElapsedSimTime; set => ShowElapsedSimTime = value; }
+        [XmlIgnore]
+        internal static bool ShowElapsedSimTime = false;
+
+        [XmlElement(nameof(ShowInGameClock))]
+        public bool XMLShowInGameClock { get => ShowInGameClock; set => ShowInGameClock = value; }
+        [XmlIgnore]
+        internal static bool ShowInGameClock = false;
+
+        [XmlElement(nameof(ShowRealLifeClock))]
+        public bool XMLShowRealLifeClock { get => ShowRealLifeClock; set => ShowRealLifeClock = value; }
+        [XmlIgnore]
+        internal static bool ShowRealLifeClock = false;
+
+        [XmlElement(nameof(ShowSlope))]
+        public bool XMLShowSlope { get => ShowSlope; set => ShowSlope = value; }
+        [XmlIgnore]
+        internal static bool ShowSlope = false;
+
+        [XmlElement(nameof(ShowPassengerExchangeInfo))]
+        public bool XMLShowPassengerExchangeInfo { get => ShowPassengerExchangeInfo; set => ShowPassengerExchangeInfo = value; }
+        [XmlIgnore]
+        internal static bool ShowPassengerExchangeInfo
+        {
+            get => field;
+            set
+            {
+                if (field == value)
+                    return;
+
+                field = value;
+                if (PatcherManager<Patcher>.IsReady)
+                    PatcherManager<Patcher>.Instance?.UpdatePassengerExchangePatches(value);
+            }
+        } = true;
 
         #region Optimization Options
         [XmlElement("LodOpt")]
         public int XMLLodOpt { get => LodOpt; set => LodOpt = value; }
         [XmlIgnore]
-        internal static int LodOpt = 0;
+        internal static int LodOpt
+        {
+            get => field;
+            set
+            {
+                if (field == value)
+                    return;
+
+                field = value;
+                if (PatcherManager<Patcher>.IsReady)
+                    PatcherManager<Patcher>.Instance?.UpdateLodPatches(value != 0);
+            }
+        }
 
         [XmlElement("ShadowsOpt")]
         public bool XMLShadowsOpt { get => ShadowsOpt; set => ShadowsOpt = value; }
@@ -233,6 +308,11 @@ namespace FPSCamera.Settings
         public float XMLFoViewScrollfactor { get => FoViewScrollfactor; set => FoViewScrollfactor = value; }
         [XmlIgnore]
         internal static float FoViewScrollfactor = 1.2f;
+
+        [XmlElement("ACMEBehavior")]
+        public ACMEBehaviors XMLACMEBehavior { get => ACMEBehavior; set => ACMEBehavior = value; }
+        [XmlIgnore]
+        internal static ACMEBehaviors ACMEBehavior = ACMEBehaviors.FreeCam;
 
         #endregion
         #region Free-Camera Mode Options

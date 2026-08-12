@@ -1,11 +1,9 @@
 ﻿using AlgernonCommons.Translation;
 using AlgernonCommons.UI;
-using ColossalFramework;
 using ColossalFramework.UI;
 using FPSCamera.Cam.Controller;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
-using System;
 using UnifiedUI.GUI;
 using UnityEngine;
 
@@ -55,11 +53,14 @@ namespace FPSCamera.UI
             Panel.atlas = UITextures.InGameAtlas;
             Panel.backgroundSprite = "UnlockingPanel2";
             Panel.width = 400f;
+            Panel.opacity = 0f;
 
             AddSettings();
 
             Panel.isVisible = false;
             Panel.eventVisibilityChanged += OnChangedVisibility;
+            fadeHelper.OnFadeCompleted += OnFadeCompleted;
+
 
             if (ModSupport.FoundUUI)
             {
@@ -85,6 +86,7 @@ namespace FPSCamera.UI
             _mainBtn.absolutePosition = new Vector3(x, y);
             _mainBtn.size = new Vector2(MainButtonSize, MainButtonSize);
             _mainBtn.scaleFactor = .8f;
+            _mainBtn.atlas = UITextures.InGameAtlas;
             _mainBtn.pressedBgSprite = "OptionBasePressed";
             _mainBtn.normalBgSprite = "OptionBase";
             _mainBtn.hoveredBgSprite = "OptionBaseHovered";
@@ -97,9 +99,9 @@ namespace FPSCamera.UI
             _mainBtn.pressedTextColor = new Color32(30, 30, 44, 255);
             _mainBtn.eventClick += (_, m) =>
             {
-                if (!Panel.isVisible) LoadPanelPosition();
+                if (!targetVisible) LoadPanelPosition();
 
-                Panel.isVisible = !Panel.isVisible;
+                OnChangedVisibility(Panel, !targetVisible);
             };
 
             //drag
@@ -109,7 +111,7 @@ namespace FPSCamera.UI
             mainBtn_drag.relativePosition = Vector3.zero;
             mainBtn_drag.target = _mainBtn;
             mainBtn_drag.transform.parent = _mainBtn.transform;
-            mainBtn_drag.eventMouseDown += (_, p) => Panel.isVisible = false;
+            mainBtn_drag.eventMouseDown += (_, p) => OnChangedVisibility(Panel, false);
             mainBtn_drag.eventMouseUp += (_, p) => { SavedButtonPosition = _mainBtn.absolutePosition; ModSettings.Save(); };
             #endregion
         }
@@ -142,11 +144,12 @@ namespace FPSCamera.UI
             var movementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_MOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.MovementSpeed, Panel.width - 70f);
             movementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.MovementSpeed = value;
             currentY += movementSpeed_Slider.height + SliderMargin;
-
-            var offsetMovementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_OFFSETMOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.OffsetMovementSpeed, Panel.width - 70f);
-            offsetMovementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.OffsetMovementSpeed = value;
-            currentY += offsetMovementSpeed_Slider.height + SliderMargin;
-
+            if (Loading.IsGame)
+            {
+                var offsetMovementSpeed_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_OFFSETMOVEMENTSPEED"), 1f, 60f, .5f, ModSettings.OffsetMovementSpeed, Panel.width - 70f);
+                offsetMovementSpeed_Slider.eventValueChanged += (_, value) => ModSettings.OffsetMovementSpeed = value;
+                currentY += offsetMovementSpeed_Slider.height + SliderMargin;
+            }
             var fov_Slider = UISliders.AddPlainSliderWithValue(Panel, Margin, currentY, Translations.Translate("SETTINGS_FIELDOFVIEW"), 10f, 75f, 1f, ModSettings.CamFieldOfView, new UISliders.SliderValueFormat(valueMultiplier: 1, roundToNearest: 1f, numberFormat: "N0", suffix: "°"), Panel.width - 70f);
             fov_Slider.eventValueChanged += (_, value) => ModSettings.CamFieldOfView = value;
             currentY += fov_Slider.height + SliderMargin;
@@ -167,7 +170,7 @@ namespace FPSCamera.UI
             groundClipping_dropDown.canFocus = false;
             currentY += groundClipping_dropDown.parent.height + Margin;
 
-            if (ToolsModifierControl.isGame)
+            if (Loading.IsGame)
             {
                 var stickToFrontVehicle_CheckBox = UICheckBoxes.AddPlainCheckBox(Panel, Margin, currentY, Translations.Translate("SETTINGS_STICKTOFRONTVEHICLE"), Panel.width - Margin);
                 stickToFrontVehicle_CheckBox.isChecked = ModSettings.StickToFrontVehicle;
@@ -232,29 +235,23 @@ namespace FPSCamera.UI
                 closeButton.eventClick += (c, p) => OnEsc();
             }
         }
-        private void OnDestory()
+        private void OnDestroy()
         {
+            fadeHelper.Reset();
             Panel.eventVisibilityChanged -= OnChangedVisibility;
+            fadeHelper.OnFadeCompleted -= OnFadeCompleted;
 
             Destroy(Panel);
             Destroy(GetMainButton());
         }
-        private void Close()
-        {
-            OnEsc();
-            foreach (var component in Panel.components)
-            {
-                Destroy(component.gameObject);
-            }
-        }
         public bool OnEsc()
         {
-            if (Panel.isVisible)
+            if (targetVisible)
             {
-                Panel.isVisible = false;
+                OnChangedVisibility(Panel, false);
                 if (ModSupport.FoundUUI)
                 {
-                    (GetMainButton() as ButtonBase).IsActive = false;
+                    (GetMainButton() as ButtonBase)?.IsActive = false;
                 }
                 return true;
             }
@@ -262,11 +259,16 @@ namespace FPSCamera.UI
         }
         public void LocaleChanged()
         {
-            wasVisible = Panel.isVisible;
-            Close();
+            var wasVisible = targetVisible;
+            fadeHelper.Reset();
+            foreach (var component in Panel.components)
+            {
+                Destroy(component.gameObject);
+            }
             AddSettings();
-            if (wasVisible)
-                Panel.Show();
+            targetVisible = wasVisible;
+            Panel.opacity = wasVisible ? 1f : 0f;
+            SetPanelVisibilityImmediate(wasVisible);
         }
         public static void OpenSettingsPanel(string modName)
         {
@@ -289,53 +291,68 @@ namespace FPSCamera.UI
         }
 
         private static void OpenSettingsPanel() => OpenSettingsPanel(Mod.Instance.Name);
-        private void OnChangedVisibility(UIComponent component, bool value)
+        internal void OnChangedVisibility(UIComponent _, bool visible)
         {
-            if (isAnimating) return;
-            if (!value)
+            if (changingPanelVisibility)
+                return;
+
+            var wasTargetVisible = targetVisible;
+            targetVisible = visible;
+
+            if (!visible && wasTargetVisible)
             {
                 SavedPanelPosition = Panel.absolutePosition;
                 ModSettings.Save();
-
-                if (ModSettings.Fade)
-                {
-                    isAnimating = true;
-                    RunFadeInOrOutAnimation(value, () =>
-                    {
-                        Panel.isVisible = false;
-                        isAnimating = false;
-                    });
-                }
-                else
-                {
-                    Panel.opacity = 0f;
-                }
             }
+
+            if (!visible && !Panel.isVisible && fadeHelper.Opacity <= 0f && !fadeHelper.IsFading)
+                return;
+
+            // Keep the panel active while fading so opacity changes remain visible.
+            SetPanelVisibilityImmediate(true);
+
+            if (visible)
+                fadeHelper.FadeIn();
             else
-            {
-                Panel.opacity = 1f;
-                if (ModSettings.Fade)
-                {
-                    isAnimating = true;
-                    RunFadeInOrOutAnimation(value, () => isAnimating = false);
-                }
-            }
+                fadeHelper.FadeOut();
         }
-        //Edited from BrokenNodeDetector.UI.RunFadeInOrOutAnimation() by krzychu1245. Many Thanks!
-        private void RunFadeInOrOutAnimation(bool status, Action action = null)
+        private void OnFadeCompleted(FadeHelper.FadeType fadeType)
         {
-            if (!Panel.isVisible)
-            {
-                Panel.isVisible = true;
-            }
-
-            ValueAnimator.Animate("fade_in_out",
-                f => Panel.opacity = f,
-                new AnimatedFloat(status ? 0f : 1f, status ? 1f : 0.0f, 0.2f, EasingType.SineEaseOut),
-                () => action?.Invoke());
+            if (fadeType == FadeHelper.FadeType.Out && !targetVisible)
+                SetPanelVisibilityImmediate(false);
         }
+
+        private void SetPanelVisibilityImmediate(bool visible)
+        {
+            if (Panel.isVisible == visible)
+                return;
+
+            changingPanelVisibility = true;
+            try
+            {
+                Panel.isVisible = visible;
+            }
+            finally
+            {
+                changingPanelVisibility = false;
+            }
+        }
+
         private UIButton _mainBtn = null;
-        private bool isAnimating = false;
-        private bool wasVisible = false;
+
+        private FadeHelper fadeHelper = new MainPanelFadeHelper();
+        private bool targetVisible;
+        private bool changingPanelVisibility;
+
+        private sealed class MainPanelFadeHelper() : FadeHelper
+        {
+
+            public override string FadeID => Mod.Instance.HarmonyID + ".MainPanel.Fade";
+            public override float Opacity
+            {
+                get => Instance.Panel.opacity;
+                set => Instance.Panel.opacity = value;
+            }
+        }
     }
 }

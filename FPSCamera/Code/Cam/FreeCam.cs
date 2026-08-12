@@ -1,6 +1,4 @@
 ﻿using AlgernonCommons.Translation;
-using FPSCamera.Cam.Controller;
-using FPSCamera.Utils;
 using UnityEngine;
 using static FPSCamera.Utils.MathUtils;
 
@@ -11,17 +9,15 @@ namespace FPSCamera.Cam
     /// </summary>
     public class FreeCam : IFPSCam
     {
-        public Positioning GetPositioning() =>
-            new(GameCamController.Instance.MainCamera.transform.position,
-            GameCamController.Instance.MainCamera.transform.rotation);
-        internal void UpdateSpeed(Vector3 a, Vector3 b) => speed = a.DistanceTo(b) / Time.deltaTime;
+        public Positioning GetPositioning() => Positioning.MainCameraPositioning;
+        internal void UpdateSpeed(Vector3 previousPosition, Vector3 nextPosition)
+            => Velocity = Time.deltaTime > 0f ? (nextPosition - previousPosition) / Time.deltaTime : Vector3.zero;
         public bool AutoMove { get; set; }
         public string Name => Translations.Translate("SETTINGS_KEYCAMTOGGLE");
         public void ToggleAutoMove() => AutoMove = !AutoMove;
-        public float GetSpeed() => speed;
+        public float GetSpeed() => Velocity.magnitude;
+        public Vector3 Velocity { get; private set; }
         public bool IsValid() => true;
-        public void DisableCam() { AutoMove = false; speed = 0f; }
-
-        private float speed = 0f;
+        public void DisableCam() { AutoMove = false; Velocity = Vector3.zero; }
     }
 }

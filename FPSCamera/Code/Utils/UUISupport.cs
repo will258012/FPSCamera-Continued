@@ -44,7 +44,7 @@ namespace FPSCamera.Utils
                             MainPanel.Instance.LoadPanelPosition();
 
                         // Set main panel visibility
-                        MainPanel.Instance.Panel.isVisible = value;
+                        MainPanel.Instance.OnChangedVisibility(MainPanel.Instance.Panel, value);
                     },
                     onToolChanged: null,
                     activationKey: UUIKey,

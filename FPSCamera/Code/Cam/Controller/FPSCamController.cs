@@ -86,9 +86,8 @@ namespace FPSCamera.Cam.Controller
         private void Awake()
         {
             Instance = this;
-            isGame = ToolsModifierControl.isGame;
-        }
 
+        }
         /// <summary>
         /// Enables the camera and associated UI elements or settings.
         /// </summary>
@@ -188,7 +187,22 @@ namespace FPSCamera.Cam.Controller
         {
             Logging.KeyMessage("Starting Free-Camera mode");
             FPSCam = new FreeCam();
+            if (FPSCam is not FreeCam) return;
             offset = new Positioning(Vector3.zero, GameCamController.Instance.MainCamera.transform.rotation);
+        }
+        /// <summary>
+        /// Starts Free-camera mode.
+        /// </summary>
+        public void StartFreeCam(Positioning positioning, float fov = -1f)
+        {
+            Logging.KeyMessage("Starting Free-Camera mode and setting position to ", positioning.pos);
+            FPSCam = new FreeCam();
+            if (FPSCam is not FreeCam) return;
+
+            GameCamController.Instance.MainCamera.transform.position = positioning.pos;
+            offset = new Positioning(Vector3.zero, positioning.rotation);
+            if (fov == -1f) fov = ModSettings.CamFieldOfView;
+            targetFoV = fov;
         }
 
         /// <summary>
@@ -314,14 +328,14 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void HandleInput()
         {
-            if (!SimulationManager.instance.ForcedSimulationPaused) // If the game isn't in the pause menu
+            if (!SimulationManager.instance.ForcedSimulationPaused || Loading.IsScenario) // If the game isn't in the pause menu
             {
                 if (ModSettings.KeyCamToggle.KeyTriggered())
                 {
                     if (FPSCam is not FreeCam) StartFreeCam();
                     else FPSCam = null;
                 }
-                if (isGame)
+                if (Loading.IsGame)
                 {
                     if (ModSettings.KeyWalkThruToggle.KeyTriggered())
                     {
@@ -349,10 +363,7 @@ namespace FPSCamera.Cam.Controller
                 ModSettings.KeyCamReset.KeyTriggered())
             {
                 (FPSCam as IFollowCam)?.SyncCamOffset();
-                if (ModSettings.SmoothTransition)
-                    targetFoV = ModSettings.CamFieldOfView;
-                else
-                    GameCamController.Instance.MainCamera.fieldOfView = ModSettings.CamFieldOfView;
+                targetFoV = ModSettings.CamFieldOfView;
             }
 
             if (InputManager.MouseButton.Secondary.MouseTriggered() && ModSettings.ManualSwitchWalk)
@@ -413,32 +424,27 @@ namespace FPSCamera.Cam.Controller
 
             // scroll zooming
             var scroll = InputManager.MouseScroll;
+            var currentFoV = GameCamController.Instance.MainCamera.fieldOfView;
+            if (scroll > 0f && currentFoV > MinFoV)
+            {
+                targetFoV = currentFoV / ModSettings.FoViewScrollfactor;
+            }
+            else if (scroll < 0f && currentFoV < MaxFoV)
+            {
+                targetFoV = currentFoV * ModSettings.FoViewScrollfactor;
+            }
+
             if (ModSettings.SmoothTransition)
             {
-                var currentFoV = GameCamController.Instance.MainCamera.fieldOfView;
-                if (scroll > 0f && currentFoV > MinFoV)
-                {
-                    targetFoV = currentFoV / ModSettings.FoViewScrollfactor;
-                    isFOVTransitioning = true;
-                }
-                else if (scroll < 0f && currentFoV < MaxFoV)
-                {
-                    targetFoV = currentFoV * ModSettings.FoViewScrollfactor;
-                    isFOVTransitioning = true;
-                }
-                else if (!isFOVTransitioning && currentFoV != targetFoV)
+                if (!isFOVTransitioning && !currentFoV.AlmostEquals(targetFoV))
                     isFOVTransitioning = true;
 
                 UpdateFOVTransition();
             }
             else
             {
-                var FoV = GameCamController.Instance.MainCamera.fieldOfView;
-
-                if (scroll > 0f && FoV > MinFoV)
-                    GameCamController.Instance.MainCamera.fieldOfView = FoV / ModSettings.FoViewScrollfactor;
-                else if (scroll < 0f && FoV < MaxFoV)
-                    GameCamController.Instance.MainCamera.fieldOfView = FoV * ModSettings.FoViewScrollfactor;
+                if (!currentFoV.AlmostEquals(targetFoV))
+                    GameCamController.Instance.MainCamera.fieldOfView = targetFoV;
             }
         }
 
@@ -448,7 +454,7 @@ namespace FPSCamera.Cam.Controller
         /// <param name="followCam">Given camera.</param>
         internal void SaveCamOffset(IFollowCam followCam)
         {
-            var name = followCam?.GetPrefabName();
+            var name = followCam?.PrefabName;
             if (name != null)
             {
                 OffsetsSettings.Offsets[name] = offset;
@@ -463,7 +469,7 @@ namespace FPSCamera.Cam.Controller
         /// <param name="followCam">Given camera.</param>
         internal void SyncCamOffset(IFollowCam followCam)
         {
-            var name = followCam?.GetPrefabName();
+            var name = followCam?.PrefabName;
             offset = default;
             offsetFromSetting = default;
 
@@ -477,7 +483,7 @@ namespace FPSCamera.Cam.Controller
                 offsetFromSetting += ModSettings.PedestrianFixedOffset;
             else if (followCam is VehicleCam cam)
             {
-                if (cam.GetVehicle().m_leadingVehicle != default && cam.GetPrefabName() != VehicleCam.GetVehicle(cam.GetFrontVehicleID()).Info.name)
+                if (cam.GetVehicle().m_leadingVehicle != default && cam.PrefabName != VehicleCam.GetVehicle(cam.GetFrontVehicleID()).Info.name)
                     offsetFromSetting += ModSettings.MidVehFixedOffset;
                 else
                     offsetFromSetting += ModSettings.VehicleFixedOffset;
@@ -517,6 +523,8 @@ namespace FPSCamera.Cam.Controller
         /// </summary>
         private void UpdateFreeCamPos(FreeCam freeCam)
         {
+            var previousPosition = CameraTransform.position;
+
             // Automatically move the camera forward if AutoMove is enabled and the secondary mouse button is not pressed.
             if (freeCam.AutoMove && !InputManager.MouseButton.Secondary.MousePressed())
             {
@@ -545,16 +553,12 @@ namespace FPSCamera.Cam.Controller
             // Limit the camera's position to the allowed area.
             instancePos = CameraController.ClampCameraPosition(instancePos);
 
-            // When in free-camera mode, update the speed for info panel to display.
-            if (CamInfoPanel.Instance.UIEnabled)
-                freeCam.UpdateSpeed(CameraTransform.position, instancePos);
-
             // Apply the calculated position and rotation to the camera.
             if (ModSettings.SmoothTransition)
             {
                 CameraTransform.position =
                 CameraTransform.position.DistanceTo(instancePos) > ModSettings.MinTransDistance &&
-                 CameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
+                CameraTransform.position.DistanceTo(instancePos) <= ModSettings.MaxTransDistance
                 ? Vector3.Lerp(CameraTransform.position, instancePos, Time.deltaTime * ModSettings.TransSpeed)
                 : instancePos;
                 CameraTransform.rotation =
@@ -566,6 +570,11 @@ namespace FPSCamera.Cam.Controller
                 CameraTransform.rotation = instanceRotation;
 
             }
+
+            // When in free-camera mode, update the speed for info panel using the final applied position.
+            if (CamInfoPanel.Instance.UIEnabled)
+                freeCam.UpdateSpeed(previousPosition, CameraTransform.position);
+
             // Reset the position offset after applying.
             offset.pos = Vector3.zero;
         }
@@ -649,14 +658,14 @@ namespace FPSCamera.Cam.Controller
         private bool isFOVTransitioning = false;
         private Positioning offset = default;
         private Vector3 offsetFromSetting = default;
-        private bool isGame = false;
 
         private float transitionTimer = 0f;
         private const float MaxTransitioningTime = 5f;
 
-        private float targetFoV = ModSettings.CamFieldOfView;
-        private const float MinFoV = 10f;
-        private const float MaxFoV = 75f;
+        internal float targetFoV = ModSettings.CamFieldOfView;
+
+        public const float MinFoV = 10f;
+        public const float MaxFoV = 75f;
         private const float MouseFactor = .2f;
     }
 }

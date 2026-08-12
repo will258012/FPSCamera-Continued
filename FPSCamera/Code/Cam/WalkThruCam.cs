@@ -4,6 +4,7 @@ using ColossalFramework;
 using ColossalFramework.UI;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -18,13 +19,17 @@ namespace FPSCamera.Cam
         public InstanceID FollowInstance => CurrentCam?.FollowInstance ?? default;
         public string Name => Translations.Translate("SETTINGS_KEYWALKTHRUTOGGLE");
         public float GetSpeed() => CurrentCam?.GetSpeed() ?? default;
-        public string GetFollowName() => CurrentCam?.GetFollowName();
-        public string GetPrefabName() => CurrentCam?.GetPrefabName();
+        public string FollowName => CurrentCam?.FollowName;
+        public string PrefabName => CurrentCam?.PrefabName;
         public Dictionary<string, string> GetInfo() => CurrentCam?.GetInfo();
         public string GetStatus() => CurrentCam?.GetStatus();
         public Positioning GetPositioning() => CurrentCam?.GetPositioning() ?? default;
-        public void ElapseTime(float seconds) => elapsedTime += seconds;
+        public void ElapseTime(float seconds)
+        {
+            elapsedTime += seconds;
+        }
         public float GetElapsedTime() => elapsedTime;
+        public TimeSpan GetElapsedSimTime() => simulationElapsedTimer.Elapsed;
         public void SyncCamOffset() => CurrentCam?.SyncCamOffset();
         public void SaveCamOffset() => CurrentCam?.SaveCamOffset();
         public bool IsValid()
@@ -101,6 +106,7 @@ namespace FPSCamera.Cam
             while (!(CurrentCam?.IsValid() ?? false) && --attempt >= 0);
 
             elapsedTime = 0f;
+            simulationElapsedTimer.Reset();
             SyncCamOffset();
         }
         public void DisableCam()
@@ -110,6 +116,7 @@ namespace FPSCamera.Cam
         }
         private const VehicleInfo.VehicleCategory CityServiceCopters = VehicleInfo.VehicleCategory.AmbulanceCopter | VehicleInfo.VehicleCategory.FireCopter | VehicleInfo.VehicleCategory.PoliceCopter | VehicleInfo.VehicleCategory.DisasterCopter;
         private float elapsedTime;
+        private readonly SimulationElapsedTimer simulationElapsedTimer = new();
         private IEnumerable<InstanceID> items;
         private readonly AudioClip disabledClickSound = UIView.GetAView().defaultDisabledClickSound;
 

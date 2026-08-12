@@ -12,10 +12,13 @@ using UnityEngine;
 
 namespace FPSCamera
 {
-    public sealed class Loading : PatcherLoadingBase<OptionsPanel, PatcherBase>
+    public sealed class Loading : PatcherLoadingBase<OptionsPanel, Patches.Patcher>
     {
-        protected override List<AppMode> PermittedModes => [AppMode.Game, AppMode.MapEditor, AppMode.AssetEditor];
+        protected override List<AppMode> PermittedModes => [AppMode.Game, AppMode.MapEditor, AppMode.AssetEditor, AppMode.ThemeEditor, AppMode.ScenarioEditor];
         protected override List<string> CheckModConflicts() => ModSupport.CheckModConflicts();
+
+        internal static bool IsGame = true;
+        internal static bool IsScenario = false;
         public override void OnLevelUnloading()
         {
             if (gameObject != null)
@@ -23,11 +26,16 @@ namespace FPSCamera
                 Object.Destroy(gameObject);
                 gameObject = null;
             }
+            IsGame = true;
+            IsScenario = false;
             base.OnLevelUnloading();
         }
         protected override void LoadedActions(LoadMode mode)
         {
             base.LoadedActions(mode);
+            IsGame = ToolsModifierControl.isGame;
+            IsScenario = ToolsModifierControl.isScenarioEditor;
+
             if (gameObject != null)
             {
                 Object.Destroy(gameObject);
@@ -36,7 +44,7 @@ namespace FPSCamera
             gameObject.AddComponent<FPSCamController>();
             gameObject.AddComponent<CamInfoPanel>();
             gameObject.AddComponent<MainPanel>();
-            if (ToolsModifierControl.isGame)
+            if (IsGame)
                 gameObject.AddComponent<FollowButtons>();
             if (WhatsNew.LastNotifiedVersion < AssemblyUtils.CurrentVersion)
             {

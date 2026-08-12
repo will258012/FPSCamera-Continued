@@ -2,6 +2,7 @@
 using AlgernonCommons.UI;
 using ColossalFramework.UI;
 using FPSCamera.UI;
+using FPSCamera.Utils;
 using UnityEngine;
 
 namespace FPSCamera.Settings.Tabs
@@ -69,8 +70,11 @@ namespace FPSCamera.Settings.Tabs
             this.tabStrip = AutoTabstrip.AddTabstrip(panel, 0f, 0f, panel.width, panel.height, out _, tabHeight: 40f);
             CameraControls(0);
             FreeMode(1);
-            FollowMode(2);
-            WalkThruMode(3);
+            if (Loading.IsGame)
+            {
+                FollowMode(2);
+                WalkThruMode(3);
+            }
 
             // Select first tab.
             this.tabStrip.selectedIndex = -1;
@@ -143,6 +147,27 @@ namespace FPSCamera.Settings.Tabs
             foViewScrollfactor_Slider.tooltip = Translations.Translate("SETTINGS_FOVIEWSCROLLFACTOR_DETAIL");
             foViewScrollfactor_Slider.eventValueChanged += (_, value) => ModSettings.FoViewScrollfactor = value;
             currentY += foViewScrollfactor_Slider.height + SliderMargin;
+
+            if (ModSupport.FoundACME)
+            {
+                string[] acmeBehaviorItems =
+                [
+                    string.Format(Translations.Translate("SETTINGS_ACMEBEHAVIOR_FREECAM"), Translations.Translate("SETTINGS_KEYCAMTOGGLE")),
+                    string.Format(Translations.Translate("SETTINGS_ACMEBEHAVIOR_DISABLECAM"), Translations.Translate("MAINPANELBTN_TOOLTIP"))
+                ];
+
+                var acmeBehaviorDropDown = UIDropDowns.AddPlainDropDown(
+                    scrollPanel,
+                    LeftMargin,
+                    currentY,
+                    string.Format(Translations.Translate("SETTINGS_ACMEBEHAVIOR"), Translations.Translate("MAINPANELBTN_TOOLTIP")),
+                    acmeBehaviorItems,
+                    (int)ModSettings.ACMEBehavior,
+                    300f);
+                acmeBehaviorDropDown.tooltip = string.Format(Translations.Translate("SETTINGS_ACMEBEHAVIOR"), Translations.Translate("MAINPANELBTN_TOOLTIP"));
+                acmeBehaviorDropDown.eventSelectedIndexChanged += (_, index) => ModSettings.ACMEBehavior = (ModSettings.ACMEBehaviors)index;
+                currentY += acmeBehaviorDropDown.parent.height + Margin;
+            }
             #endregion
         }
         private void FreeMode(int tabIndex)
