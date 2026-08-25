@@ -1,8 +1,8 @@
 ﻿using AlgernonCommons;
+using ColossalFramework.UI;
 using FPSCamera.Game;
 using FPSCamera.Settings;
 using FPSCamera.Utils;
-using System.Linq;
 using UnityEngine;
 using UnityStandardAssets.ImageEffects;
 using static FPSCamera.Utils.MathUtils;
@@ -35,7 +35,6 @@ namespace FPSCamera.Cam.Controller
         public GameCamController()
         {
             CameraController = ToolsModifierControl.cameraController;
-            UICamera = Object.FindObjectsOfType<Camera>().FirstOrDefault(cam => cam.name == "UIView");
             camDoF = GetComponent<DepthOfField>();
             camTiltEffect = GetComponent<TiltShiftEffect>();
         }
@@ -50,9 +49,9 @@ namespace FPSCamera.Cam.Controller
         public Camera MainCamera => CameraController.m_camera;
 
         /// <summary>
-        /// Gets the game's UI camera instance.
+        /// Gets the current game's UI camera instance.
         /// </summary>
-        public Camera UICamera { get; }
+        public Camera UICamera => UIView.GetAView()?.uiCamera ?? null;
 
         /// <summary>
         /// Gets the current <see cref="global::CinematicCameraController"/>.
